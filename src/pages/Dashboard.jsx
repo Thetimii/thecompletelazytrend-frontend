@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   getTrendQueries,
   getTikTokVideos,
@@ -14,7 +14,6 @@ import RecommendationCard from '../components/RecommendationCard';
 import QuerySelector from '../components/QuerySelector';
 import WorkflowButton from '../components/WorkflowButton';
 import ApiButtons from '../components/ApiButtons';
-import { runCompleteWorkflow } from '../services/workflowService';
 import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -37,16 +36,13 @@ ChartJS.register(
 );
 
 const Dashboard = () => {
-  const { user, userProfile } = useAuth();
+  const { user } = useAuth();
   const [queries, setQueries] = useState([]);
   const [videos, setVideos] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
   const [selectedQueryId, setSelectedQueryId] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [workflowRunning, setWorkflowRunning] = useState(false);
-  const [workflowResult, setWorkflowResult] = useState(null);
-  const hasTriggeredWorkflow = useRef(false);
 
   // Define fetchData function first
   const fetchData = async () => {
@@ -107,50 +103,6 @@ const Dashboard = () => {
   useEffect(() => {
     fetchData();
   }, [selectedQueryId, user?.id]);
-
-  // Function to trigger the workflow automatically
-  const triggerAutomaticWorkflow = async () => {
-    if (!userProfile?.business_description || !user?.id || workflowRunning || hasTriggeredWorkflow.current) {
-      return;
-    }
-
-    try {
-      console.log('Automatically triggering workflow after onboarding completion');
-      setWorkflowRunning(true);
-
-      const response = await runCompleteWorkflow(
-        userProfile.business_description,
-        user.id,
-        1 // Just 1 video per query for initial run
-      );
-
-      setWorkflowResult(response);
-      console.log('Automatic workflow completed:', response);
-
-      // Refresh data to show new content
-      fetchData();
-    } catch (err) {
-      console.error('Error running automatic workflow:', err);
-    } finally {
-      setWorkflowRunning(false);
-      hasTriggeredWorkflow.current = true;
-    }
-  };
-
-  // Check if we should trigger the workflow automatically
-  useEffect(() => {
-    // Only run if we have a user profile and no existing data
-    if (
-      userProfile?.onboarding_completed &&
-      queries.length === 0 &&
-      videos.length === 0 &&
-      recommendations.length === 0 &&
-      !loading &&
-      !hasTriggeredWorkflow.current
-    ) {
-      triggerAutomaticWorkflow();
-    }
-  }, [userProfile, queries.length, videos.length, recommendations.length, loading]);
 
   // Prepare chart data for video metrics
   const topVideos = [...videos]
@@ -223,38 +175,6 @@ const Dashboard = () => {
   return (
     <div>
       <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
-
-      {/* Automatic workflow notification */}
-      {workflowRunning && (
-        <div className="mb-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
-          <div className="flex items-center">
-            <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-500 mr-3"></div>
-            <div>
-              <p className="font-medium">Generating TikTok content ideas for your business...</p>
-              <p className="text-sm text-gray-600">This may take a few minutes. Please wait while we analyze trends for your business.</p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Workflow result notification */}
-      {workflowResult && !workflowRunning && (
-        <div className="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div className="ml-3">
-              <p className="font-medium text-green-800">Content ideas generated successfully!</p>
-              <p className="text-sm text-green-700 mt-1">
-                We've analyzed TikTok trends for your business and created recommendations.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* API Buttons for individual API calls */}
       <ApiButtons />
