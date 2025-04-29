@@ -44,7 +44,6 @@ const Dashboard = () => {
   const [selectedQueryId, setSelectedQueryId] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [workflowTriggered, setWorkflowTriggered] = useState(false);
 
   // Define fetchData function first
   const fetchData = async () => {
@@ -106,26 +105,25 @@ const Dashboard = () => {
     fetchData();
   }, [selectedQueryId, user?.id]);
 
-  // Effect to trigger the workflow when a user first visits the dashboard after completing onboarding
+  // Effect to check for the triggerWorkflow flag and run the workflow if needed
   useEffect(() => {
-    const triggerInitialWorkflow = async () => {
-      // Only run if user is logged in, has a profile with business description, and workflow hasn't been triggered yet
-      if (
-        user?.id &&
-        userProfile?.business_description &&
-        userProfile?.onboarding_completed &&
-        !workflowTriggered &&
-        videos.length === 0 &&
-        recommendations.length === 0
-      ) {
+    const checkAndTriggerWorkflow = async () => {
+      // Check if we need to trigger the workflow
+      const shouldTriggerWorkflow = localStorage.getItem('triggerWorkflow') === 'true';
+
+      if (shouldTriggerWorkflow && user?.id && userProfile?.business_description && !loading) {
         console.log('Automatically triggering complete workflow after onboarding completion');
         try {
-          setWorkflowTriggered(true);
+          // Remove the flag so we don't trigger it again
+          localStorage.removeItem('triggerWorkflow');
+
+          // Call the runCompleteWorkflow function with the same parameters as the button
           const response = await runCompleteWorkflow(
             userProfile.business_description,
             user.id,
             1 // Just 1 video per query for initial run
           );
+
           console.log('Auto-triggered workflow complete:', response);
           // Refresh data after workflow completes
           fetchData();
@@ -136,10 +134,10 @@ const Dashboard = () => {
     };
 
     // Only run this effect after loading is complete and we have user data
-    if (!loading && user?.id) {
-      triggerInitialWorkflow();
+    if (!loading && user?.id && userProfile) {
+      checkAndTriggerWorkflow();
     }
-  }, [user, userProfile, loading, workflowTriggered, videos.length, recommendations.length, fetchData]);
+  }, [user, userProfile, loading, fetchData]);
 
   // Prepare chart data for video metrics
   const topVideos = [...videos]

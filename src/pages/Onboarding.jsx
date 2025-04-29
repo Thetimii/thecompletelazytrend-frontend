@@ -75,10 +75,8 @@ const Onboarding = () => {
 
       console.log("Onboarding completed successfully:", updatedProfile);
 
-      // Clear the localStorage flag to ensure the workflow is triggered on first dashboard visit
-      if (user?.id) {
-        localStorage.removeItem(`hasVisitedAfterOnboarding_${user.id}`);
-      }
+      // Set a flag in localStorage to trigger workflow on dashboard
+      localStorage.setItem('triggerWorkflow', 'true');
 
       // Force refresh of auth context
       if (window.location.pathname === '/onboarding') {
