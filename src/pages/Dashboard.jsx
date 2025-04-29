@@ -14,6 +14,7 @@ import RecommendationCard from '../components/RecommendationCard';
 import QuerySelector from '../components/QuerySelector';
 import WorkflowButton from '../components/WorkflowButton';
 import ApiButtons from '../components/ApiButtons';
+import { runCompleteWorkflow } from '../services/workflowService';
 import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -36,13 +37,14 @@ ChartJS.register(
 );
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
   const [queries, setQueries] = useState([]);
   const [videos, setVideos] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
   const [selectedQueryId, setSelectedQueryId] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [workflowTriggered, setWorkflowTriggered] = useState(false);
 
   // Define fetchData function first
   const fetchData = async () => {
@@ -103,6 +105,41 @@ const Dashboard = () => {
   useEffect(() => {
     fetchData();
   }, [selectedQueryId, user?.id]);
+
+  // Effect to trigger the workflow when a user first visits the dashboard after completing onboarding
+  useEffect(() => {
+    const triggerInitialWorkflow = async () => {
+      // Only run if user is logged in, has a profile with business description, and workflow hasn't been triggered yet
+      if (
+        user?.id &&
+        userProfile?.business_description &&
+        userProfile?.onboarding_completed &&
+        !workflowTriggered &&
+        videos.length === 0 &&
+        recommendations.length === 0
+      ) {
+        console.log('Automatically triggering complete workflow after onboarding completion');
+        try {
+          setWorkflowTriggered(true);
+          const response = await runCompleteWorkflow(
+            userProfile.business_description,
+            user.id,
+            1 // Just 1 video per query for initial run
+          );
+          console.log('Auto-triggered workflow complete:', response);
+          // Refresh data after workflow completes
+          fetchData();
+        } catch (err) {
+          console.error('Error auto-triggering workflow:', err);
+        }
+      }
+    };
+
+    // Only run this effect after loading is complete and we have user data
+    if (!loading && user?.id) {
+      triggerInitialWorkflow();
+    }
+  }, [user, userProfile, loading, workflowTriggered, videos.length, recommendations.length, fetchData]);
 
   // Prepare chart data for video metrics
   const topVideos = [...videos]
