@@ -37,7 +37,7 @@ ChartJS.register(
 );
 
 const Dashboard = () => {
-  const { user, userProfile } = useAuth();
+  const { user, userProfile, logout } = useAuth();
   const [queries, setQueries] = useState([]);
   const [videos, setVideos] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
@@ -207,9 +207,26 @@ const Dashboard = () => {
     fetchData();
   };
 
+  const handleLogout = async () => {
+    try {
+      await logout();
+      // No need to redirect as the ProtectedRoute component will handle it
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
+
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <button
+          onClick={handleLogout}
+          className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
+        >
+          Logout
+        </button>
+      </div>
 
       {/* API Buttons for individual API calls */}
       <ApiButtons />
