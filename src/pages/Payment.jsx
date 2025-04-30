@@ -20,8 +20,12 @@ const Payment = () => {
       setError(null);
 
       // Define API URL with fallback
-      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://thecompletelazytrend-backend.onrender.com';
       console.log('Using API URL:', apiUrl);
+
+      if (!apiUrl) {
+        throw new Error('API URL is not configured. Please check your environment variables.');
+      }
 
       // Create checkout session directly
       const response = await fetch(`${apiUrl}/api/create-checkout-session`, {

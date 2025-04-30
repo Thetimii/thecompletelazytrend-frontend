@@ -12,10 +12,10 @@ services:
       - key: VITE_API_URL
         value: https://thecompletelazytrend-backend.onrender.com
       - key: VITE_STRIPE_PUBLIC_KEY
-        sync: false
+        value: pk_live_51RERMjG4vQYDStWY80yELhyq6RKUiRwvcuLjiVpXF0Pt9zOp0EKFlGWKYic7DQrStSB717etXBjVH5a7K2qdV74W00jeZOiZcz
       - key: VITE_STRIPE_PRODUCT_ID
-        sync: false
+        value: prod_S8sIksYYQAe6tW
       - key: VITE_STRIPE_PRICE_ID
-        sync: false
+        value: price_1REaY3G4vQYDStWYZu4rRLu5
       - key: VITE_STRIPE_CONNECT_ACCOUNT_ID
-        sync: false
+        value: we_1RH6CRG4vQYDStWYJIIk27cL
