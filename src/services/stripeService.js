@@ -8,6 +8,16 @@ import { supabase } from './supabaseService';
  */
 export const createCheckoutSession = async (userId, email) => {
   try {
+    // For development mode, return a mock URL if API_URL is not set
+    if (import.meta.env.DEV && !import.meta.env.VITE_API_URL) {
+      console.log('Development mode detected, using mock checkout URL');
+      // Simulate a delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return 'https://example.com/mock-checkout';
+    }
+
+    console.log('Creating checkout session with API URL:', import.meta.env.VITE_API_URL || '');
+
     // Call the backend API to create a checkout session
     const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/create-checkout-session`, {
       method: 'POST',
@@ -17,18 +27,31 @@ export const createCheckoutSession = async (userId, email) => {
       body: JSON.stringify({
         userId,
         email,
-        priceId: import.meta.env.VITE_STRIPE_PRICE_ID,
+        priceId: import.meta.env.VITE_STRIPE_PRICE_ID || 'price_1REaY3G4vQYDStWYZu4rRLu5',
         successUrl: `${window.location.origin}/payment-success`,
         cancelUrl: `${window.location.origin}/payment-cancel`,
       }),
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to create checkout session');
+      let errorMessage = 'Failed to create checkout session';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorMessage;
+      } catch (jsonError) {
+        console.error('Error parsing error response:', jsonError);
+        errorMessage += ` (Status: ${response.status})`;
+      }
+      throw new Error(errorMessage);
     }
 
-    const data = await response.json();
+    let data;
+    try {
+      data = await response.json();
+    } catch (jsonError) {
+      console.error('Error parsing response:', jsonError);
+      throw new Error('Invalid response from server');
+    }
     return data.url;
   } catch (error) {
     console.error('Error creating checkout session:', error);
