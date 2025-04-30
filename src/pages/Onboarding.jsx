@@ -65,13 +65,27 @@ const Onboarding = () => {
       setLoading(true);
       setError(null);
 
-      // Save user profile data
-      const updatedProfile = await saveUserProfile({
+      // Debug user object
+      console.log("User object in onboarding:", user);
+
+      if (!user || !user.id) {
+        setError("User not authenticated. Please log in again.");
+        setLoading(false);
+        return;
+      }
+
+      // Prepare data to save
+      const dataToSave = {
         auth_id: user.id,
         email: user.email,
         ...formData,
         onboarding_completed: true
-      });
+      };
+
+      console.log("Saving user profile data:", dataToSave);
+
+      // Save user profile data
+      const updatedProfile = await saveUserProfile(dataToSave);
 
       console.log("Onboarding completed successfully:", updatedProfile);
 

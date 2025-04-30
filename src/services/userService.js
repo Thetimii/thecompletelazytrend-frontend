@@ -49,6 +49,9 @@ export const saveUserProfile = async (userData) => {
 
     if (existingUser) {
       // Update existing user
+      console.log("Updating existing user:", existingUser.id);
+      console.log("Data to update:", dataToSave);
+
       const { data, error } = await supabase
         .from('users')
         .update(dataToSave)
@@ -56,17 +59,30 @@ export const saveUserProfile = async (userData) => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error updating user:", error);
+        throw error;
+      }
+
+      console.log("Update result:", data);
       result = data;
     } else {
       // Insert new user
+      console.log("Inserting new user");
+      console.log("Data to insert:", dataToSave);
+
       const { data, error } = await supabase
         .from('users')
         .insert(dataToSave)
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error inserting user:", error);
+        throw error;
+      }
+
+      console.log("Insert result:", data);
       result = data;
     }
 
