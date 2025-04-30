@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { createCheckoutSession } from '../services/stripeService';
 
 const Payment = () => {
   const { user, userProfile } = useAuth();
@@ -9,36 +8,65 @@ const Payment = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    // If user has already completed payment, redirect to dashboard
-    if (userProfile?.payment_completed) {
-      navigate('/', { replace: true });
-    }
-  }, [userProfile, navigate]);
+  // If user has already completed payment, redirect to dashboard
+  if (userProfile?.payment_completed) {
+    navigate('/', { replace: true });
+    return null;
+  }
 
-  // Redirect to Stripe Checkout when the component mounts
-  useEffect(() => {
-    const redirectToCheckout = async () => {
-      if (user && !userProfile?.payment_completed) {
+  const handleCheckout = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Define API URL with fallback
+      const apiUrl = import.meta.env.VITE_API_URL || '';
+      console.log('Using API URL:', apiUrl);
+
+      // Create checkout session directly
+      const response = await fetch(`${apiUrl}/api/create-checkout-session`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user?.id,
+          email: user?.email,
+          priceId: import.meta.env.VITE_STRIPE_PRICE_ID || 'price_1REaY3G4vQYDStWYZu4rRLu5',
+          successUrl: `${window.location.origin}/payment-success`,
+          cancelUrl: `${window.location.origin}/payment-cancel`,
+        }),
+      });
+
+      console.log('Response status:', response.status);
+
+      if (!response.ok) {
+        let errorMessage = `Failed to create checkout session (Status: ${response.status})`;
         try {
-          setLoading(true);
-          setError(null);
-
-          // Get checkout URL from backend
-          const checkoutUrl = await createCheckoutSession(user.id, user.email);
-
-          // Redirect to Stripe Checkout
-          window.location.href = checkoutUrl;
-        } catch (err) {
-          console.error('Error redirecting to checkout:', err);
-          setError(err.message || 'Failed to initialize checkout');
-          setLoading(false);
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (e) {
+          console.error('Error parsing error response:', e);
         }
+        throw new Error(errorMessage);
       }
-    };
 
-    redirectToCheckout();
-  }, [user, userProfile]);
+      // Parse the response
+      const data = await response.json();
+      console.log('Checkout session created:', data);
+
+      if (!data.url) {
+        throw new Error('No checkout URL returned from server');
+      }
+
+      // Redirect to Stripe Checkout
+      window.location.href = data.url;
+    } catch (err) {
+      console.error('Error redirecting to checkout:', err);
+      setError(err.message || 'Failed to initialize checkout');
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 py-12">
@@ -66,21 +94,23 @@ const Payment = () => {
         {error && (
           <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
             <p>{error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="mt-2 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            >
-              Try Again
-            </button>
           </div>
         )}
 
-        {loading && !error && (
-          <div className="flex flex-col items-center justify-center py-4">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-            <p className="text-gray-700">Redirecting to secure payment page...</p>
-          </div>
-        )}
+        <button
+          onClick={handleCheckout}
+          disabled={loading}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
+        >
+          {loading ? (
+            <div className="flex items-center justify-center">
+              <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white mr-2"></div>
+              <span>Processing...</span>
+            </div>
+          ) : (
+            'Proceed to Payment'
+          )}
+        </button>
       </div>
     </div>
   );
