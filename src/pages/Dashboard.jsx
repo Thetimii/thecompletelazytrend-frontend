@@ -15,6 +15,7 @@ import QuerySelector from '../components/QuerySelector';
 import WorkflowButton from '../components/WorkflowButton';
 import ApiButtons from '../components/ApiButtons';
 import ScheduleSettings from '../components/ScheduleSettings';
+import SubscriptionManager from '../components/SubscriptionManager';
 import { runCompleteWorkflow } from '../services/workflowService';
 import { Bar } from 'react-chartjs-2';
 import {
@@ -234,6 +235,11 @@ const Dashboard = () => {
 
       {/* Legacy Workflow Button */}
       <WorkflowButton onComplete={handleWorkflowComplete} />
+
+      {/* Subscription Manager */}
+      {user && userProfile && (
+        <SubscriptionManager userProfile={userProfile} />
+      )}
 
       {/* Schedule Settings */}
       {user && userProfile && (

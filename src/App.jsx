@@ -9,6 +9,7 @@ import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentCancel from './pages/PaymentCancel';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
+import SubscriptionMiddleware from './middleware/SubscriptionMiddleware';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { supabase } from './services/supabaseService';
 
@@ -121,7 +122,9 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <OnboardingCheck>
-                  <Dashboard />
+                  <SubscriptionMiddleware>
+                    <Dashboard />
+                  </SubscriptionMiddleware>
                 </OnboardingCheck>
               </ProtectedRoute>
             }
