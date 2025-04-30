@@ -28,7 +28,7 @@ export const createCheckoutSession = async (userId, email) => {
         userId,
         email,
         priceId: import.meta.env.VITE_STRIPE_PRICE_ID || 'price_1REaY3G4vQYDStWYZu4rRLu5',
-        successUrl: `${window.location.origin}/payment-success`,
+        successUrl: `${window.location.origin}/payment-success?redirect=true`,
         cancelUrl: `${window.location.origin}/payment-cancel`,
       }),
     });
@@ -87,7 +87,7 @@ export const handlePaymentSuccess = async (sessionId, userId) => {
         payment_date: new Date().toISOString(),
         payment_id: sessionId,
         subscription_status: 'trialing', // Default to trialing for new subscriptions
-        trial_end: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
+        trial_end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
         onboarding_completed: true // Ensure onboarding is marked as complete
       })
       .eq('auth_id', userId)
