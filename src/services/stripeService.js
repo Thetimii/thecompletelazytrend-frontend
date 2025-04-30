@@ -67,6 +67,18 @@ export const createCheckoutSession = async (userId, email) => {
  */
 export const handlePaymentSuccess = async (sessionId, userId) => {
   try {
+    // First, check if the user already has payment information
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('*')
+      .eq('auth_id', userId)
+      .single();
+
+    // If the user already has payment information, just return the existing data
+    if (existingUser?.payment_completed) {
+      return existingUser;
+    }
+
     // Update user profile with payment information
     const { data, error } = await supabase
       .from('users')
@@ -74,6 +86,8 @@ export const handlePaymentSuccess = async (sessionId, userId) => {
         payment_completed: true,
         payment_date: new Date().toISOString(),
         payment_id: sessionId,
+        subscription_status: 'trialing', // Default to trialing for new subscriptions
+        trial_end: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
         onboarding_completed: true // Ensure onboarding is marked as complete
       })
       .eq('auth_id', userId)
