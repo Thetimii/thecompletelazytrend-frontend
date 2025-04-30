@@ -111,74 +111,11 @@ export const handlePaymentSuccess = async (sessionId, userId) => {
  */
 export const createCustomerPortalSession = async () => {
   try {
-    // Call the backend API to create a customer portal session
-    const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/create-portal-session`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        returnUrl: window.location.origin,
-      }),
-    });
-
-    if (!response.ok) {
-      let errorMessage = 'Failed to create customer portal session';
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData.message || errorMessage;
-      } catch (jsonError) {
-        console.error('Error parsing error response:', jsonError);
-        errorMessage += ` (Status: ${response.status})`;
-      }
-      throw new Error(errorMessage);
-    }
-
-    const data = await response.json();
-    return data.url;
+    // The actual implementation is now directly in the SubscriptionManager component
+    // This function is kept for API consistency
+    throw new Error('This function has been moved to the component level');
   } catch (error) {
     console.error('Error creating customer portal session:', error);
-    throw error;
-  }
-};
-
-/**
- * Cancel a subscription
- * @param {string} subscriptionId - Subscription ID
- * @returns {Promise<Object>} - Cancellation result
- */
-export const cancelSubscription = async (subscriptionId) => {
-  try {
-    if (!subscriptionId) {
-      throw new Error('Subscription ID is required');
-    }
-
-    // Call the backend API to cancel the subscription
-    const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/cancel-subscription`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        subscriptionId,
-      }),
-    });
-
-    if (!response.ok) {
-      let errorMessage = 'Failed to cancel subscription';
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData.message || errorMessage;
-      } catch (jsonError) {
-        console.error('Error parsing error response:', jsonError);
-        errorMessage += ` (Status: ${response.status})`;
-      }
-      throw new Error(errorMessage);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error canceling subscription:', error);
     throw error;
   }
 };
@@ -186,6 +123,5 @@ export const cancelSubscription = async (subscriptionId) => {
 export default {
   createCheckoutSession,
   handlePaymentSuccess,
-  createCustomerPortalSession,
-  cancelSubscription
+  createCustomerPortalSession
 };
