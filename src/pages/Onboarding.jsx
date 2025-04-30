@@ -11,7 +11,6 @@ const Onboarding = () => {
     full_name: '',
     business_name: '',
     business_description: '',
-    industry: '',
     website: '',
     phone: ''
   });
@@ -39,7 +38,6 @@ const Onboarding = () => {
               full_name: profile.full_name || '',
               business_name: profile.business_name || '',
               business_description: profile.business_description || '',
-              industry: profile.industry || '',
               website: profile.website || '',
               phone: profile.phone || ''
             });
@@ -182,30 +180,6 @@ const Onboarding = () => {
           placeholder="Acme Inc."
           required
         />
-      </div>
-
-      <div className="mb-4">
-        <label htmlFor="industry" className="block text-gray-700 text-sm font-bold mb-2">
-          Industry
-        </label>
-        <select
-          id="industry"
-          name="industry"
-          value={formData.industry}
-          onChange={handleChange}
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          required
-        >
-          <option value="">Select an industry</option>
-          <option value="retail">Retail</option>
-          <option value="food">Food & Beverage</option>
-          <option value="technology">Technology</option>
-          <option value="healthcare">Healthcare</option>
-          <option value="education">Education</option>
-          <option value="finance">Finance</option>
-          <option value="entertainment">Entertainment</option>
-          <option value="other">Other</option>
-        </select>
       </div>
 
       <div className="mb-4">
