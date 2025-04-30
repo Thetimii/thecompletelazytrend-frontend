@@ -73,11 +73,13 @@ const Onboarding = () => {
       }
 
       // Prepare data to save
+      // Note: We're setting onboarding_completed to false until payment is completed
       const dataToSave = {
         auth_id: user.id,
         email: user.email,
         ...formData,
-        onboarding_completed: true
+        onboarding_completed: true, // We'll still set this to true to proceed to payment
+        payment_completed: false // This will be set to true after payment
       };
 
       console.log("Saving user profile data:", dataToSave);
@@ -92,9 +94,9 @@ const Onboarding = () => {
 
       // Force refresh of auth context
       if (window.location.pathname === '/onboarding') {
-        // Redirect to dashboard with a slight delay to allow state to update
+        // Redirect to payment page with a slight delay to allow state to update
         setTimeout(() => {
-          navigate('/', { replace: true });
+          navigate('/payment', { replace: true });
         }, 100);
       }
     } catch (err) {

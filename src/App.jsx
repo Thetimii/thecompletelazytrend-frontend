@@ -4,12 +4,13 @@ import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Onboarding from './pages/Onboarding';
+import Payment from './pages/Payment';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { supabase } from './services/supabaseService';
 
-// OnboardingCheck component to redirect users to onboarding if needed
+// OnboardingCheck component to redirect users to onboarding or payment if needed
 const OnboardingCheck = ({ children }) => {
   const { user, userProfile, loading, fetchUserProfile } = useAuth();
   const location = useLocation();
@@ -49,6 +50,19 @@ const OnboardingCheck = ({ children }) => {
     return <Navigate to="/onboarding" />;
   }
 
+  // If user has completed onboarding but hasn't completed payment, redirect to payment
+  // Skip this check if already on the payment page
+  if (
+    user &&
+    userProfile &&
+    userProfile.onboarding_completed &&
+    !userProfile.payment_completed &&
+    location.pathname !== '/payment'
+  ) {
+    console.log("Redirecting to payment, profile:", userProfile);
+    return <Navigate to="/payment" />;
+  }
+
   return children;
 };
 
@@ -73,6 +87,14 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <Onboarding />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/payment"
+            element={
+              <ProtectedRoute>
+                <Payment />
               </ProtectedRoute>
             }
           />
