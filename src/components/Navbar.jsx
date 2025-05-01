@@ -6,8 +6,25 @@ const Navbar = ({ isDarkMode, toggleDarkMode }) => {
   const { user, userProfile, isAuthenticated, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const handleLogout = async () => {
-    await logout();
+  const handleLogout = async (e) => {
+    // Prevent default behavior
+    if (e) e.preventDefault();
+
+    // Add visual feedback
+    const logoutBtn = e?.target;
+    if (logoutBtn) {
+      logoutBtn.innerText = 'Logging out...';
+      logoutBtn.disabled = true;
+    }
+
+    try {
+      // Call the logout function from AuthContext
+      await logout();
+    } catch (error) {
+      console.error('Error in Navbar logout handler:', error);
+      // Force a page refresh as a fallback
+      window.location.href = '/login';
+    }
   };
 
   // Get user display name (full name from profile or email)
@@ -88,11 +105,11 @@ const Navbar = ({ isDarkMode, toggleDarkMode }) => {
                       </Link>
                     )}
                     <button
-                      onClick={() => {
-                        handleLogout();
+                      onClick={(e) => {
+                        handleLogout(e);
                         setMobileMenuOpen(false);
                       }}
-                      className="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-primary-100 dark:hover:bg-primary-600"
+                      className="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-primary-100 dark:hover:bg-primary-600 transition-colors"
                     >
                       Logout
                     </button>

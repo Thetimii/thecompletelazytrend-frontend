@@ -146,6 +146,15 @@ const Dashboard = () => {
     fetchData();
   }, [selectedQueryId, user?.id, userProfile?.id]);
 
+  // Add an effect to refresh data when tab changes to ensure fresh data
+  useEffect(() => {
+    // Only refetch data when switching to tabs that need fresh data
+    if (activeTab === 'summary' || activeTab === 'videos' || activeTab === 'recommendations') {
+      console.log(`Tab changed to ${activeTab}, refreshing data...`);
+      fetchData();
+    }
+  }, [activeTab]);
+
   // Effect to apply dark mode
   useEffect(() => {
     if (isDarkMode) {
@@ -316,6 +325,7 @@ const Dashboard = () => {
                 videos={videos}
                 recommendations={recommendations}
                 userProfile={userProfile}
+                onTabChange={setActiveTab}
               />
             )}
 

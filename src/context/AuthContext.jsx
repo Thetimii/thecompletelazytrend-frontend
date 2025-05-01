@@ -96,12 +96,38 @@ export const AuthProvider = ({ children }) => {
   // Handle user logout
   const logout = async () => {
     try {
-      await supabase.auth.signOut();
+      console.log('Logging out user...');
+
+      // Clear state first for immediate UI feedback
       setUser(null);
       setUserProfile(null);
       setOnboardingComplete(false);
+
+      // Then perform the actual logout
+      const { error } = await supabase.auth.signOut();
+
+      if (error) {
+        console.error('Error from Supabase during logout:', error);
+        throw error;
+      }
+
+      // Clear any local storage items that might be causing issues
+      localStorage.removeItem('supabase.auth.token');
+
+      // Force navigation to login page
+      window.location.href = '/login';
+
+      console.log('Logout successful');
     } catch (error) {
       console.error('Error logging out:', error);
+
+      // Even if there's an error, force a clean state
+      setUser(null);
+      setUserProfile(null);
+      setOnboardingComplete(false);
+
+      // Force navigation to login page as a fallback
+      window.location.href = '/login';
     }
   };
 

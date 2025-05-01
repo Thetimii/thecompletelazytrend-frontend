@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getLatestRecommendationByUserId } from '../../services/supabaseService';
+import { formatContentIdeas, formatSummary } from '../../utils/textFormatters';
 
 const RecommendationsTab = ({ userProfile }) => {
   const [recommendation, setRecommendation] = useState(null);
@@ -46,34 +47,16 @@ const RecommendationsTab = ({ userProfile }) => {
     // This prevents constant searching for recommendations
   }, [userProfile]);
 
-  // Parse content ideas from JSON string if needed
+  // Get formatted content ideas using our utility function
   const getContentIdeas = () => {
     if (!recommendation?.content_ideas) return [];
-
-    try {
-      if (typeof recommendation.content_ideas === 'string') {
-        return JSON.parse(recommendation.content_ideas);
-      }
-      return recommendation.content_ideas;
-    } catch (err) {
-      console.error('Error parsing content ideas:', err);
-      return [];
-    }
+    return formatContentIdeas(recommendation.content_ideas);
   };
 
-  // Parse combined summary from JSON string if needed
+  // Get formatted summary using our utility function
   const getCombinedSummary = () => {
     if (!recommendation?.combined_summary) return '';
-
-    try {
-      if (typeof recommendation.combined_summary === 'string') {
-        return recommendation.combined_summary;
-      }
-      return JSON.stringify(recommendation.combined_summary);
-    } catch (err) {
-      console.error('Error parsing combined summary:', err);
-      return '';
-    }
+    return formatSummary(recommendation.combined_summary);
   };
 
   // Skip loading state and go straight to content or empty state
@@ -165,7 +148,7 @@ const RecommendationsTab = ({ userProfile }) => {
         </div>
 
         <div className="bg-white dark:bg-primary-800 p-6 rounded-lg border border-primary-100 dark:border-primary-700">
-          <p className="text-primary-700 dark:text-primary-300 whitespace-pre-line">
+          <p className="text-primary-700 dark:text-primary-300 whitespace-pre-line leading-relaxed">
             {combinedSummary}
           </p>
         </div>
