@@ -247,8 +247,12 @@ const Dashboard = () => {
           user={user}
           userProfile={userProfile}
           onUpdate={(updatedProfile) => {
-            // You can handle profile updates here if needed
-            console.log('Profile updated:', updatedProfile);
+            // Refresh data after profile update
+            if (updatedProfile) {
+              console.log('Profile updated:', updatedProfile);
+              // Refresh queries, videos, and recommendations
+              fetchData();
+            }
           }}
         />
       )}

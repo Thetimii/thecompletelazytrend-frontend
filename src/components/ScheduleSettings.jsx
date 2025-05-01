@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { saveUserProfile } from '../services/userService';
+import { useAuth } from '../context/AuthContext';
 
 const ScheduleSettings = ({ user, userProfile, onUpdate }) => {
+  const { updateUserProfile } = useAuth();
   const [isEnabled, setIsEnabled] = useState(userProfile?.email_notifications || false);
   const [hour, setHour] = useState(userProfile?.email_time_hour || 9);
   const [timezone, setTimezone] = useState(userProfile?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone);
@@ -110,6 +112,9 @@ const ScheduleSettings = ({ user, userProfile, onUpdate }) => {
         email_time_hour: parseInt(hour, 10),
         timezone: timezone
       });
+
+      // Update the user profile in the auth context
+      await updateUserProfile(updatedProfile);
 
       setSuccess(true);
 

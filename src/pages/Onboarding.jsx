@@ -48,8 +48,20 @@ const Onboarding = () => {
       }
     };
 
-    checkUserProfile();
-  }, [user, navigate]);
+    // Only run once when the component mounts
+    // This prevents the effect from running again when auth state changes
+    const initialCheck = async () => {
+      await checkUserProfile();
+      // Set a flag in sessionStorage to prevent multiple checks
+      sessionStorage.setItem('onboardingChecked', 'true');
+    };
+
+    // Check if we've already done the initial check
+    const hasChecked = sessionStorage.getItem('onboardingChecked');
+    if (!hasChecked) {
+      initialCheck();
+    }
+  }, [navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

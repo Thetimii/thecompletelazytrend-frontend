@@ -105,6 +105,14 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Function to update user profile in context
+  const updateUserProfile = async (updatedProfile) => {
+    if (updatedProfile) {
+      setUserProfile(updatedProfile);
+      setOnboardingComplete(updatedProfile.onboarding_completed || false);
+    }
+  };
+
   // Auth context value
   const value = {
     user,
@@ -113,6 +121,7 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: !!user,
     onboardingComplete,
     fetchUserProfile,
+    updateUserProfile,
     logout,
   };
 
