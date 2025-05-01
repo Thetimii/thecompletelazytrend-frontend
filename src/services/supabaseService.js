@@ -152,12 +152,24 @@ export const getTikTokVideosByUserIdWithQueries = async (userId) => {
   try {
     console.log('Getting videos by query for user ID:', userId);
 
-    // First get all queries for this user
+    // Get the current user to double-check
+    const { data: { user } } = await supabase.auth.getUser();
+    console.log('Current authenticated user:', user);
+
+    // Check all trend_queries to see what's available
+    const { data: allQueries, error: allQueriesError } = await supabase
+      .from('trend_queries')
+      .select('id, query, user_id')
+      .limit(10);
+
+    console.log('Sample of all trend_queries:', allQueries);
+    console.log('All queries error:', allQueriesError);
+
+    // Step 1: Get all trend_queries for this user
     const { data: queries, error: queriesError } = await supabase
       .from('trend_queries')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
+      .select('id, query')
+      .eq('user_id', userId);
 
     if (queriesError) {
       console.error('Error getting trend queries:', queriesError);
@@ -171,98 +183,66 @@ export const getTikTokVideosByUserIdWithQueries = async (userId) => {
       return [];
     }
 
-    // Get all videos for these queries
+    // Step 2: Get the IDs from those queries
     const queryIds = queries.map(query => query.id);
     console.log('Query IDs to search for videos:', queryIds);
 
-    // First try with the foreign key relationship
-    let videos;
-    let videosError;
-
-    try {
-      const result = await supabase
-        .from('tiktok_videos')
-        .select('*, trend_queries:trend_query_id(id, query)')
-        .in('trend_query_id', queryIds)
-        .order('created_at', { ascending: false });
-
-      videos = result.data;
-      videosError = result.error;
-
-      console.log('Videos found with foreign key relationship:', videos?.length || 0);
-    } catch (err) {
-      console.warn('Error using foreign key relationship, trying direct query:', err);
-
-      // If the foreign key relationship fails, try a direct query
-      const result = await supabase
-        .from('tiktok_videos')
-        .select('*')
-        .in('trend_query_id', queryIds)
-        .order('created_at', { ascending: false });
-
-      videos = result.data;
-      videosError = result.error;
-
-      console.log('Videos found with direct query:', videos?.length || 0);
-    }
+    // Step 3: Get all tiktok_videos where trend_query_id is in that list
+    const { data: videos, error: videosError } = await supabase
+      .from('tiktok_videos')
+      .select('*')
+      .in('trend_query_id', queryIds);
 
     if (videosError) {
       console.error('Error getting TikTok videos:', videosError);
       throw new Error(`Error getting TikTok videos: ${videosError.message}`);
     }
 
+    console.log('Videos found:', videos?.length || 0);
+
     if (!videos || videos.length === 0) {
       console.log('No videos found for queries');
       return [];
     }
 
-    // Group videos by query
-    const videosByQuery = {};
+    // Step 4: Create a map of query IDs to query objects for easier lookup
     const queriesMap = {};
-
-    // Create a map of query IDs to query objects for easier lookup
     queries.forEach(query => {
       queriesMap[query.id] = query;
     });
 
+    // Step 5: Group videos by their trend_query_id
+    const videosByQuery = {};
+
     videos.forEach(video => {
-      // Try to get query info from the foreign key relationship first
-      let queryId = null;
-      let queryText = null;
+      const queryId = video.trend_query_id;
 
-      if (video.trend_queries) {
-        // Foreign key relationship worked
-        queryId = video.trend_queries.id;
-        queryText = video.trend_queries.query;
-      } else if (video.trend_query_id && queriesMap[video.trend_query_id]) {
-        // Direct query - use the trend_query_id field and look up the query
-        queryId = video.trend_query_id;
-        queryText = queriesMap[queryId].query;
+      // Skip videos with no query ID or if the query doesn't exist in our map
+      if (!queryId || !queriesMap[queryId]) {
+        console.warn('Video has invalid trend_query_id:', video);
+        return;
       }
 
-      if (queryId && queryText) {
-        if (!videosByQuery[queryId]) {
-          videosByQuery[queryId] = {
-            queryId,
-            queryText,
-            videos: []
-          };
-        }
+      const queryText = queriesMap[queryId].query;
 
-        // Add video to the appropriate query group
-        videosByQuery[queryId].videos.push({
-          ...video,
-          queryText: queryText // Add the query text to each video for easy reference
-        });
-      } else {
-        console.warn('Could not determine query for video:', video);
+      if (!videosByQuery[queryId]) {
+        videosByQuery[queryId] = {
+          queryId,
+          queryText,
+          videos: []
+        };
       }
+
+      // Add video to the appropriate query group
+      videosByQuery[queryId].videos.push({
+        ...video,
+        queryText: queryText // Add the query text to each video for easy reference
+      });
     });
 
     const result = Object.values(videosByQuery);
     console.log('Final grouped videos result:', result);
 
-    // Convert to array for easier rendering
     return result;
   } catch (error) {
     console.error('Error getting TikTok videos with queries:', error);
