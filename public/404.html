@@ -2,89 +2,11 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Page Not Found - LazyTrend</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background-color: #f8fafc;
-      color: #1e293b;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-      padding: 20px;
-      text-align: center;
-    }
-    .container {
-      max-width: 600px;
-      padding: 40px;
-      background-color: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-      color: #4f46e5;
-    }
-    p {
-      font-size: 1.1rem;
-      line-height: 1.5;
-      margin-bottom: 1.5rem;
-    }
-    a {
-      color: #4f46e5;
-      text-decoration: none;
-      font-weight: 500;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-    .btn {
-      display: inline-block;
-      background-color: #4f46e5;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 6px;
-      font-weight: 500;
-      transition: background-color 0.2s;
-    }
-    .btn:hover {
-      background-color: #4338ca;
-      text-decoration: none;
-    }
-  </style>
-  <script>
-    // Preserve the hash route when redirecting
-    window.onload = function() {
-      // Get the current path from the URL
-      var path = window.location.pathname;
-
-      // If we're on a route that's not the root, extract it
-      if (path !== '/' && !path.includes('.')) {
-        // Remove leading slash and redirect to that hash route
-        var route = path.substring(1);
-        setTimeout(function() {
-          window.location.href = '/#/' + route;
-        }, 1000);
-      } else {
-        // Otherwise just go to the homepage
-        setTimeout(function() {
-          window.location.href = '/';
-        }, 1000);
-      }
-    }
-  </script>
+  <meta http-equiv="refresh" content="0;url=/">
+  <title>LazyTrend</title>
 </head>
 <body>
-  <div class="container">
-    <h1>Page Not Found</h1>
-    <p>The page you're looking for doesn't exist or has been moved.</p>
-    <p>You'll be redirected to the homepage in a few seconds.</p>
-    <a href="/" class="btn">Go to Homepage</a>
-  </div>
+  <!-- This file is only used when the server tries to serve a non-existent path -->
+  <!-- It immediately redirects to the root, where the SPA router will take over -->
 </body>
 </html>
