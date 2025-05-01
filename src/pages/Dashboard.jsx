@@ -315,8 +315,7 @@ const Dashboard = () => {
                 queries={queries}
                 videos={videos}
                 recommendations={recommendations}
-                chartData={chartData}
-                chartOptions={chartOptions}
+                userProfile={userProfile}
               />
             )}
 

@@ -7,6 +7,7 @@ import Onboarding from './pages/Onboarding';
 import Payment from './pages/Payment';
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentCancel from './pages/PaymentCancel';
+import ResetPassword from './pages/ResetPassword';
 import PublicNavbar from './components/PublicNavbar';
 import ProtectedRoute from './components/ProtectedRoute';
 import SubscriptionMiddleware from './middleware/SubscriptionMiddleware';
@@ -104,6 +105,10 @@ function AppContent() {
       <Route
         path="/signup"
         element={isAuthenticated ? <Navigate to="/" /> : <Signup />}
+      />
+      <Route
+        path="/reset-password"
+        element={<ResetPassword />}
       />
       <Route
         path="/onboarding"

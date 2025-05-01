@@ -1,9 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import StatCard from '../StatCard';
 import RecommendationCard from '../RecommendationCard';
-import { Bar } from 'react-chartjs-2';
+import { getLatestRecommendationByUserId } from '../../services/supabaseService';
 
-const SummaryTab = ({ queries, videos, recommendations, chartData, chartOptions }) => {
+const SummaryTab = ({ queries, videos, recommendations, userProfile }) => {
+  const [latestRecommendation, setLatestRecommendation] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLatestRecommendation = async () => {
+      try {
+        setLoading(true);
+        if (userProfile?.id) {
+          const latest = await getLatestRecommendationByUserId(userProfile.id);
+          setLatestRecommendation(latest);
+        }
+      } catch (err) {
+        console.error('Error fetching latest recommendation:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLatestRecommendation();
+  }, [userProfile]);
   return (
     <div className="animate-fade-in">
       <div className="flex items-center mb-8">
@@ -49,41 +69,40 @@ const SummaryTab = ({ queries, videos, recommendations, chartData, chartOptions 
         </div>
       </div>
 
-      {/* Chart */}
-      {videos.length > 0 && (
-        <div className="dashboard-card mb-10">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-semibold text-primary-800 dark:text-primary-100 flex items-center">
-              <svg className="h-5 w-5 mr-2 text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
-              </svg>
-              Top Videos Performance
-            </h3>
-          </div>
-          <div className="bg-primary-50 dark:bg-primary-800 p-6 rounded-lg">
-            <Bar data={chartData} options={chartOptions} />
-          </div>
+      {/* Latest Recommendation */}
+      <div className="mb-10">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-semibold text-primary-800 dark:text-primary-100 flex items-center">
+            <svg className="h-5 w-5 mr-2 text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+            </svg>
+            Latest Marketing Recommendation
+          </h3>
         </div>
-      )}
 
-      {/* Recommendations */}
-      {recommendations.length > 0 && (
-        <div className="mb-10">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-semibold text-primary-800 dark:text-primary-100 flex items-center">
-              <svg className="h-5 w-5 mr-2 text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-              </svg>
-              Latest Marketing Recommendations
-            </h3>
+        {loading ? (
+          <div className="dashboard-card p-10 flex justify-center items-center">
+            <div className="animate-spin rounded-full h-10 w-10 border-4 border-primary-200 border-t-accent-500"></div>
+            <span className="ml-3 text-primary-600 dark:text-primary-400">Loading recommendation...</span>
           </div>
+        ) : latestRecommendation ? (
           <div className="grid grid-cols-1 gap-6">
-            {recommendations.slice(0, 3).map((recommendation) => (
-              <RecommendationCard key={recommendation.id} recommendation={recommendation} />
-            ))}
+            <RecommendationCard recommendation={latestRecommendation} />
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="dashboard-card p-10 text-center">
+            <div className="w-16 h-16 bg-primary-100 dark:bg-primary-800 rounded-full flex items-center justify-center mb-4 mx-auto">
+              <svg className="h-8 w-8 text-primary-500 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold mb-2 text-primary-800 dark:text-primary-100">No Recommendations Yet</h3>
+            <p className="text-primary-600 dark:text-primary-400 max-w-md mx-auto">
+              We're currently analyzing TikTok videos to generate personalized recommendations for your business. This process typically takes a few minutes after you complete onboarding.
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

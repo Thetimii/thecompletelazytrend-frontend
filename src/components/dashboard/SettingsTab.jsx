@@ -3,6 +3,7 @@ import SubscriptionManager from '../SubscriptionManager';
 import { saveUserProfile } from '../../services/userService';
 import { supabase } from '../../services/supabaseService';
 import { useAuth } from '../../context/AuthContext';
+import { toast } from 'react-hot-toast';
 
 const SettingsTab = ({ user, userProfile, onWorkflowComplete }) => {
   const { updateUserProfile } = useAuth();
@@ -12,7 +13,12 @@ const SettingsTab = ({ user, userProfile, onWorkflowComplete }) => {
     business_description: userProfile?.business_description || '',
     full_name: userProfile?.full_name || ''
   });
+  const [feedbackData, setFeedbackData] = useState({
+    subject: '',
+    message: ''
+  });
   const [loading, setLoading] = useState(false);
+  const [feedbackLoading, setFeedbackLoading] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
 
   const handleChange = (e) => {
@@ -21,6 +27,55 @@ const SettingsTab = ({ user, userProfile, onWorkflowComplete }) => {
       ...prev,
       [name]: value
     }));
+  };
+
+  const handleFeedbackChange = (e) => {
+    const { name, value } = e.target;
+    setFeedbackData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleFeedbackSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!feedbackData.subject || !feedbackData.message) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+
+    setFeedbackLoading(true);
+
+    try {
+      // Use the backend API endpoint
+      const apiUrl = `${import.meta.env.VITE_BACKEND_URL || 'https://thecompletelazytrend-backend.onrender.com'}/api/feedback`;
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          subject: feedbackData.subject,
+          message: feedbackData.message,
+          userEmail: user.email,
+          userName: userProfile.full_name || user.email
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send feedback');
+      }
+
+      toast.success('Feedback sent successfully!');
+      setFeedbackData({ subject: '', message: '' });
+    } catch (error) {
+      console.error('Error sending feedback:', error);
+      toast.error('Failed to send feedback. Please try again later.');
+    } finally {
+      setFeedbackLoading(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -229,6 +284,75 @@ const SettingsTab = ({ user, userProfile, onWorkflowComplete }) => {
 
           <div className="bg-white dark:bg-primary-800 p-6 rounded-lg border border-primary-100 dark:border-primary-700">
             <SubscriptionManager userProfile={userProfile} />
+          </div>
+        </div>
+      )}
+
+      {/* Feedback Form */}
+      {user && userProfile && (
+        <div className="dashboard-card mb-8">
+          <div className="flex items-center mb-6">
+            <svg className="h-6 w-6 text-accent-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+            </svg>
+            <h3 className="text-xl font-semibold text-primary-800 dark:text-primary-100">Send Feedback</h3>
+          </div>
+
+          <div className="bg-accent-50 dark:bg-accent-900/20 p-4 rounded-lg mb-6 border-l-4 border-accent-500">
+            <p className="text-primary-700 dark:text-primary-300">
+              We value your feedback! Let us know how we can improve LazyTrend or report any issues you've encountered.
+            </p>
+          </div>
+
+          <div className="bg-white dark:bg-primary-800 p-6 rounded-lg border border-primary-100 dark:border-primary-700">
+            <form onSubmit={handleFeedbackSubmit} className="space-y-6">
+              <div>
+                <label htmlFor="subject" className="block text-sm font-medium text-primary-700 dark:text-primary-300 mb-1">
+                  Subject
+                </label>
+                <input
+                  type="text"
+                  id="subject"
+                  name="subject"
+                  value={feedbackData.subject}
+                  onChange={handleFeedbackChange}
+                  required
+                  className="input w-full"
+                  placeholder="What's this about?"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="message" className="block text-sm font-medium text-primary-700 dark:text-primary-300 mb-1">
+                  Message
+                </label>
+                <textarea
+                  id="message"
+                  name="message"
+                  value={feedbackData.message}
+                  onChange={handleFeedbackChange}
+                  rows="5"
+                  required
+                  className="input w-full"
+                  placeholder="Tell us what you think..."
+                ></textarea>
+              </div>
+
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={feedbackLoading}
+                >
+                  {feedbackLoading ? (
+                    <>
+                      <span className="animate-spin inline-block h-4 w-4 mr-2 border-2 border-white border-t-transparent rounded-full"></span>
+                      Sending...
+                    </>
+                  ) : 'Send Feedback'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
