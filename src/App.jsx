@@ -8,6 +8,10 @@ import Payment from './pages/Payment';
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentCancel from './pages/PaymentCancel';
 import ResetPassword from './pages/ResetPassword';
+import LandingPage from './pages/LandingPage';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
+import CookiePolicy from './pages/CookiePolicy';
 import PublicNavbar from './components/PublicNavbar';
 import ProtectedRoute from './components/ProtectedRoute';
 import SubscriptionMiddleware from './middleware/SubscriptionMiddleware';
@@ -98,18 +102,27 @@ function AppContent() {
 
   return (
     <Routes>
+      {/* Public Routes */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/terms" element={<TermsOfService />} />
+      <Route path="/cookies" element={<CookiePolicy />} />
+
+      {/* Authentication Routes */}
       <Route
         path="/login"
-        element={isAuthenticated ? <Navigate to="/" /> : <Login />}
+        element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />}
       />
       <Route
         path="/signup"
-        element={isAuthenticated ? <Navigate to="/" /> : <Signup />}
+        element={isAuthenticated ? <Navigate to="/dashboard" /> : <Signup />}
       />
       <Route
         path="/reset-password"
         element={<ResetPassword />}
       />
+
+      {/* Protected Routes */}
       <Route
         path="/onboarding"
         element={
@@ -143,7 +156,7 @@ function AppContent() {
         }
       />
       <Route
-        path="/"
+        path="/dashboard"
         element={
           <ProtectedRoute>
             <OnboardingCheck>
@@ -154,6 +167,9 @@ function AppContent() {
           </ProtectedRoute>
         }
       />
+
+      {/* Redirect from old dashboard path to new one */}
+      <Route path="/app" element={<Navigate to="/dashboard" />} />
     </Routes>
   );
 }
