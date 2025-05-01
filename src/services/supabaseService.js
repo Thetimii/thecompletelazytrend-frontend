@@ -177,17 +177,53 @@ export const getRecommendations = async () => {
  */
 export const getRecommendationsByUserId = async (userId) => {
   try {
-    const { data, error } = await supabase
+    // First try with the provided user ID
+    const { data: userData, error: userError } = await supabase
       .from('recommendations')
       .select('*')
       .eq('user_id', userId)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: true });
 
-    if (error) {
-      throw new Error(`Error getting recommendations: ${error.message}`);
+    if (userError) {
+      throw new Error(`Error getting recommendations: ${userError.message}`);
     }
 
-    return data;
+    // If we found recommendations, return them
+    if (userData && userData.length > 0) {
+      console.log(`Found ${userData.length} recommendations with user_id: ${userId}`);
+      return userData;
+    }
+
+    // If no recommendations found, try getting the user's auth_id
+    const { data: userProfile, error: profileError } = await supabase
+      .from('users')
+      .select('auth_id')
+      .eq('id', userId)
+      .single();
+
+    if (profileError) {
+      console.warn(`Error getting user profile: ${profileError.message}`);
+      return [];
+    }
+
+    if (!userProfile || !userProfile.auth_id) {
+      console.warn(`No auth_id found for user: ${userId}`);
+      return [];
+    }
+
+    // Try with the auth_id
+    const { data: authData, error: authError } = await supabase
+      .from('recommendations')
+      .select('*')
+      .eq('user_id', userProfile.auth_id)
+      .order('created_at', { ascending: true });
+
+    if (authError) {
+      throw new Error(`Error getting recommendations by auth_id: ${authError.message}`);
+    }
+
+    console.log(`Found ${authData?.length || 0} recommendations with auth_id: ${userProfile.auth_id}`);
+    return authData || [];
   } catch (error) {
     console.error('Error getting recommendations:', error);
     throw new Error('Failed to get recommendations');
@@ -296,7 +332,8 @@ export const getLatestRecommendationByUserId = async (userId) => {
       return null;
     }
 
-    const { data, error } = await supabase
+    // First try with the provided user ID
+    const { data: userData, error: userError } = await supabase
       .from('recommendations')
       .select('*')
       .eq('user_id', userId)
@@ -304,11 +341,53 @@ export const getLatestRecommendationByUserId = async (userId) => {
       .limit(1)
       .maybeSingle();
 
-    if (error) {
-      throw new Error(`Error getting latest recommendation: ${error.message}`);
+    if (userError) {
+      throw new Error(`Error getting latest recommendation: ${userError.message}`);
     }
 
-    return data;
+    // If we found a recommendation, return it
+    if (userData) {
+      console.log(`Found latest recommendation with user_id: ${userId}`);
+      return userData;
+    }
+
+    // If no recommendation found, try getting the user's auth_id
+    const { data: userProfile, error: profileError } = await supabase
+      .from('users')
+      .select('auth_id')
+      .eq('id', userId)
+      .single();
+
+    if (profileError) {
+      console.warn(`Error getting user profile: ${profileError.message}`);
+      return null;
+    }
+
+    if (!userProfile || !userProfile.auth_id) {
+      console.warn(`No auth_id found for user: ${userId}`);
+      return null;
+    }
+
+    // Try with the auth_id
+    const { data: authData, error: authError } = await supabase
+      .from('recommendations')
+      .select('*')
+      .eq('user_id', userProfile.auth_id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (authError) {
+      throw new Error(`Error getting latest recommendation by auth_id: ${authError.message}`);
+    }
+
+    if (authData) {
+      console.log(`Found latest recommendation with auth_id: ${userProfile.auth_id}`);
+    } else {
+      console.log(`No recommendation found for user_id: ${userId} or auth_id: ${userProfile.auth_id}`);
+    }
+
+    return authData;
   } catch (error) {
     console.error('Error getting latest recommendation:', error);
     throw new Error('Failed to get latest recommendation');
