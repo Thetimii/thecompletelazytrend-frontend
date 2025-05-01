@@ -2,29 +2,77 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Redirecting...</title>
+  <title>Page Not Found - LazyTrend</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    .container {
+      max-width: 600px;
+      padding: 40px;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #4f46e5;
+    }
+    p {
+      font-size: 1.1rem;
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+    }
+    a {
+      color: #4f46e5;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .btn {
+      display: inline-block;
+      background-color: #4f46e5;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+    .btn:hover {
+      background-color: #4338ca;
+      text-decoration: none;
+    }
+  </style>
   <script>
-    // Single Page Apps for GitHub Pages or custom domains
-    // https://github.com/rafrex/spa-github-pages
-    // Copyright (c) 2016 Rafael Pedicini, licensed under the MIT License
-    
-    // This script takes the current URL and converts the path and query
-    // string into just a query string, and then redirects the browser
-    // to the new URL with only a query string and hash fragment.
-    
-    var segmentCount = 0;
-    var l = window.location;
-    l.replace(
-      l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-      l.pathname.split('/').slice(0, 1 + segmentCount).join('/') + '/?p=/' +
-      l.pathname.slice(1).split('/').slice(segmentCount).join('/').replace(/&/g, '~and~') +
-      (l.search ? '&q=' + l.search.slice(1).replace(/&/g, '~and~') : '') +
-      l.hash
-    );
+    // Simple redirect to home page with hash router
+    window.onload = function() {
+      // Wait a moment before redirecting
+      setTimeout(function() {
+        window.location.href = '/';
+      }, 3000);
+    }
   </script>
 </head>
 <body>
-  <h1>Redirecting...</h1>
-  <p>If you are not redirected automatically, follow this <a href="/">link</a>.</p>
+  <div class="container">
+    <h1>Page Not Found</h1>
+    <p>The page you're looking for doesn't exist or has been moved.</p>
+    <p>You'll be redirected to the homepage in a few seconds.</p>
+    <a href="/" class="btn">Go to Homepage</a>
+  </div>
 </body>
 </html>
