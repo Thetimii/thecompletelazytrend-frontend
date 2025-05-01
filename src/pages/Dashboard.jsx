@@ -367,44 +367,7 @@ const Dashboard = () => {
             )}
           </div>
 
-          {/* Empty State */}
-          {videos.length === 0 && recommendations.length === 0 && queries.length === 0 && activeTab === 'summary' && (
-            <div className="bg-white dark:bg-primary-900 p-10 rounded-2xl shadow-xl text-center mt-8 border border-primary-100 dark:border-primary-800 transition-all duration-300 animate-slide-up">
-              <div className="mb-6">
-                <div className="w-20 h-20 bg-accent-50 dark:bg-accent-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-10 h-10 text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                  </svg>
-                </div>
-                <h3 className="text-2xl font-bold mb-2 text-primary-800 dark:text-primary-50">Get Started with LazyTrend</h3>
-                <p className="text-primary-600 dark:text-primary-300 mb-6 max-w-lg mx-auto">
-                  There are no search queries, videos, or recommendations available yet. Let's set up your first analysis.
-                </p>
-              </div>
-
-              <div className="bg-accent-50 dark:bg-accent-900/20 border-l-4 border-accent-500 dark:border-accent-600 p-4 mb-8 rounded-lg text-left max-w-lg mx-auto">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <svg className="h-6 w-6 text-accent-500 dark:text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm text-primary-800 dark:text-primary-200 font-medium">
-                      Go to the Settings tab to generate search queries and analyze TikTok videos based on your business.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setActiveTab('settings')}
-                className="btn btn-primary px-8 py-3 text-base"
-              >
-                Go to Settings
-              </button>
-            </div>
-          )}
+          {/* Empty State - Removed as requested */}
         </div>
       </div>
     </div>

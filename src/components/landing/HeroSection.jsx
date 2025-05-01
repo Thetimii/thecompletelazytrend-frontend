@@ -1,7 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 const HeroSection = () => {
+  const [darkMode, setDarkMode] = useState(false);
+
+  // Check for dark mode preference on component mount
+  useEffect(() => {
+    const darkModePreference = localStorage.getItem('darkMode') === 'true';
+    setDarkMode(darkModePreference);
+
+    // Set up a listener for dark mode changes
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          const isDark = document.documentElement.classList.contains('dark');
+          setDarkMode(isDark);
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, { attributes: true });
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <section className="relative overflow-hidden bg-white dark:bg-primary-950 py-20 md:py-32">
       {/* Background decorations */}
@@ -45,18 +67,23 @@ const HeroSection = () => {
                 </div>
               </div>
               <div className="pt-6 pb-4 px-4">
-                <div className="w-full h-64 bg-gray-100 dark:bg-primary-800 rounded-lg animate-pulse">
-                  <div className="h-full flex items-center justify-center text-gray-400 dark:text-gray-600">
-                    <span className="text-sm">Dashboard Preview</span>
-                  </div>
-                </div>
-                <div className="mt-4 space-y-2">
-                  <div className="h-4 bg-gray-200 dark:bg-primary-700 rounded w-3/4 animate-pulse"></div>
-                  <div className="h-4 bg-gray-200 dark:bg-primary-700 rounded w-1/2 animate-pulse"></div>
+                <div className="w-full h-auto rounded-lg overflow-hidden">
+                  <img
+                    src={darkMode
+                      ? "https://cxtystgaxoeygwbvgqcg.supabase.co/storage/v1/object/public/images//Screenshot%202025-05-01%20at%2021.49.13.png"
+                      : "https://cxtystgaxoeygwbvgqcg.supabase.co/storage/v1/object/public/images//Screenshot%202025-05-01%20at%2021.49.06.png"
+                    }
+                    alt="LazyTrend Dashboard"
+                    className="w-full object-cover"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "https://placehold.co/600x400/e2e8f0/64748b?text=Dashboard+Preview";
+                    }}
+                  />
                 </div>
               </div>
             </div>
-            
+
             {/* Floating elements for visual interest */}
             <div className="absolute -top-6 -right-6 w-24 h-24 bg-accent-100 dark:bg-accent-900/30 rounded-lg rotate-12 animate-float"></div>
             <div className="absolute -bottom-8 -left-8 w-20 h-20 bg-purple-100 dark:bg-purple-900/30 rounded-lg -rotate-12 animate-float-delay"></div>
