@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import VideoCard from '../VideoCard';
 import QuerySelector from '../QuerySelector';
 
 const VideosTab = ({ queries, videos, videosByQuery, selectedQueryId, setSelectedQueryId }) => {
-  const [viewMode, setViewMode] = useState('grouped'); // 'grouped' or 'filtered'
+  // Always use filtered mode
+  const [viewMode, setViewMode] = useState('filtered');
 
   console.log('VideosTab props:', {
     queriesCount: queries?.length || 0,
@@ -121,48 +122,23 @@ const VideosTab = ({ queries, videos, videosByQuery, selectedQueryId, setSelecte
     <div className="animate-fade-in">
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-3xl font-bold gradient-text">Videos Analyzed</h2>
-
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => setViewMode('grouped')}
-            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-              viewMode === 'grouped'
-                ? 'bg-accent-500 text-white'
-                : 'bg-primary-100 dark:bg-primary-800 text-primary-700 dark:text-primary-300 hover:bg-primary-200 dark:hover:bg-primary-700'
-            }`}
-          >
-            Grouped by Search
-          </button>
-          <button
-            onClick={() => setViewMode('filtered')}
-            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-              viewMode === 'filtered'
-                ? 'bg-accent-500 text-white'
-                : 'bg-primary-100 dark:bg-primary-800 text-primary-700 dark:text-primary-300 hover:bg-primary-200 dark:hover:bg-primary-700'
-            }`}
-          >
-            Filter by Search
-          </button>
-        </div>
       </div>
 
-      {viewMode === 'filtered' && (
-        <div className="dashboard-card mb-8">
-          <h3 className="text-lg font-semibold mb-4 flex items-center text-primary-800 dark:text-primary-100">
-            <svg className="h-5 w-5 mr-2 text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
-            </svg>
-            <span>Filter Videos</span>
-          </h3>
-          <QuerySelector
-            queries={queries}
-            selectedQueryId={selectedQueryId}
-            onSelectQuery={setSelectedQueryId}
-          />
-        </div>
-      )}
+      <div className="dashboard-card mb-8">
+        <h3 className="text-lg font-semibold mb-4 flex items-center text-primary-800 dark:text-primary-100">
+          <svg className="h-5 w-5 mr-2 text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+          </svg>
+          <span>Filter Videos</span>
+        </h3>
+        <QuerySelector
+          queries={queries}
+          selectedQueryId={selectedQueryId}
+          onSelectQuery={setSelectedQueryId}
+        />
+      </div>
 
-      {viewMode === 'filtered' ? renderFilteredVideos() : renderGroupedVideos()}
+      {renderFilteredVideos()}
     </div>
   );
 };

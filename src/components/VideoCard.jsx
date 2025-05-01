@@ -26,13 +26,26 @@ const VideoCard = ({ video }) => {
   else if (video.cover) thumbnailUrl = video.cover;
 
   // If we have a video URL but no thumbnail, try to extract from the video URL
-  if (!thumbnailUrl && video.video_url) {
+  if ((!thumbnailUrl || thumbnailUrl.includes('undefined')) && video.video_url) {
     // TikTok video URLs often contain the video ID which can be used to construct a thumbnail URL
     const videoIdMatch = video.video_url.match(/\/video\/(\d+)/);
     if (videoIdMatch && videoIdMatch[1]) {
       const videoId = videoIdMatch[1];
-      thumbnailUrl = `https://p16-sign-va.tiktokcdn.com/obj/tos-maliva-p-0068/${videoId}`;
+      // Try different TikTok CDN patterns
+      thumbnailUrl = `https://p16-sign-va.tiktokcdn.com/obj/tos-maliva-p-0068/${videoId}~c5_720x720.jpeg`;
+
+      // If the video ID is available, we can also try to use the TikTok API to get the thumbnail
+      // This is a fallback in case the direct CDN URL doesn't work
+      if (!thumbnailUrl || thumbnailUrl.includes('undefined')) {
+        thumbnailUrl = `https://www.tiktok.com/api/img/?itemId=${videoId}&location=0`;
+      }
     }
+  }
+
+  // Fallback to a generic TikTok thumbnail if we still don't have one
+  if (!thumbnailUrl || thumbnailUrl.includes('undefined')) {
+    // Use a placeholder image for TikTok
+    thumbnailUrl = 'https://p16-sign-va.tiktokcdn.com/musically-maliva-obj/1645136815763462~c5_720x720.jpeg';
   }
 
   // If the URL doesn't start with http, it might be a relative URL
