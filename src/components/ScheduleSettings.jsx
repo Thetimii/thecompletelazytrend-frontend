@@ -104,42 +104,24 @@ const ScheduleSettings = ({ user, userProfile, onUpdate }) => {
       setError(null);
       setSuccess(false);
 
-      console.log('Saving schedule settings...');
-      console.log('Current user profile:', userProfile);
-
-      // Create a complete profile update with all existing fields plus our changes
-      const profileUpdate = {
-        ...userProfile,
+      // Save the updated preferences
+      const updatedProfile = await saveUserProfile({
         id: userProfile.id,
         auth_id: user.id,
         email_notifications: isEnabled,
         email_time_hour: parseInt(hour, 10),
-        timezone: timezone,
-        updated_at: new Date().toISOString()
-      };
-
-      console.log('Sending profile update:', profileUpdate);
-
-      // Save the updated preferences
-      const updatedProfile = await saveUserProfile(profileUpdate);
-      console.log('Profile updated successfully:', updatedProfile);
+        timezone: timezone
+      });
 
       // Update the user profile in the auth context
-      const contextUpdated = await updateUserProfile(updatedProfile);
-      console.log('Auth context updated:', contextUpdated);
+      await updateUserProfile(updatedProfile);
 
       setSuccess(true);
 
       // Notify parent component
       if (onUpdate) {
-        console.log('Notifying parent component of update');
         onUpdate(updatedProfile);
       }
-
-      // Force a small delay to ensure state updates are processed
-      setTimeout(() => {
-        console.log('Schedule settings saved successfully');
-      }, 100);
     } catch (err) {
       console.error('Error saving schedule settings:', err);
       setError(err.message || 'Failed to save settings');
