@@ -76,17 +76,15 @@ const SubscriptionManager = ({ userProfile }) => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-      <h2 className="text-2xl font-bold mb-4">Subscription Management</h2>
-
+    <div>
       <div className="mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <p className="text-gray-600">Status:</p>
-            <p className="font-semibold">
+            <p className="text-primary-500 dark:text-primary-400 text-sm">Status:</p>
+            <p className="font-semibold text-primary-800 dark:text-primary-100">
               {formatStatus(userProfile.subscription_status)}
               {userProfile.subscription_status === 'trialing' && (
-                <span className="ml-2 bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                <span className="ml-2 bg-accent-100 dark:bg-accent-900 text-accent-800 dark:text-accent-200 text-xs font-medium px-2.5 py-0.5 rounded">
                   {daysLeftInTrial} days left
                 </span>
               )}
@@ -95,29 +93,29 @@ const SubscriptionManager = ({ userProfile }) => {
 
           {userProfile.payment_date && (
             <div>
-              <p className="text-gray-600">Started:</p>
-              <p className="font-semibold">{new Date(userProfile.payment_date).toLocaleDateString()}</p>
+              <p className="text-primary-500 dark:text-primary-400 text-sm">Started:</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-100">{new Date(userProfile.payment_date).toLocaleDateString()}</p>
             </div>
           )}
 
           {trialEndDate && userProfile.subscription_status === 'trialing' && (
             <div>
-              <p className="text-gray-600">Trial Ends:</p>
-              <p className="font-semibold">{trialEndDate}</p>
+              <p className="text-primary-500 dark:text-primary-400 text-sm">Trial Ends:</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-100">{trialEndDate}</p>
             </div>
           )}
 
           {userProfile.subscription_status === 'cancelled' && (
             <div>
-              <p className="text-gray-600">Access Until:</p>
-              <p className="font-semibold">{userProfile.cancel_at ? new Date(userProfile.cancel_at).toLocaleDateString() : 'End of billing period'}</p>
+              <p className="text-primary-500 dark:text-primary-400 text-sm">Access Until:</p>
+              <p className="font-semibold text-primary-800 dark:text-primary-100">{userProfile.cancel_at ? new Date(userProfile.cancel_at).toLocaleDateString() : 'End of billing period'}</p>
             </div>
           )}
         </div>
       </div>
 
       {error && (
-        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
+        <div className="bg-red-100 dark:bg-red-900/30 border-l-4 border-red-500 text-red-700 dark:text-red-300 p-4 mb-4 rounded">
           <p>{error}</p>
         </div>
       )}
@@ -126,7 +124,7 @@ const SubscriptionManager = ({ userProfile }) => {
         <button
           onClick={handleManageSubscription}
           disabled={loading}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
+          className="btn btn-primary disabled:opacity-50"
         >
           {loading ? 'Loading...' : 'Manage Subscription'}
         </button>

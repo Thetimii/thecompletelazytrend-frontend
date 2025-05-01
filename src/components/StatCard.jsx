@@ -9,7 +9,7 @@ const StatCard = ({ title, value, icon, color }) => {
       {/* Left border accent */}
       <div className={`absolute left-0 top-0 bottom-0 w-1 ${color.replace('border-l-4', 'bg')}`}></div>
 
-      {/* Background gradient that shows on hover */}
+      {/* Background gradient that shows on hover - using dynamic classes based on color */}
       <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500 bg-gradient-to-br from-${colorName}-500 to-${colorName}-300 dark:from-${colorName}-600 dark:to-${colorName}-800`}></div>
 
       <div className="flex items-center justify-between relative z-10">

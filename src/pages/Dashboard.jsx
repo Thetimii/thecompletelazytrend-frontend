@@ -218,8 +218,14 @@ const Dashboard = () => {
   // Render loading state
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-primary-50 dark:bg-primary-900">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent-500"></div>
+      <div className="flex flex-col justify-center items-center h-screen w-screen fixed inset-0 bg-primary-50 dark:bg-primary-950">
+        <div className="relative">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary-200 dark:border-primary-800"></div>
+          <div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center">
+            <div className="h-8 w-8 rounded-full bg-accent-500"></div>
+          </div>
+        </div>
+        <p className="mt-4 text-primary-600 dark:text-primary-400 font-medium">Loading your dashboard...</p>
       </div>
     );
   }
@@ -227,21 +233,35 @@ const Dashboard = () => {
   // Render error state
   if (error) {
     return (
-      <div className="flex justify-center items-center h-screen bg-primary-50 dark:bg-primary-900">
-        <div className="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-6 py-4 rounded-lg max-w-lg" role="alert">
-          <strong className="font-bold">Error!</strong>
-          <span className="block sm:inline ml-2">{error}</span>
-          <p className="mt-2 text-sm">Please try refreshing the page or contact support if the problem persists.</p>
+      <div className="flex justify-center items-center h-screen w-screen fixed inset-0 bg-primary-50 dark:bg-primary-950">
+        <div className="bg-white dark:bg-primary-900 shadow-xl rounded-xl p-8 max-w-lg border border-red-200 dark:border-red-900" role="alert">
+          <div className="flex items-center mb-4">
+            <div className="bg-red-100 dark:bg-red-900/30 p-3 rounded-full">
+              <svg className="h-6 w-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h3 className="ml-3 text-lg font-bold text-primary-900 dark:text-primary-100">Error Loading Dashboard</h3>
+          </div>
+          <p className="text-primary-800 dark:text-primary-200 mb-4">{error}</p>
+          <p className="text-primary-600 dark:text-primary-400 text-sm mb-6">Please try refreshing the page or contact support if the problem persists.</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="btn btn-primary w-full"
+          >
+            Refresh Page
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900 dark:to-primary-800 transition-colors duration-300 ${isDarkMode ? 'dark' : ''}`}>
+    <div className="h-screen w-screen overflow-hidden bg-primary-50 dark:bg-primary-950 transition-colors duration-300 fixed inset-0">
       {/* Background pattern */}
       <div className="fixed inset-0 z-0 opacity-5 dark:opacity-10 pointer-events-none">
         <div className="absolute inset-0 bg-grid-pattern"></div>
+        <div className="absolute inset-0 bg-texture"></div>
       </div>
 
       {/* Sidebar */}
@@ -253,10 +273,10 @@ const Dashboard = () => {
       />
 
       {/* Main Content */}
-      <div className="ml-16 lg:ml-64 pt-16 transition-all duration-300 relative z-10">
-        <div className="p-6">
+      <div className="ml-20 lg:ml-64 h-screen transition-all duration-300 relative z-10 overflow-y-auto">
+        <div className="p-8">
           {/* Tab Content */}
-          <div className="animate-fade-in">
+          <div className="animate-fade-in max-w-7xl mx-auto">
             {activeTab === 'summary' && (
               <SummaryTab
                 queries={queries}
@@ -300,28 +320,37 @@ const Dashboard = () => {
 
           {/* Empty State */}
           {videos.length === 0 && recommendations.length === 0 && queries.length === 0 && activeTab === 'summary' && (
-            <div className="backdrop-blur-sm bg-white/70 dark:bg-primary-800/70 p-8 rounded-xl shadow-lg text-center mt-8 border border-primary-100/50 dark:border-primary-700/50 transition-all duration-300 hover:shadow-xl">
-              <h3 className="text-xl font-semibold mb-2 text-primary-800 dark:text-primary-50">No data available</h3>
-              <p className="text-primary-600 dark:text-primary-300 mb-4">
-                There are no search queries, videos, or recommendations available yet.
-              </p>
-              <div className="bg-yellow-50/70 dark:bg-yellow-900/30 border-l-4 border-yellow-400 dark:border-yellow-600 p-4 mb-4 rounded-r-lg">
+            <div className="bg-white dark:bg-primary-900 p-10 rounded-2xl shadow-xl text-center mt-8 border border-primary-100 dark:border-primary-800 transition-all duration-300 animate-slide-up">
+              <div className="mb-6">
+                <div className="w-20 h-20 bg-accent-50 dark:bg-accent-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-10 h-10 text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold mb-2 text-primary-800 dark:text-primary-50">Get Started with LazyTrend</h3>
+                <p className="text-primary-600 dark:text-primary-300 mb-6 max-w-lg mx-auto">
+                  There are no search queries, videos, or recommendations available yet. Let's set up your first analysis.
+                </p>
+              </div>
+
+              <div className="bg-accent-50 dark:bg-accent-900/20 border-l-4 border-accent-500 dark:border-accent-600 p-4 mb-8 rounded-lg text-left max-w-lg mx-auto">
                 <div className="flex">
                   <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-yellow-400 dark:text-yellow-300" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    <svg className="h-6 w-6 text-accent-500 dark:text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                   </div>
                   <div className="ml-3">
-                    <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                      Go to the Settings tab to generate search queries and analyze TikTok videos.
+                    <p className="text-sm text-primary-800 dark:text-primary-200 font-medium">
+                      Go to the Settings tab to generate search queries and analyze TikTok videos based on your business.
                     </p>
                   </div>
                 </div>
               </div>
+
               <button
                 onClick={() => setActiveTab('settings')}
-                className="btn btn-primary transform transition-transform duration-300 hover:scale-105 hover:shadow-md"
+                className="btn btn-primary px-8 py-3 text-base"
               >
                 Go to Settings
               </button>

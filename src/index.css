@@ -1,14 +1,22 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  html {
+    @apply h-full;
+  }
+
   body {
-    @apply m-0 font-sans text-primary-800 bg-primary-50 dark:bg-primary-900 dark:text-primary-50;
+    @apply m-0 font-sans text-primary-800 bg-primary-50 dark:bg-primary-950 dark:text-primary-50 h-full;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  #root {
+    @apply h-full;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -18,31 +26,31 @@
 
 @layer components {
   .card {
-    @apply backdrop-blur-sm bg-white/80 dark:bg-primary-800/80 rounded-lg shadow-card transition-all duration-300 hover:shadow-card-hover border border-primary-100/50 dark:border-primary-700/50;
+    @apply bg-white dark:bg-primary-900 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl border border-primary-100 dark:border-primary-800;
   }
 
   .btn {
-    @apply px-4 py-2 rounded-md font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 hover:scale-105;
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 hover:scale-[1.02];
   }
 
   .btn-primary {
-    @apply bg-gradient-to-r from-accent-600 to-accent-500 hover:from-accent-700 hover:to-accent-600 text-white focus:ring-accent-500 shadow-md hover:shadow-lg;
+    @apply bg-accent-600 hover:bg-accent-700 text-white focus:ring-accent-500 shadow-md hover:shadow-lg;
   }
 
   .btn-secondary {
-    @apply bg-primary-100 hover:bg-primary-200 text-primary-800 dark:bg-primary-700 dark:hover:bg-primary-600 dark:text-primary-50 focus:ring-primary-400 shadow-sm hover:shadow-md;
+    @apply bg-primary-100 hover:bg-primary-200 text-primary-800 dark:bg-primary-800 dark:hover:bg-primary-700 dark:text-primary-50 focus:ring-primary-400 shadow-sm hover:shadow-md;
   }
 
   .btn-danger {
-    @apply bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white focus:ring-red-500 shadow-md hover:shadow-lg;
+    @apply bg-red-600 hover:bg-red-700 text-white focus:ring-red-500 shadow-md hover:shadow-lg;
   }
 
   .input {
-    @apply w-full px-3 py-2 border border-primary-200/70 dark:border-primary-600/70 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500 dark:bg-primary-700/90 dark:text-primary-50 backdrop-blur-sm;
+    @apply w-full px-4 py-3 border border-primary-200 dark:border-primary-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500 dark:bg-primary-800 dark:text-primary-50;
   }
 
   .select {
-    @apply w-full px-3 py-2 border border-primary-200/70 dark:border-primary-600/70 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500 dark:bg-primary-700/90 dark:text-primary-50 backdrop-blur-sm;
+    @apply w-full px-4 py-3 border border-primary-200 dark:border-primary-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500 dark:bg-primary-800 dark:text-primary-50;
   }
 
   .tab {
@@ -53,17 +61,39 @@
     @apply text-accent-600 dark:text-accent-400 border-accent-500;
   }
 
-  /* Glassmorphic card with hover effect */
+  /* Modern card with hover effect */
   .glass-card {
-    @apply backdrop-blur-md bg-white/40 dark:bg-primary-800/40 rounded-xl shadow-lg border border-white/20 dark:border-primary-700/30 transition-all duration-300 hover:shadow-xl hover:bg-white/50 dark:hover:bg-primary-800/50 hover:scale-[1.02];
+    @apply bg-white dark:bg-primary-900 rounded-xl shadow-lg border border-primary-100 dark:border-primary-800 transition-all duration-300 hover:shadow-xl hover:border-accent-200 dark:hover:border-accent-900;
+  }
+
+  /* Dashboard card */
+  .dashboard-card {
+    @apply bg-white dark:bg-primary-900 rounded-xl shadow-lg border border-primary-100 dark:border-primary-800 p-6 transition-all duration-300 hover:shadow-xl;
+  }
+
+  /* Stat card */
+  .stat-card {
+    @apply bg-white dark:bg-primary-900 rounded-xl shadow-lg border-l-4 p-6 transition-all duration-300 hover:shadow-xl flex items-center justify-between;
   }
 
   /* Background grid pattern */
   .bg-grid-pattern {
     background-image:
-      linear-gradient(to right, rgba(100, 116, 139, 0.05) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(100, 116, 139, 0.05) 1px, transparent 1px);
-    background-size: 20px 20px;
+      linear-gradient(to right, rgba(203, 213, 225, 0.1) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(203, 213, 225, 0.1) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  /* Improved background with subtle noise texture */
+  .bg-texture {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+    background-position: 0 0;
+    background-size: 200px 200px;
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-accent-600 to-accent-500 dark:from-accent-500 dark:to-accent-400 bg-clip-text text-transparent;
   }
 }
 
@@ -74,18 +104,43 @@ code {
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-primary-100 dark:bg-primary-800;
+  @apply bg-primary-100 dark:bg-primary-900;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-primary-300 dark:bg-primary-600 rounded-full;
+  @apply bg-primary-300 dark:bg-primary-700 rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-primary-400 dark:bg-primary-500;
+  @apply bg-accent-400 dark:bg-accent-600;
+}
+
+/* Animations */
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

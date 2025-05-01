@@ -96,7 +96,7 @@ function AppContent() {
   }, [isDarkMode]);
 
   return (
-    <div className={`min-h-screen bg-primary-50 dark:bg-primary-900 transition-colors duration-300 ${isDarkMode ? 'dark' : ''}`}>
+    <div className="min-h-screen bg-primary-50 dark:bg-primary-900 transition-colors duration-300">
       {/* Only show Navbar on non-dashboard pages */}
       {window.location.pathname !== '/' && (
         <Navbar isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />

@@ -88,37 +88,43 @@ const Sidebar = ({ activeTab, setActiveTab, isDarkMode, toggleDarkMode }) => {
 
   return (
     <div
-      className={`h-screen fixed left-0 top-0 z-30 backdrop-blur-md bg-white/80 dark:bg-primary-800/90 shadow-lg transition-all duration-300 border-r border-primary-100/50 dark:border-primary-700/50 ${
-        collapsed ? 'w-16' : 'w-64'
+      className={`h-screen fixed left-0 top-0 z-30 bg-white dark:bg-primary-900 shadow-xl transition-all duration-300 border-r border-primary-100 dark:border-primary-800 ${
+        collapsed ? 'w-20' : 'w-64'
       }`}
     >
       <div className="flex flex-col h-full">
         {/* Logo and collapse button */}
-        <div className="flex items-center justify-between p-4 border-b border-primary-100/50 dark:border-primary-700/50">
-          {!collapsed && (
-            <div className="text-xl font-bold text-accent-600 dark:text-accent-400 animate-pulse-scale">
+        <div className="flex items-center justify-between p-5 border-b border-primary-100 dark:border-primary-800">
+          {!collapsed ? (
+            <div className="text-xl font-bold gradient-text">
               LazyTrend
             </div>
+          ) : (
+            <div className="text-xl font-bold gradient-text mx-auto">
+              LT
+            </div>
           )}
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="p-2 rounded-md hover:bg-primary-100/70 dark:hover:bg-primary-700/70 transition-all duration-300 hover:scale-105"
-          >
-            {collapsed ? <ExpandIcon /> : <CollapseIcon />}
-          </button>
+          {!collapsed && (
+            <button
+              onClick={() => setCollapsed(!collapsed)}
+              className="p-2 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-800 transition-all duration-300 text-primary-500"
+            >
+              <CollapseIcon />
+            </button>
+          )}
         </div>
 
         {/* User profile */}
-        <div className="p-4 border-b border-primary-100/50 dark:border-primary-700/50">
+        <div className="p-5 border-b border-primary-100 dark:border-primary-800">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent-500 to-accent-600 flex items-center justify-center text-white font-medium shadow-md">
+              <div className="w-10 h-10 rounded-full bg-accent-600 flex items-center justify-center text-white font-medium shadow-md">
                 {getUserInitials()}
               </div>
             </div>
             {!collapsed && (
               <div className="ml-3 overflow-hidden">
-                <p className="text-sm font-medium truncate">{getUserDisplayName()}</p>
+                <p className="text-sm font-medium truncate text-primary-800 dark:text-primary-100">{getUserDisplayName()}</p>
                 <p className="text-xs text-primary-500 dark:text-primary-400 truncate">
                   {user?.email}
                 </p>
@@ -128,23 +134,23 @@ const Sidebar = ({ activeTab, setActiveTab, isDarkMode, toggleDarkMode }) => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto py-4">
-          <ul className="space-y-3 px-2">
+        <nav className="flex-1 overflow-y-auto py-6">
+          <ul className="space-y-2 px-3">
             {tabs.map((tab) => (
               <li key={tab.id}>
                 <button
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center w-full p-3 rounded-lg transition-all duration-300 hover:scale-105 ${
+                  className={`flex items-center w-full p-3 rounded-xl transition-all duration-300 ${
                     activeTab === tab.id
-                      ? 'bg-gradient-to-r from-accent-500/20 to-accent-600/20 text-accent-600 dark:text-accent-400 shadow-sm'
-                      : 'hover:bg-primary-100/70 dark:hover:bg-primary-700/70'
-                  }`}
+                      ? 'bg-accent-50 dark:bg-accent-900/30 text-accent-600 dark:text-accent-400 shadow-sm'
+                      : 'hover:bg-primary-50 dark:hover:bg-primary-800 text-primary-700 dark:text-primary-300'
+                  } ${collapsed ? 'justify-center' : ''}`}
                 >
-                  <span className={`flex-shrink-0 transition-transform duration-300 ${activeTab === tab.id ? 'scale-110' : ''}`}>
+                  <span className={`flex-shrink-0 transition-transform duration-300 ${activeTab === tab.id ? 'text-accent-600 dark:text-accent-400' : ''}`}>
                     {tab.icon}
                   </span>
                   {!collapsed && (
-                    <span className={`ml-3 font-medium transition-all duration-300 ${activeTab === tab.id ? 'translate-x-1' : ''}`}>
+                    <span className={`ml-3 font-medium transition-all duration-300 ${activeTab === tab.id ? 'font-semibold' : ''}`}>
                       {tab.label}
                     </span>
                   )}
@@ -155,11 +161,11 @@ const Sidebar = ({ activeTab, setActiveTab, isDarkMode, toggleDarkMode }) => {
         </nav>
 
         {/* Bottom actions */}
-        <div className="p-4 border-t border-primary-100/50 dark:border-primary-700/50">
-          <div className="space-y-3">
+        <div className="p-5 border-t border-primary-100 dark:border-primary-800">
+          <div className="space-y-2">
             <button
               onClick={toggleDarkMode}
-              className="flex items-center w-full p-3 rounded-lg hover:bg-primary-100/70 dark:hover:bg-primary-700/70 transition-all duration-300 hover:scale-105"
+              className={`flex items-center w-full p-3 rounded-xl hover:bg-primary-50 dark:hover:bg-primary-800 transition-all duration-300 text-primary-700 dark:text-primary-300 ${collapsed ? 'justify-center' : ''}`}
             >
               <span className="flex-shrink-0">
                 <ThemeIcon isDark={isDarkMode} />
@@ -172,7 +178,7 @@ const Sidebar = ({ activeTab, setActiveTab, isDarkMode, toggleDarkMode }) => {
             </button>
             <button
               onClick={handleLogout}
-              className="flex items-center w-full p-3 rounded-lg hover:bg-red-50/70 dark:hover:bg-red-900/30 transition-all duration-300 hover:scale-105 text-red-600 dark:text-red-400"
+              className={`flex items-center w-full p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300 text-red-600 dark:text-red-400 ${collapsed ? 'justify-center' : ''}`}
             >
               <span className="flex-shrink-0">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -183,6 +189,18 @@ const Sidebar = ({ activeTab, setActiveTab, isDarkMode, toggleDarkMode }) => {
             </button>
           </div>
         </div>
+
+        {/* Expand button when collapsed */}
+        {collapsed && (
+          <div className="p-5 flex justify-center">
+            <button
+              onClick={() => setCollapsed(!collapsed)}
+              className="p-2 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-800 transition-all duration-300 text-primary-500"
+            >
+              <ExpandIcon />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -144,47 +144,49 @@ const ScheduleSettings = ({ user, userProfile, onUpdate }) => {
   });
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-      <h2 className="text-xl font-semibold mb-4">Scheduled Analysis Settings</h2>
-
+    <div>
       {error && (
-        <div className="mb-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
+        <div className="mb-6 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 text-red-700 dark:text-red-300 p-4 rounded-lg">
           <p>{error}</p>
         </div>
       )}
 
       {success && (
-        <div className="mb-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4">
+        <div className="mb-6 bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 text-green-700 dark:text-green-300 p-4 rounded-lg">
           <p>Settings saved successfully!</p>
         </div>
       )}
 
       <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              checked={isEnabled}
-              onChange={(e) => setIsEnabled(e.target.checked)}
-              className="form-checkbox h-5 w-5 text-blue-600"
-            />
-            <span className="ml-2 text-gray-700">Enable scheduled analysis</span>
+        <div className="mb-6">
+          <label className="flex items-center cursor-pointer">
+            <div className="relative">
+              <input
+                type="checkbox"
+                checked={isEnabled}
+                onChange={(e) => setIsEnabled(e.target.checked)}
+                className="sr-only"
+              />
+              <div className={`block w-14 h-8 rounded-full transition-colors duration-300 ${isEnabled ? 'bg-accent-500' : 'bg-primary-300 dark:bg-primary-700'}`}></div>
+              <div className={`absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition-transform duration-300 ${isEnabled ? 'transform translate-x-6' : ''}`}></div>
+            </div>
+            <span className="ml-3 text-primary-800 dark:text-primary-100 font-medium">Enable scheduled analysis</span>
           </label>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-primary-600 dark:text-primary-400 mt-2 ml-16">
             When enabled, we'll automatically run the complete workflow at your specified time.
           </p>
         </div>
 
         {isEnabled && (
-          <>
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">
+          <div className="bg-white dark:bg-primary-800 p-6 rounded-lg border border-primary-100 dark:border-primary-700 mb-6">
+            <div className="mb-6">
+              <label className="block text-primary-800 dark:text-primary-100 text-sm font-medium mb-2">
                 Your Timezone
               </label>
               <select
                 value={timezone}
                 onChange={(e) => setTimezone(e.target.value)}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="select"
               >
                 {timezones.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -192,19 +194,19 @@ const ScheduleSettings = ({ user, userProfile, onUpdate }) => {
                   </option>
                 ))}
               </select>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-primary-600 dark:text-primary-400 mt-2">
                 Select your local timezone to ensure emails are sent at the correct time.
               </p>
             </div>
 
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">
+              <label className="block text-primary-800 dark:text-primary-100 text-sm font-medium mb-2">
                 Time to receive analysis (in your local time)
               </label>
               <select
                 value={hour}
                 onChange={(e) => setHour(e.target.value)}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="select"
               >
                 {hourOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -212,20 +214,28 @@ const ScheduleSettings = ({ user, userProfile, onUpdate }) => {
                   </option>
                 ))}
               </select>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-primary-600 dark:text-primary-400 mt-2">
                 The analysis will run and you'll receive an email once per day at this time in your local timezone.
               </p>
             </div>
-          </>
+          </div>
         )}
 
         <div className="flex justify-end">
           <button
             type="submit"
             disabled={loading}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
+            className="btn btn-primary px-6 py-3 disabled:opacity-50 flex items-center"
           >
-            {loading ? 'Saving...' : 'Save Settings'}
+            {loading ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Saving...
+              </>
+            ) : 'Save Settings'}
           </button>
         </div>
       </form>

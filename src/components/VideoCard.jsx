@@ -32,10 +32,10 @@ const VideoCard = ({ video }) => {
           />
 
           {/* Gradient overlay that appears on hover */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-primary-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
           {/* Views badge */}
-          <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full shadow-md">
+          <div className="absolute top-2 right-2 bg-primary-900/60 backdrop-blur-sm text-primary-50 text-xs px-2 py-1 rounded-full shadow-md">
             {video.views ? `${video.views.toLocaleString()} views` : 'No views'}
           </div>
 
@@ -47,8 +47,8 @@ const VideoCard = ({ video }) => {
               rel="noopener noreferrer"
               className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500"
             >
-              <div className="w-16 h-16 rounded-full bg-white/30 backdrop-blur-sm flex items-center justify-center transform transition-transform duration-500 group-hover:scale-110">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor">
+              <div className="w-16 h-16 rounded-full bg-primary-50/30 dark:bg-primary-800/30 backdrop-blur-sm flex items-center justify-center transform transition-transform duration-500 group-hover:scale-110">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary-50 dark:text-primary-50" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
                 </svg>
               </div>

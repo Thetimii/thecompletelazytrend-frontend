@@ -76,9 +76,11 @@ const RecommendationCard = ({ recommendation }) => {
                   className="text-primary-600 dark:text-primary-300 flex items-start"
                   style={{
                     opacity: 0,
-                    animation: 'fadeIn 0.5s ease forwards',
-                    animationDelay: `${index * 0.1}s`,
-                    animationFillMode: 'forwards'
+                    animationName: 'fadeIn',
+                    animationDuration: '0.5s',
+                    animationTimingFunction: 'ease',
+                    animationFillMode: 'forwards',
+                    animationDelay: `${index * 0.1}s`
                   }}
                 >
                   <span className="text-purple-500 dark:text-purple-400 mr-2">•</span>
