@@ -4,6 +4,32 @@ const RecommendationCard = ({ recommendation }) => {
   const [expanded, setExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
+  // Handle case where no recommendation is provided
+  if (!recommendation) {
+    return (
+      <div className="glass-card p-6 overflow-hidden relative">
+        <div className="absolute left-0 top-0 bottom-0 w-1 bg-purple-500 dark:bg-purple-600"></div>
+        <div className="flex justify-between items-start mb-3 relative z-10">
+          <h3 className="font-bold text-lg text-primary-800 dark:text-primary-50 flex items-center">
+            <span className="mr-2">💡</span>
+            <span>Marketing Recommendation</span>
+          </h3>
+        </div>
+        <div className="p-8 text-center">
+          <div className="w-16 h-16 bg-primary-100 dark:bg-primary-800 rounded-full flex items-center justify-center mb-4 mx-auto">
+            <svg className="h-8 w-8 text-primary-500 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h3 className="text-xl font-semibold mb-2 text-primary-800 dark:text-primary-100">No Recommendation Available</h3>
+          <p className="text-primary-600 dark:text-primary-400">
+            We're currently analyzing TikTok videos to generate personalized recommendations for your business.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   // Parse content ideas if they're stored as a string
   const getContentIdeas = () => {
     if (!recommendation.content_ideas) return [];

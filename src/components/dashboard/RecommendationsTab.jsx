@@ -29,7 +29,7 @@ const RecommendationsTab = ({ userProfile }) => {
   // Parse content ideas from JSON string if needed
   const getContentIdeas = () => {
     if (!recommendation?.content_ideas) return [];
-    
+
     try {
       if (typeof recommendation.content_ideas === 'string') {
         return JSON.parse(recommendation.content_ideas);
@@ -44,7 +44,7 @@ const RecommendationsTab = ({ userProfile }) => {
   // Parse combined summary from JSON string if needed
   const getCombinedSummary = () => {
     if (!recommendation?.combined_summary) return '';
-    
+
     try {
       if (typeof recommendation.combined_summary === 'string') {
         return recommendation.combined_summary;
@@ -106,8 +106,13 @@ const RecommendationsTab = ({ userProfile }) => {
           </div>
           <h3 className="text-xl font-semibold mb-2 text-primary-800 dark:text-primary-100">No Recommendations Yet</h3>
           <p className="text-primary-600 dark:text-primary-400 max-w-md mx-auto">
-            We haven't generated any recommendations for your business yet. Go to the Settings tab to run the workflow and analyze TikTok videos.
+            We're currently analyzing TikTok videos to generate personalized recommendations for your business. This process typically takes a few minutes after you complete onboarding.
           </p>
+          <div className="mt-6 p-4 bg-accent-50 dark:bg-accent-900/20 rounded-lg border-l-4 border-accent-500 text-left">
+            <p className="text-primary-700 dark:text-primary-300">
+              <span className="font-bold">What to expect:</span> Once the analysis is complete, you'll receive personalized content recommendations based on trending TikTok videos in your niche. These recommendations will help you create more engaging content for your audience.
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -116,7 +121,7 @@ const RecommendationsTab = ({ userProfile }) => {
   // Render recommendation data
   const contentIdeas = getContentIdeas();
   const combinedSummary = getCombinedSummary();
-  
+
   return (
     <div className="animate-fade-in">
       <div className="flex items-center mb-8">
@@ -131,7 +136,7 @@ const RecommendationsTab = ({ userProfile }) => {
           </svg>
           <h3 className="text-xl font-semibold text-primary-800 dark:text-primary-100">Trend Summary</h3>
         </div>
-        
+
         <div className="bg-white dark:bg-primary-800 p-6 rounded-lg border border-primary-100 dark:border-primary-700">
           <p className="text-primary-700 dark:text-primary-300 whitespace-pre-line">
             {combinedSummary}
@@ -147,7 +152,7 @@ const RecommendationsTab = ({ userProfile }) => {
           </svg>
           <h3 className="text-xl font-semibold text-primary-800 dark:text-primary-100">Content Ideas</h3>
         </div>
-        
+
         <div className="bg-white dark:bg-primary-800 p-6 rounded-lg border border-primary-100 dark:border-primary-700">
           {Array.isArray(contentIdeas) && contentIdeas.length > 0 ? (
             <ul className="space-y-4">
