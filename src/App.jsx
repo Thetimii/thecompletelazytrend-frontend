@@ -71,10 +71,36 @@ const OnboardingCheck = ({ children }) => {
 
 function AppContent() {
   const { isAuthenticated } = useAuth();
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    // Check if user has a preference stored
+    const savedMode = localStorage.getItem('darkMode');
+    // Check if browser prefers dark mode
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return savedMode ? savedMode === 'true' : prefersDark;
+  });
+
+  // Toggle dark mode
+  const toggleDarkMode = () => {
+    setIsDarkMode(prev => !prev);
+  };
+
+  // Effect to apply dark mode
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    // Save preference to localStorage
+    localStorage.setItem('darkMode', isDarkMode);
+  }, [isDarkMode]);
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <Navbar />
+    <div className={`min-h-screen bg-primary-50 dark:bg-primary-900 transition-colors duration-300 ${isDarkMode ? 'dark' : ''}`}>
+      {/* Only show Navbar on non-dashboard pages */}
+      {window.location.pathname !== '/' && (
+        <Navbar isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
+      )}
       <div className="container mx-auto px-4 py-8">
         <Routes>
           <Route

@@ -8,14 +8,6 @@ import {
   getRecommendationsByUserId
 } from '../services/supabaseService';
 import { useAuth } from '../context/AuthContext';
-import StatCard from '../components/StatCard';
-import VideoCard from '../components/VideoCard';
-import RecommendationCard from '../components/RecommendationCard';
-import QuerySelector from '../components/QuerySelector';
-import WorkflowButton from '../components/WorkflowButton';
-import ApiButtons from '../components/ApiButtons';
-import ScheduleSettings from '../components/ScheduleSettings';
-import SubscriptionManager from '../components/SubscriptionManager';
 import { runCompleteWorkflow } from '../services/workflowService';
 import { Bar } from 'react-chartjs-2';
 import {
@@ -27,6 +19,13 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+
+// Import components
+import Sidebar from '../components/Sidebar';
+import SummaryTab from '../components/dashboard/SummaryTab';
+import VideosTab from '../components/dashboard/VideosTab';
+import EmailScheduleTab from '../components/dashboard/EmailScheduleTab';
+import SettingsTab from '../components/dashboard/SettingsTab';
 
 // Register Chart.js components
 ChartJS.register(
@@ -46,6 +45,14 @@ const Dashboard = () => {
   const [selectedQueryId, setSelectedQueryId] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState('summary');
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    // Check if user has a preference stored
+    const savedMode = localStorage.getItem('darkMode');
+    // Check if browser prefers dark mode
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return savedMode ? savedMode === 'true' : prefersDark;
+  });
 
   // Define fetchData function first
   const fetchData = async () => {
@@ -106,6 +113,22 @@ const Dashboard = () => {
   useEffect(() => {
     fetchData();
   }, [selectedQueryId, user?.id]);
+
+  // Effect to apply dark mode
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    // Save preference to localStorage
+    localStorage.setItem('darkMode', isDarkMode);
+  }, [isDarkMode]);
+
+  // Toggle dark mode
+  const toggleDarkMode = () => {
+    setIsDarkMode(prev => !prev);
+  };
 
   // Effect to check for the triggerWorkflow flag and run the workflow if needed
   useEffect(() => {
@@ -187,185 +210,120 @@ const Dashboard = () => {
     },
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-        <strong className="font-bold">Error!</strong>
-        <span className="block sm:inline"> {error}</span>
-      </div>
-    );
-  }
-
   const handleWorkflowComplete = () => {
     // Refresh the data after workflow completes
     fetchData();
   };
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      // No need to redirect as the ProtectedRoute component will handle it
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
-  };
+  // Render loading state
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-primary-50 dark:bg-primary-900">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent-500"></div>
+      </div>
+    );
+  }
+
+  // Render error state
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-primary-50 dark:bg-primary-900">
+        <div className="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-6 py-4 rounded-lg max-w-lg" role="alert">
+          <strong className="font-bold">Error!</strong>
+          <span className="block sm:inline ml-2">{error}</span>
+          <p className="mt-2 text-sm">Please try refreshing the page or contact support if the problem persists.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <button
-          onClick={handleLogout}
-          className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
-        >
-          Logout
-        </button>
-      </div>
-
-      {/* API Buttons for individual API calls */}
-      <ApiButtons />
-
-      {/* Legacy Workflow Button */}
-      <WorkflowButton onComplete={handleWorkflowComplete} />
-
-      {/* Subscription Manager */}
-      {user && userProfile && (
-        <SubscriptionManager userProfile={userProfile} />
-      )}
-
-      {/* Schedule Settings */}
-      {user && userProfile && (
-        <ScheduleSettings
-          user={user}
-          userProfile={userProfile}
-          onUpdate={(updatedProfile) => {
-            // Refresh data after profile update
-            if (updatedProfile) {
-              console.log('Profile updated:', updatedProfile);
-              // Refresh queries, videos, and recommendations
-              fetchData();
-            }
-          }}
-        />
-      )}
-
-      <QuerySelector
-        queries={queries}
-        selectedQueryId={selectedQueryId}
-        onSelectQuery={setSelectedQueryId}
+    <div className={`min-h-screen bg-primary-50 dark:bg-primary-900 transition-colors duration-300 ${isDarkMode ? 'dark' : ''}`}>
+      {/* Sidebar */}
+      <Sidebar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        isDarkMode={isDarkMode}
+        toggleDarkMode={toggleDarkMode}
       />
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <StatCard
-          title="Search Queries"
-          value={queries.length}
-          icon={<span className="text-xl">🔍</span>}
-          color="border-l-4 border-blue-500"
-        />
-        <StatCard
-          title="TikTok Videos"
-          value={videos.length}
-          icon={<span className="text-xl">🎬</span>}
-          color="border-l-4 border-green-500"
-        />
-        <StatCard
-          title="Recommendations"
-          value={recommendations.length}
-          icon={<span className="text-xl">📊</span>}
-          color="border-l-4 border-purple-500"
-        />
-      </div>
+      {/* Main Content */}
+      <div className="ml-16 lg:ml-64 pt-16 transition-all duration-300">
+        <div className="p-6">
+          {/* Tab Content */}
+          <div className="animate-fade-in">
+            {activeTab === 'summary' && (
+              <SummaryTab
+                queries={queries}
+                videos={videos}
+                recommendations={recommendations}
+                chartData={chartData}
+                chartOptions={chartOptions}
+              />
+            )}
 
-      {/* Chart */}
-      {videos.length > 0 && (
-        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-          <Bar data={chartData} options={chartOptions} />
-        </div>
-      )}
+            {activeTab === 'videos' && (
+              <VideosTab
+                queries={queries}
+                videos={videos}
+                selectedQueryId={selectedQueryId}
+                setSelectedQueryId={setSelectedQueryId}
+              />
+            )}
 
-      {/* Recommendations */}
-      {recommendations.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">Marketing Recommendations</h2>
-          <div className="grid grid-cols-1 gap-6">
-            {recommendations.slice(0, 3).map((recommendation) => (
-              <RecommendationCard key={recommendation.id} recommendation={recommendation} />
-            ))}
+            {activeTab === 'email' && (
+              <EmailScheduleTab
+                user={user}
+                userProfile={userProfile}
+                onUpdate={(updatedProfile) => {
+                  if (updatedProfile) {
+                    console.log('Profile updated:', updatedProfile);
+                    fetchData();
+                  }
+                }}
+              />
+            )}
+
+            {activeTab === 'settings' && (
+              <SettingsTab
+                user={user}
+                userProfile={userProfile}
+                onWorkflowComplete={handleWorkflowComplete}
+              />
+            )}
           </div>
-        </div>
-      )}
 
-      {/* Videos Grid */}
-      {videos.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">TikTok Videos</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {videos.slice(0, 6).map((video) => (
-              <VideoCard key={video.id} video={video} />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Search Queries */}
-      {queries.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">Search Queries</h2>
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <ul className="divide-y divide-gray-200">
-              {queries.map((query) => (
-                <li key={query.id} className="py-4">
-                  <div className="flex justify-between">
-                    <div>
-                      <p className="text-lg font-medium text-gray-900">{query.query}</p>
-                      <p className="text-sm text-gray-500">Created: {new Date(query.created_at).toLocaleDateString()}</p>
-                    </div>
-                    <button
-                      onClick={() => setSelectedQueryId(query.id)}
-                      className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm hover:bg-blue-200"
-                    >
-                      View Videos
-                    </button>
+          {/* Empty State */}
+          {videos.length === 0 && recommendations.length === 0 && queries.length === 0 && activeTab === 'summary' && (
+            <div className="card p-8 text-center mt-8">
+              <h3 className="text-xl font-semibold mb-2 text-primary-800 dark:text-primary-50">No data available</h3>
+              <p className="text-primary-600 dark:text-primary-300 mb-4">
+                There are no search queries, videos, or recommendations available yet.
+              </p>
+              <div className="bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400 dark:border-yellow-600 p-4 mb-4">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <svg className="h-5 w-5 text-yellow-400 dark:text-yellow-300" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
                   </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
-
-      {/* Empty State */}
-      {videos.length === 0 && recommendations.length === 0 && queries.length === 0 && (
-        <div className="bg-white p-8 rounded-lg shadow-md text-center">
-          <h3 className="text-xl font-semibold mb-2">No data available</h3>
-          <p className="text-gray-600 mb-4">
-            There are no search queries, videos, or recommendations available yet.
-          </p>
-          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
+                  <div className="ml-3">
+                    <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                      Go to the Settings tab to generate search queries and analyze TikTok videos.
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div className="ml-3">
-                <p className="text-sm text-yellow-700">
-                  Start by generating search queries and scraping TikTok videos using the backend API.
-                </p>
-              </div>
+              <button
+                onClick={() => setActiveTab('settings')}
+                className="btn btn-primary"
+              >
+                Go to Settings
+              </button>
             </div>
-          </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };
