@@ -5,7 +5,8 @@ import {
   getRecommendations,
   getTrendQueriesByUserId,
   getTikTokVideosByTrendQueryId,
-  getRecommendationsByUserId
+  getRecommendationsByUserId,
+  getTikTokVideosByUserIdWithQueries
 } from '../services/supabaseService';
 import { useAuth } from '../context/AuthContext';
 import { runCompleteWorkflow } from '../services/workflowService';
@@ -41,6 +42,7 @@ const Dashboard = () => {
   const { user, userProfile, logout } = useAuth();
   const [queries, setQueries] = useState([]);
   const [videos, setVideos] = useState([]);
+  const [videosByQuery, setVideosByQuery] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
   const [selectedQueryId, setSelectedQueryId] = useState('');
   const [loading, setLoading] = useState(true);
@@ -87,6 +89,17 @@ const Dashboard = () => {
         } catch (error) {
           console.warn('Error fetching TikTok videos, table might not exist yet:', error);
           setVideos([]);
+        }
+      }
+
+      // Fetch videos grouped by query for the current user
+      if (user?.id) {
+        try {
+          const videosByQueryData = await getTikTokVideosByUserIdWithQueries(user.id);
+          setVideosByQuery(videosByQueryData || []);
+        } catch (error) {
+          console.warn('Error fetching videos by query, table might not exist yet:', error);
+          setVideosByQuery([]);
         }
       }
 
@@ -291,6 +304,7 @@ const Dashboard = () => {
               <VideosTab
                 queries={queries}
                 videos={videos}
+                videosByQuery={videosByQuery}
                 selectedQueryId={selectedQueryId}
                 setSelectedQueryId={setSelectedQueryId}
               />

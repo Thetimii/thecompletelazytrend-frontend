@@ -143,11 +143,79 @@ export const getRecommendationsByUserId = async (userId) => {
   }
 };
 
+/**
+ * Get TikTok videos by user ID with query information
+ * @param {string} userId - User ID
+ * @returns {Promise<Array>} - Array of TikTok videos with query information
+ */
+export const getTikTokVideosByUserIdWithQueries = async (userId) => {
+  try {
+    // First get all queries for this user
+    const { data: queries, error: queriesError } = await supabase
+      .from('trend_queries')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (queriesError) {
+      throw new Error(`Error getting trend queries: ${queriesError.message}`);
+    }
+
+    if (!queries || queries.length === 0) {
+      return [];
+    }
+
+    // Get all videos for these queries
+    const queryIds = queries.map(query => query.id);
+    const { data: videos, error: videosError } = await supabase
+      .from('tiktok_videos')
+      .select('*, trend_queries:trend_query_id(id, query)')
+      .in('trend_query_id', queryIds)
+      .order('created_at', { ascending: false });
+
+    if (videosError) {
+      throw new Error(`Error getting TikTok videos: ${videosError.message}`);
+    }
+
+    // Group videos by query
+    const videosByQuery = {};
+
+    videos.forEach(video => {
+      const queryInfo = video.trend_queries;
+      if (queryInfo) {
+        const queryId = queryInfo.id;
+        const queryText = queryInfo.query;
+
+        if (!videosByQuery[queryId]) {
+          videosByQuery[queryId] = {
+            queryId,
+            queryText,
+            videos: []
+          };
+        }
+
+        // Add video to the appropriate query group
+        videosByQuery[queryId].videos.push({
+          ...video,
+          queryText: queryText // Add the query text to each video for easy reference
+        });
+      }
+    });
+
+    // Convert to array for easier rendering
+    return Object.values(videosByQuery);
+  } catch (error) {
+    console.error('Error getting TikTok videos with queries:', error);
+    throw new Error('Failed to get TikTok videos with queries');
+  }
+};
+
 export default {
   getTrendQueries,
   getTrendQueriesByUserId,
   getTikTokVideos,
   getTikTokVideosByTrendQueryId,
   getRecommendations,
-  getRecommendationsByUserId
+  getRecommendationsByUserId,
+  getTikTokVideosByUserIdWithQueries
 };
