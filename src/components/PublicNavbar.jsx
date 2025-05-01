@@ -23,7 +23,7 @@ const PublicNavbar = ({ isDarkMode, toggleDarkMode }) => {
     } catch (error) {
       console.error('Error in PublicNavbar logout handler:', error);
       // Force a page refresh as a fallback
-      window.location.href = '/login';
+      window.location.href = '/';
     }
   };
 

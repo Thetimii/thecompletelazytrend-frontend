@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import StatCard from '../StatCard';
 import { getLatestRecommendationByUserId } from '../../services/supabaseService';
+import { formatSummary } from '../../utils/textFormatters';
 
 const SummaryTab = ({ queries, videos, recommendations, userProfile, onTabChange }) => {
   const [latestRecommendation, setLatestRecommendation] = useState(null);
@@ -99,22 +100,29 @@ const SummaryTab = ({ queries, videos, recommendations, userProfile, onTabChange
 
         {latestRecommendation ? (
           <div className="dashboard-card p-6">
-            <div className="flex flex-col items-center justify-center text-center">
-              <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mb-4">
-                <svg className="h-8 w-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-                </svg>
+            <div className="flex flex-col">
+              {/* Summary section */}
+              <div className="mb-6">
+                <h4 className="font-semibold text-primary-700 dark:text-primary-200 flex items-center mb-3">
+                  <span className="w-4 h-4 rounded-full bg-purple-100 dark:bg-purple-900/50 mr-2 flex-shrink-0"></span>
+                  Trend Summary
+                </h4>
+                <div className="bg-white dark:bg-primary-800 p-4 rounded-lg border border-primary-100 dark:border-primary-700 mb-4">
+                  <p className="text-primary-700 dark:text-primary-300 whitespace-pre-line leading-relaxed line-clamp-4">
+                    {formatSummary(latestRecommendation.combined_summary)}
+                  </p>
+                </div>
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-primary-800 dark:text-primary-100">Marketing Recommendation Ready</h3>
-              <p className="text-primary-600 dark:text-primary-400 max-w-md mx-auto mb-6">
-                We've analyzed TikTok videos in your niche and created personalized content recommendations for your business.
-              </p>
-              <button
-                onClick={() => onTabChange('recommendations')}
-                className="btn btn-primary px-6 py-2"
-              >
-                View Recommendations
-              </button>
+
+              {/* Button to view full recommendations */}
+              <div className="flex justify-center">
+                <button
+                  onClick={() => onTabChange('recommendations')}
+                  className="btn btn-primary px-6 py-2"
+                >
+                  View Full Recommendations
+                </button>
+              </div>
             </div>
           </div>
         ) : (

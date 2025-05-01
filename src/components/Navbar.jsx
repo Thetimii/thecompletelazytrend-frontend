@@ -23,7 +23,7 @@ const Navbar = ({ isDarkMode, toggleDarkMode }) => {
     } catch (error) {
       console.error('Error in Navbar logout handler:', error);
       // Force a page refresh as a fallback
-      window.location.href = '/login';
+      window.location.href = '/';
     }
   };
 

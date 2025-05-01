@@ -114,8 +114,8 @@ export const AuthProvider = ({ children }) => {
       // Clear any local storage items that might be causing issues
       localStorage.removeItem('supabase.auth.token');
 
-      // Force navigation to login page
-      window.location.href = '/login';
+      // Force navigation to landing page
+      window.location.href = '/';
 
       console.log('Logout successful');
     } catch (error) {
@@ -126,8 +126,8 @@ export const AuthProvider = ({ children }) => {
       setUserProfile(null);
       setOnboardingComplete(false);
 
-      // Force navigation to login page as a fallback
-      window.location.href = '/login';
+      // Force navigation to landing page as a fallback
+      window.location.href = '/';
     }
   };
 
