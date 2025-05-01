@@ -105,7 +105,7 @@ function AppContent() {
   return (
     <Routes>
       {/* Public Routes */}
-      <Route path="/" element={<LandingPage />} />
+      <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <LandingPage />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/terms" element={<TermsOfService />} />
       <Route path="/cookies" element={<CookiePolicy />} />
