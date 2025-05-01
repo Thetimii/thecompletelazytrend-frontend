@@ -61,11 +61,23 @@ const Dashboard = () => {
     try {
       setLoading(true);
 
+      // Make sure we have the user profile
+      if (!userProfile && user?.id) {
+        console.log('Fetching user profile first');
+        await fetchUserProfile(user.id);
+      }
+
+      // Use the user ID from the profile (not the auth ID)
+      const userId = userProfile?.id;
+      console.log('Using user ID from profile:', userId);
+      console.log('User profile:', userProfile);
+
       try {
         // Fetch queries for the current user
-        const queriesData = user?.id
-          ? await getTrendQueriesByUserId(user.id)
+        const queriesData = userId
+          ? await getTrendQueriesByUserId(userId)
           : await getTrendQueries();
+        console.log('Queries data:', queriesData?.length || 0, 'queries');
         setQueries(queriesData || []);
       } catch (error) {
         console.warn('Error fetching trend queries, table might not exist yet:', error);
@@ -74,10 +86,11 @@ const Dashboard = () => {
 
       // Fetch videos grouped by query for the current user
       // We'll use this data for both grouped and filtered views
-      if (user?.id) {
+      if (userId) {
         try {
-          console.log('Fetching videos by query for user:', user.id);
-          const videosByQueryData = await getTikTokVideosByUserIdWithQueries(user.id);
+          console.log('Fetching videos by query for user ID:', userId);
+          const videosByQueryData = await getTikTokVideosByUserIdWithQueries(userId);
+          console.log('Videos by query data:', videosByQueryData);
 
           // Set the videos by query data
           setVideosByQuery(videosByQueryData || []);
@@ -96,23 +109,26 @@ const Dashboard = () => {
           setVideos(allVideos);
         } catch (error) {
           console.warn('Error fetching videos by query:', error);
+          console.error('Detailed error:', error);
           setVideosByQuery([]);
           setVideos([]);
         }
       } else {
-        console.log('No user ID available, cannot fetch videos');
+        console.log('No user ID available from profile, cannot fetch videos');
         setVideosByQuery([]);
         setVideos([]);
       }
 
       // Fetch recommendations for the current user
       try {
-        const recommendationsData = user?.id
-          ? await getRecommendationsByUserId(user.id)
+        const recommendationsData = userId
+          ? await getRecommendationsByUserId(userId)
           : await getRecommendations();
+        console.log('Recommendations data:', recommendationsData?.length || 0, 'recommendations');
         setRecommendations(recommendationsData || []);
       } catch (error) {
         console.warn('Error fetching recommendations, table might not exist yet:', error);
+        console.error('Detailed error:', error);
         setRecommendations([]);
       }
 
@@ -127,7 +143,7 @@ const Dashboard = () => {
   // Then use it in useEffect
   useEffect(() => {
     fetchData();
-  }, [selectedQueryId, user?.id]);
+  }, [selectedQueryId, user?.id, userProfile?.id]);
 
   // Effect to apply dark mode
   useEffect(() => {
@@ -158,9 +174,10 @@ const Dashboard = () => {
           localStorage.removeItem('triggerWorkflow');
 
           // Call the runCompleteWorkflow function with the same parameters as the button
+          // Use the user ID from the profile (not the auth ID)
           const response = await runCompleteWorkflow(
             userProfile.business_description,
-            user.id,
+            userProfile.id, // Use profile ID instead of auth ID
             1 // Just 1 video per query for initial run
           );
 

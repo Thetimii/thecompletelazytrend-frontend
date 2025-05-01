@@ -95,7 +95,7 @@ export const getTikTokVideos = async (userId = null) => {
       const { data, error } = await supabase
         .from('tiktok_videos')
         .select('*')
-        .in('trend_query_id', queryIds)
+        .eq('trend_query_id', queryIds)
         .order('created_at', { ascending: false });
 
       if (error) {
