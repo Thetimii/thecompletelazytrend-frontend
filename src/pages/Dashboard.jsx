@@ -95,10 +95,13 @@ const Dashboard = () => {
       // Fetch videos grouped by query for the current user
       if (user?.id) {
         try {
+          console.log('Fetching videos by query for user:', user.id);
           const videosByQueryData = await getTikTokVideosByUserIdWithQueries(user.id);
+          console.log('Videos by query data:', videosByQueryData);
           setVideosByQuery(videosByQueryData || []);
         } catch (error) {
           console.warn('Error fetching videos by query, table might not exist yet:', error);
+          console.error('Detailed error:', error);
           setVideosByQuery([]);
         }
       }

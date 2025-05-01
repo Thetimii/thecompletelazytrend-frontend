@@ -5,6 +5,13 @@ import QuerySelector from '../QuerySelector';
 const VideosTab = ({ queries, videos, videosByQuery, selectedQueryId, setSelectedQueryId }) => {
   const [viewMode, setViewMode] = useState('grouped'); // 'grouped' or 'filtered'
 
+  console.log('VideosTab props:', {
+    queriesCount: queries?.length || 0,
+    videosCount: videos?.length || 0,
+    videosByQueryCount: videosByQuery?.length || 0,
+    selectedQueryId
+  });
+
   // Function to render videos in filtered mode (using the existing filter dropdown)
   const renderFilteredVideos = () => {
     if (videos.length === 0) {
@@ -46,7 +53,9 @@ const VideosTab = ({ queries, videos, videosByQuery, selectedQueryId, setSelecte
 
   // Function to render videos grouped by search query
   const renderGroupedVideos = () => {
-    if (videosByQuery.length === 0) {
+    console.log('Rendering grouped videos with data:', videosByQuery);
+
+    if (!videosByQuery || videosByQuery.length === 0) {
       return (
         <div className="dashboard-card p-10 text-center">
           <div className="flex flex-col items-center">

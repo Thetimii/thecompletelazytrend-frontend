@@ -150,6 +150,8 @@ export const getRecommendationsByUserId = async (userId) => {
  */
 export const getTikTokVideosByUserIdWithQueries = async (userId) => {
   try {
+    console.log('Getting videos by query for user ID:', userId);
+
     // First get all queries for this user
     const { data: queries, error: queriesError } = await supabase
       .from('trend_queries')
@@ -158,34 +160,87 @@ export const getTikTokVideosByUserIdWithQueries = async (userId) => {
       .order('created_at', { ascending: false });
 
     if (queriesError) {
+      console.error('Error getting trend queries:', queriesError);
       throw new Error(`Error getting trend queries: ${queriesError.message}`);
     }
 
+    console.log('Queries found for user:', queries);
+
     if (!queries || queries.length === 0) {
+      console.log('No queries found for user');
       return [];
     }
 
     // Get all videos for these queries
     const queryIds = queries.map(query => query.id);
-    const { data: videos, error: videosError } = await supabase
-      .from('tiktok_videos')
-      .select('*, trend_queries:trend_query_id(id, query)')
-      .in('trend_query_id', queryIds)
-      .order('created_at', { ascending: false });
+    console.log('Query IDs to search for videos:', queryIds);
+
+    // First try with the foreign key relationship
+    let videos;
+    let videosError;
+
+    try {
+      const result = await supabase
+        .from('tiktok_videos')
+        .select('*, trend_queries:trend_query_id(id, query)')
+        .in('trend_query_id', queryIds)
+        .order('created_at', { ascending: false });
+
+      videos = result.data;
+      videosError = result.error;
+
+      console.log('Videos found with foreign key relationship:', videos?.length || 0);
+    } catch (err) {
+      console.warn('Error using foreign key relationship, trying direct query:', err);
+
+      // If the foreign key relationship fails, try a direct query
+      const result = await supabase
+        .from('tiktok_videos')
+        .select('*')
+        .in('trend_query_id', queryIds)
+        .order('created_at', { ascending: false });
+
+      videos = result.data;
+      videosError = result.error;
+
+      console.log('Videos found with direct query:', videos?.length || 0);
+    }
 
     if (videosError) {
+      console.error('Error getting TikTok videos:', videosError);
       throw new Error(`Error getting TikTok videos: ${videosError.message}`);
+    }
+
+    if (!videos || videos.length === 0) {
+      console.log('No videos found for queries');
+      return [];
     }
 
     // Group videos by query
     const videosByQuery = {};
+    const queriesMap = {};
+
+    // Create a map of query IDs to query objects for easier lookup
+    queries.forEach(query => {
+      queriesMap[query.id] = query;
+    });
 
     videos.forEach(video => {
-      const queryInfo = video.trend_queries;
-      if (queryInfo) {
-        const queryId = queryInfo.id;
-        const queryText = queryInfo.query;
+      // Try to get query info from the foreign key relationship first
+      let queryId = null;
+      let queryText = null;
 
+      if (video.trend_queries) {
+        // Foreign key relationship worked
+        queryId = video.trend_queries.id;
+        queryText = video.trend_queries.query;
+      } else if (video.trend_query_id && queriesMap[video.trend_query_id]) {
+        // Direct query - use the trend_query_id field and look up the query
+        queryId = video.trend_query_id;
+        queryText = queriesMap[queryId].query;
+      }
+
+      if (queryId && queryText) {
         if (!videosByQuery[queryId]) {
           videosByQuery[queryId] = {
             queryId,
@@ -199,11 +254,16 @@ export const getTikTokVideosByUserIdWithQueries = async (userId) => {
           ...video,
           queryText: queryText // Add the query text to each video for easy reference
         });
+      } else {
+        console.warn('Could not determine query for video:', video);
       }
     });
 
+    const result = Object.values(videosByQuery);
+    console.log('Final grouped videos result:', result);
+
     // Convert to array for easier rendering
-    return Object.values(videosByQuery);
+    return result;
   } catch (error) {
     console.error('Error getting TikTok videos with queries:', error);
     throw new Error('Failed to get TikTok videos with queries');
