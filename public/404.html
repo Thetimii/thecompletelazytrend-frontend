@@ -58,12 +58,24 @@
     }
   </style>
   <script>
-    // Simple redirect to home page with hash router
+    // Preserve the hash route when redirecting
     window.onload = function() {
-      // Wait a moment before redirecting
-      setTimeout(function() {
-        window.location.href = '/';
-      }, 3000);
+      // Get the current path from the URL
+      var path = window.location.pathname;
+
+      // If we're on a route that's not the root, extract it
+      if (path !== '/' && !path.includes('.')) {
+        // Remove leading slash and redirect to that hash route
+        var route = path.substring(1);
+        setTimeout(function() {
+          window.location.href = '/#/' + route;
+        }, 1000);
+      } else {
+        // Otherwise just go to the homepage
+        setTimeout(function() {
+          window.location.href = '/';
+        }, 1000);
+      }
     }
   </script>
 </head>

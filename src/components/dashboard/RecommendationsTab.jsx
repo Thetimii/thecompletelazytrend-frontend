@@ -200,7 +200,7 @@ const RecommendationsTab = ({ userProfile }) => {
 
       {/* Last Updated */}
       <div className="text-sm text-primary-500 dark:text-primary-400 text-right">
-        Last updated: {new Date(recommendation.created_at).toLocaleString()}
+        Last updated: {recommendation && recommendation.created_at ? new Date(recommendation.created_at).toLocaleString() : 'N/A'}
       </div>
     </div>
   );
