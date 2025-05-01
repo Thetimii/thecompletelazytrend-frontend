@@ -177,53 +177,26 @@ export const getRecommendations = async () => {
  */
 export const getRecommendationsByUserId = async (userId) => {
   try {
-    // First try with the provided user ID
-    const { data: userData, error: userError } = await supabase
-      .from('recommendations')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
-
-    if (userError) {
-      throw new Error(`Error getting recommendations: ${userError.message}`);
-    }
-
-    // If we found recommendations, return them
-    if (userData && userData.length > 0) {
-      console.log(`Found ${userData.length} recommendations with user_id: ${userId}`);
-      return userData;
-    }
-
-    // If no recommendations found, try getting the user's auth_id
-    const { data: userProfile, error: profileError } = await supabase
-      .from('users')
-      .select('auth_id')
-      .eq('id', userId)
-      .single();
-
-    if (profileError) {
-      console.warn(`Error getting user profile: ${profileError.message}`);
+    if (!userId) {
+      console.warn('No user ID provided to getRecommendationsByUserId');
       return [];
     }
 
-    if (!userProfile || !userProfile.auth_id) {
-      console.warn(`No auth_id found for user: ${userId}`);
-      return [];
-    }
-
-    // Try with the auth_id
-    const { data: authData, error: authError } = await supabase
+    // Get all recommendations where user_id matches the provided userId
+    // This is the correct approach - user_id in the recommendations table
+    // should match the user's ID from the users table
+    const { data, error } = await supabase
       .from('recommendations')
       .select('*')
-      .eq('user_id', userProfile.auth_id)
+      .or(`user_id.eq.${userId}`)
       .order('created_at', { ascending: false });
 
-    if (authError) {
-      throw new Error(`Error getting recommendations by auth_id: ${authError.message}`);
+    if (error) {
+      throw new Error(`Error getting recommendations: ${error.message}`);
     }
 
-    console.log(`Found ${authData?.length || 0} recommendations with auth_id: ${userProfile.auth_id}`);
-    return authData || [];
+    console.log(`Found ${data?.length || 0} recommendations for user: ${userId}`);
+    return data || [];
   } catch (error) {
     console.error('Error getting recommendations:', error);
     throw new Error('Failed to get recommendations');
@@ -340,7 +313,7 @@ export const getTikTokVideosByUserIdWithQueries = async (userId) => {
 
 /**
  * Get the latest recommendation for a user
- * @param {string} userId - User ID (not auth ID)
+ * @param {string} userId - User ID
  * @returns {Promise<Object>} - Latest recommendation
  */
 export const getLatestRecommendationByUserId = async (userId) => {
@@ -350,62 +323,28 @@ export const getLatestRecommendationByUserId = async (userId) => {
       return null;
     }
 
-    // First try with the provided user ID
-    const { data: userData, error: userError } = await supabase
+    // Get the latest recommendation where user_id matches the provided userId
+    // This is the correct approach - user_id in the recommendations table
+    // should match the user's ID from the users table
+    const { data, error } = await supabase
       .from('recommendations')
       .select('*')
-      .eq('user_id', userId)
+      .or(`user_id.eq.${userId}`)
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
 
-    if (userError) {
-      throw new Error(`Error getting latest recommendation: ${userError.message}`);
+    if (error) {
+      throw new Error(`Error getting latest recommendation: ${error.message}`);
     }
 
-    // If we found a recommendation, return it
-    if (userData) {
-      console.log(`Found latest recommendation with user_id: ${userId}`);
-      return userData;
-    }
-
-    // If no recommendation found, try getting the user's auth_id
-    const { data: userProfile, error: profileError } = await supabase
-      .from('users')
-      .select('auth_id')
-      .eq('id', userId)
-      .single();
-
-    if (profileError) {
-      console.warn(`Error getting user profile: ${profileError.message}`);
-      return null;
-    }
-
-    if (!userProfile || !userProfile.auth_id) {
-      console.warn(`No auth_id found for user: ${userId}`);
-      return null;
-    }
-
-    // Try with the auth_id
-    const { data: authData, error: authError } = await supabase
-      .from('recommendations')
-      .select('*')
-      .eq('user_id', userProfile.auth_id)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (authError) {
-      throw new Error(`Error getting latest recommendation by auth_id: ${authError.message}`);
-    }
-
-    if (authData) {
-      console.log(`Found latest recommendation with auth_id: ${userProfile.auth_id}`);
+    if (data) {
+      console.log(`Found latest recommendation for user: ${userId}`);
     } else {
-      console.log(`No recommendation found for user_id: ${userId} or auth_id: ${userProfile.auth_id}`);
+      console.log(`No recommendation found for user: ${userId}`);
     }
 
-    return authData;
+    return data;
   } catch (error) {
     console.error('Error getting latest recommendation:', error);
     throw new Error('Failed to get latest recommendation');
