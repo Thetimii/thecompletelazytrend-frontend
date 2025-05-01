@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
-    <footer className="bg-primary-900 text-white pt-16 pb-8">
+    <footer className="bg-primary-800 dark:bg-primary-900 text-white pt-16 pb-8">
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div className="md:col-span-1">
@@ -29,7 +29,7 @@ const Footer = () => {
               </a>
             </div>
           </div>
-          
+
           <div>
             <h3 className="text-lg font-semibold mb-4 text-white">Product</h3>
             <ul className="space-y-2">
@@ -39,7 +39,7 @@ const Footer = () => {
               <li><a href="#faq" className="text-primary-300 hover:text-white transition-colors">FAQ</a></li>
             </ul>
           </div>
-          
+
           <div>
             <h3 className="text-lg font-semibold mb-4 text-white">Company</h3>
             <ul className="space-y-2">
@@ -48,7 +48,7 @@ const Footer = () => {
               <li><a href="mailto:support@lazy-trends.com" className="text-primary-300 hover:text-white transition-colors">Support</a></li>
             </ul>
           </div>
-          
+
           <div>
             <h3 className="text-lg font-semibold mb-4 text-white">Legal</h3>
             <ul className="space-y-2">
@@ -58,8 +58,8 @@ const Footer = () => {
             </ul>
           </div>
         </div>
-        
-        <div className="border-t border-primary-800 pt-8 mt-8 text-center text-primary-400 text-sm">
+
+        <div className="border-t border-primary-700 dark:border-primary-800 pt-8 mt-8 text-center text-primary-400 text-sm">
           <p>&copy; {new Date().getFullYear()} LazyTrend. All rights reserved.</p>
         </div>
       </div>

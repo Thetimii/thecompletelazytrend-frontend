@@ -6,6 +6,7 @@ import HowItWorksSection from '../components/landing/HowItWorksSection';
 import PricingSection from '../components/landing/PricingSection';
 import FAQSection from '../components/landing/FAQSection';
 import Footer from '../components/landing/Footer';
+import DarkModeToggle from '../components/DarkModeToggle';
 
 const LandingPage = () => {
   // Scroll to top when component mounts
@@ -28,6 +29,7 @@ const LandingPage = () => {
             <a href="#faq" className="text-primary-700 dark:text-primary-300 hover:text-accent-500 dark:hover:text-accent-400 transition-colors">FAQ</a>
           </div>
           <div className="flex items-center space-x-4">
+            <DarkModeToggle />
             <Link to="/login" className="text-primary-700 dark:text-primary-300 hover:text-accent-500 dark:hover:text-accent-400 transition-colors">Login</Link>
             <Link to="/signup" className="btn btn-primary">Get Started</Link>
           </div>
@@ -41,7 +43,7 @@ const LandingPage = () => {
         <HowItWorksSection />
         <PricingSection />
         <FAQSection />
-        
+
         {/* CTA Section */}
         <section className="py-20 bg-gradient-to-r from-accent-500 to-purple-600 text-white">
           <div className="container mx-auto px-6 text-center">

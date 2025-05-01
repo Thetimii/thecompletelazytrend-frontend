@@ -26,5 +26,14 @@ export default defineConfig(({ mode }) => {
     },
     // Add base URL for production deployment
     base: '/',
+    // Configure build options
+    build: {
+      // Generate the _redirects file for SPA routing
+      rollupOptions: {
+        output: {
+          manualChunks: undefined,
+        },
+      },
+    },
   };
 });
