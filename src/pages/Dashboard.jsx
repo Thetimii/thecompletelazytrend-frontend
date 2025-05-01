@@ -169,6 +169,33 @@ const Dashboard = () => {
     .sort((a, b) => (b.views || 0) - (a.views || 0))
     .slice(0, 5);
 
+  // Format numbers with K, M suffix for chart tooltips
+  const formatNumber = (num) => {
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+    return num.toString();
+  };
+
+  // Get chart colors based on dark mode
+  const getChartColors = () => {
+    return {
+      views: {
+        bg: isDarkMode ? 'rgba(96, 165, 250, 0.3)' : 'rgba(59, 130, 246, 0.2)',
+        border: isDarkMode ? 'rgba(96, 165, 250, 0.8)' : 'rgba(59, 130, 246, 0.8)',
+      },
+      likes: {
+        bg: isDarkMode ? 'rgba(167, 139, 250, 0.3)' : 'rgba(139, 92, 246, 0.2)',
+        border: isDarkMode ? 'rgba(167, 139, 250, 0.8)' : 'rgba(139, 92, 246, 0.8)',
+      },
+      comments: {
+        bg: isDarkMode ? 'rgba(79, 209, 197, 0.3)' : 'rgba(20, 184, 166, 0.2)',
+        border: isDarkMode ? 'rgba(79, 209, 197, 0.8)' : 'rgba(20, 184, 166, 0.8)',
+      }
+    };
+  };
+
+  const colors = getChartColors();
+
   const chartData = {
     labels: topVideos.map(video => {
       const text = video.caption || video.description || 'Untitled';
@@ -178,35 +205,117 @@ const Dashboard = () => {
       {
         label: 'Views',
         data: topVideos.map(video => video.views || 0),
-        backgroundColor: 'rgba(54, 162, 235, 0.5)',
-        borderColor: 'rgba(54, 162, 235, 1)',
-        borderWidth: 1,
+        backgroundColor: colors.views.bg,
+        borderColor: colors.views.border,
+        borderWidth: 2,
+        borderRadius: 4,
+        hoverBackgroundColor: colors.views.border,
       },
       {
         label: 'Likes',
         data: topVideos.map(video => video.likes || 0),
-        backgroundColor: 'rgba(255, 99, 132, 0.5)',
-        borderColor: 'rgba(255, 99, 132, 1)',
-        borderWidth: 1,
+        backgroundColor: colors.likes.bg,
+        borderColor: colors.likes.border,
+        borderWidth: 2,
+        borderRadius: 4,
+        hoverBackgroundColor: colors.likes.border,
+      },
+      {
+        label: 'Comments',
+        data: topVideos.map(video => video.comments || 0),
+        backgroundColor: colors.comments.bg,
+        borderColor: colors.comments.border,
+        borderWidth: 2,
+        borderRadius: 4,
+        hoverBackgroundColor: colors.comments.border,
       },
     ],
   };
 
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: 'top',
+        labels: {
+          color: isDarkMode ? '#E5E7EB' : '#1F2937',
+          font: {
+            family: 'Inter',
+            size: 12,
+          },
+          usePointStyle: true,
+          pointStyle: 'circle',
+        },
       },
       title: {
         display: true,
         text: 'Top 5 TikTok Videos Performance',
+        color: isDarkMode ? '#E5E7EB' : '#1F2937',
+        font: {
+          family: 'Inter',
+          size: 16,
+          weight: 'bold',
+        },
+        padding: {
+          bottom: 20,
+        },
+      },
+      tooltip: {
+        callbacks: {
+          label: (context) => {
+            const label = context.dataset.label || '';
+            const value = context.parsed.y;
+            return `${label}: ${formatNumber(value)}`;
+          },
+        },
+        titleFont: {
+          family: 'Inter',
+          size: 12,
+        },
+        bodyFont: {
+          family: 'Inter',
+          size: 12,
+        },
+        backgroundColor: isDarkMode ? 'rgba(30, 41, 59, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+        titleColor: isDarkMode ? '#E5E7EB' : '#1F2937',
+        bodyColor: isDarkMode ? '#E5E7EB' : '#1F2937',
+        borderColor: isDarkMode ? 'rgba(71, 85, 105, 0.5)' : 'rgba(203, 213, 225, 0.5)',
+        borderWidth: 1,
+        padding: 10,
+        displayColors: true,
+        boxPadding: 5,
       },
     },
     scales: {
+      x: {
+        ticks: {
+          color: isDarkMode ? '#9CA3AF' : '#4B5563',
+          font: {
+            family: 'Inter',
+          },
+        },
+        grid: {
+          color: isDarkMode ? 'rgba(71, 85, 105, 0.2)' : 'rgba(203, 213, 225, 0.5)',
+        },
+      },
       y: {
         beginAtZero: true,
+        ticks: {
+          color: isDarkMode ? '#9CA3AF' : '#4B5563',
+          font: {
+            family: 'Inter',
+          },
+          callback: (value) => formatNumber(value),
+        },
+        grid: {
+          color: isDarkMode ? 'rgba(71, 85, 105, 0.2)' : 'rgba(203, 213, 225, 0.5)',
+        },
       },
+    },
+    animation: {
+      duration: 1000,
+      easing: 'easeOutQuart',
     },
   };
 

@@ -54,6 +54,7 @@ const ThemeIcon = ({ isDark }) => (
 const Sidebar = ({ activeTab, setActiveTab, isDarkMode, toggleDarkMode }) => {
   const { user, userProfile, logout } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -79,6 +80,16 @@ const Sidebar = ({ activeTab, setActiveTab, isDarkMode, toggleDarkMode }) => {
     return user?.email?.charAt(0).toUpperCase() || 'U';
   };
 
+  // Handle dark mode toggle with animation
+  const handleDarkModeToggle = () => {
+    // Show tooltip briefly
+    setShowTooltip(true);
+    setTimeout(() => setShowTooltip(false), 2000);
+
+    // Toggle dark mode
+    toggleDarkMode();
+  };
+
   const tabs = [
     { id: 'summary', label: 'Summary', icon: <SummaryIcon /> },
     { id: 'videos', label: 'Videos Analyzed', icon: <VideosIcon /> },
@@ -87,8 +98,8 @@ const Sidebar = ({ activeTab, setActiveTab, isDarkMode, toggleDarkMode }) => {
   ];
 
   return (
-    <div 
-      className={`h-screen fixed left-0 top-0 z-30 bg-white dark:bg-primary-800 shadow-md transition-all duration-300 ${
+    <div
+      className={`h-screen fixed left-0 top-0 z-30 bg-white dark:bg-primary-800 shadow-lg transition-all duration-300 ${
         collapsed ? 'w-16' : 'w-64'
       }`}
     >
@@ -102,7 +113,8 @@ const Sidebar = ({ activeTab, setActiveTab, isDarkMode, toggleDarkMode }) => {
           )}
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="p-2 rounded-md hover:bg-primary-100 dark:hover:bg-primary-700 transition-colors duration-150"
+            className="p-2 rounded-md hover:bg-primary-100 dark:hover:bg-primary-700 transition-colors duration-150 text-primary-600 dark:text-primary-300"
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             {collapsed ? <ExpandIcon /> : <CollapseIcon />}
           </button>
@@ -112,13 +124,13 @@ const Sidebar = ({ activeTab, setActiveTab, isDarkMode, toggleDarkMode }) => {
         <div className="p-4 border-b border-primary-100 dark:border-primary-700">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <div className="w-10 h-10 rounded-full bg-accent-500 flex items-center justify-center text-white font-medium">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent-500 to-accent-600 flex items-center justify-center text-white font-medium shadow-md">
                 {getUserInitials()}
               </div>
             </div>
             {!collapsed && (
               <div className="ml-3 overflow-hidden">
-                <p className="text-sm font-medium truncate">{getUserDisplayName()}</p>
+                <p className="text-sm font-medium truncate text-primary-800 dark:text-primary-100">{getUserDisplayName()}</p>
                 <p className="text-xs text-primary-500 dark:text-primary-400 truncate">
                   {user?.email}
                 </p>
@@ -134,14 +146,20 @@ const Sidebar = ({ activeTab, setActiveTab, isDarkMode, toggleDarkMode }) => {
               <li key={tab.id}>
                 <button
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center w-full p-2 rounded-md transition-colors duration-150 ${
+                  className={`flex items-center w-full p-2 rounded-md transition-all duration-200 ${
                     activeTab === tab.id
-                      ? 'bg-accent-100 text-accent-600 dark:bg-primary-700 dark:text-accent-400'
-                      : 'hover:bg-primary-100 dark:hover:bg-primary-700'
+                      ? 'bg-accent-100 text-accent-600 dark:bg-primary-700 dark:text-accent-400 shadow-sm'
+                      : 'text-primary-600 dark:text-primary-300 hover:bg-primary-100 dark:hover:bg-primary-700'
                   }`}
                 >
-                  <span className="flex-shrink-0">{tab.icon}</span>
-                  {!collapsed && <span className="ml-3">{tab.label}</span>}
+                  <span className={`flex-shrink-0 transition-transform duration-300 ${activeTab === tab.id ? 'scale-110' : ''}`}>
+                    {tab.icon}
+                  </span>
+                  {!collapsed && (
+                    <span className={`ml-3 ${activeTab === tab.id ? 'font-medium' : ''}`}>
+                      {tab.label}
+                    </span>
+                  )}
                 </button>
               </li>
             ))}
@@ -151,22 +169,33 @@ const Sidebar = ({ activeTab, setActiveTab, isDarkMode, toggleDarkMode }) => {
         {/* Bottom actions */}
         <div className="p-4 border-t border-primary-100 dark:border-primary-700">
           <div className="space-y-2">
-            <button
-              onClick={toggleDarkMode}
-              className="flex items-center w-full p-2 rounded-md hover:bg-primary-100 dark:hover:bg-primary-700 transition-colors duration-150"
-            >
-              <span className="flex-shrink-0">
-                <ThemeIcon isDark={isDarkMode} />
-              </span>
-              {!collapsed && (
-                <span className="ml-3">
-                  {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+            <div className="relative">
+              <button
+                onClick={handleDarkModeToggle}
+                className="flex items-center w-full p-2 rounded-md hover:bg-primary-100 dark:hover:bg-primary-700 transition-colors duration-150 text-primary-600 dark:text-primary-300"
+                aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+              >
+                <span className="flex-shrink-0 transition-transform duration-300 hover:rotate-12">
+                  <ThemeIcon isDark={isDarkMode} />
                 </span>
+                {!collapsed && (
+                  <span className="ml-3">
+                    {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+                  </span>
+                )}
+              </button>
+
+              {/* Tooltip that appears briefly when toggling */}
+              {showTooltip && !collapsed && (
+                <div className="absolute right-0 top-0 -mt-8 bg-accent-500 text-white text-xs px-2 py-1 rounded animate-fade-in">
+                  {isDarkMode ? 'Light mode enabled!' : 'Dark mode enabled!'}
+                </div>
               )}
-            </button>
+            </div>
+
             <button
               onClick={handleLogout}
-              className="flex items-center w-full p-2 rounded-md hover:bg-primary-100 dark:hover:bg-primary-700 transition-colors duration-150 text-red-600 dark:text-red-400"
+              className="flex items-center w-full p-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-150 text-red-600 dark:text-red-400"
             >
               <span className="flex-shrink-0">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
