@@ -52,21 +52,72 @@ export const getTrendQueriesByUserId = async (userId) => {
 };
 
 /**
- * Get all TikTok videos
+ * Get TikTok videos for the current user
+ * @param {string} userId - User ID to filter videos by
  * @returns {Promise<Array>} - Array of TikTok videos
  */
-export const getTikTokVideos = async () => {
+export const getTikTokVideos = async (userId = null) => {
   try {
-    const { data, error } = await supabase
-      .from('tiktok_videos')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      throw new Error(`Error getting TikTok videos: ${error.message}`);
+    // If no userId is provided, try to get the current user
+    if (!userId) {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          userId = user.id;
+        }
+      } catch (err) {
+        console.warn('Could not get current user:', err);
+      }
     }
 
-    return data;
+    // If we have a userId, get videos for that user's queries
+    if (userId) {
+      // First get all queries for this user
+      const { data: queries, error: queriesError } = await supabase
+        .from('trend_queries')
+        .select('id')
+        .eq('user_id', userId);
+
+      if (queriesError) {
+        console.error('Error getting trend queries:', queriesError);
+        return [];
+      }
+
+      if (!queries || queries.length === 0) {
+        console.log('No queries found for user, returning empty videos array');
+        return [];
+      }
+
+      // Get the query IDs
+      const queryIds = queries.map(query => query.id);
+
+      // Get videos for these queries
+      const { data, error } = await supabase
+        .from('tiktok_videos')
+        .select('*')
+        .in('trend_query_id', queryIds)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        throw new Error(`Error getting TikTok videos: ${error.message}`);
+      }
+
+      return data || [];
+    } else {
+      // Fallback to getting all videos (should rarely happen)
+      console.warn('No user ID available, fetching all videos (not recommended)');
+      const { data, error } = await supabase
+        .from('tiktok_videos')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(20); // Limit to avoid fetching too many
+
+      if (error) {
+        throw new Error(`Error getting TikTok videos: ${error.message}`);
+      }
+
+      return data || [];
+    }
   } catch (error) {
     console.error('Error getting TikTok videos:', error);
     throw new Error('Failed to get TikTok videos');
@@ -150,20 +201,10 @@ export const getRecommendationsByUserId = async (userId) => {
  */
 export const getTikTokVideosByUserIdWithQueries = async (userId) => {
   try {
-    console.log('Getting videos by query for user ID:', userId);
-
-    // Get the current user to double-check
-    const { data: { user } } = await supabase.auth.getUser();
-    console.log('Current authenticated user:', user);
-
-    // Check all trend_queries to see what's available
-    const { data: allQueries, error: allQueriesError } = await supabase
-      .from('trend_queries')
-      .select('id, query, user_id')
-      .limit(10);
-
-    console.log('Sample of all trend_queries:', allQueries);
-    console.log('All queries error:', allQueriesError);
+    if (!userId) {
+      console.warn('No user ID provided to getTikTokVideosByUserIdWithQueries');
+      return [];
+    }
 
     // Step 1: Get all trend_queries for this user
     const { data: queries, error: queriesError } = await supabase
@@ -176,8 +217,6 @@ export const getTikTokVideosByUserIdWithQueries = async (userId) => {
       throw new Error(`Error getting trend queries: ${queriesError.message}`);
     }
 
-    console.log('Queries found for user:', queries);
-
     if (!queries || queries.length === 0) {
       console.log('No queries found for user');
       return [];
@@ -185,7 +224,6 @@ export const getTikTokVideosByUserIdWithQueries = async (userId) => {
 
     // Step 2: Get the IDs from those queries
     const queryIds = queries.map(query => query.id);
-    console.log('Query IDs to search for videos:', queryIds);
 
     // Step 3: Get all tiktok_videos where trend_query_id is in that list
     const { data: videos, error: videosError } = await supabase
@@ -197,8 +235,6 @@ export const getTikTokVideosByUserIdWithQueries = async (userId) => {
       console.error('Error getting TikTok videos:', videosError);
       throw new Error(`Error getting TikTok videos: ${videosError.message}`);
     }
-
-    console.log('Videos found:', videos?.length || 0);
 
     if (!videos || videos.length === 0) {
       console.log('No videos found for queries');
@@ -219,7 +255,6 @@ export const getTikTokVideosByUserIdWithQueries = async (userId) => {
 
       // Skip videos with no query ID or if the query doesn't exist in our map
       if (!queryId || !queriesMap[queryId]) {
-        console.warn('Video has invalid trend_query_id:', video);
         return;
       }
 
@@ -240,10 +275,7 @@ export const getTikTokVideosByUserIdWithQueries = async (userId) => {
       });
     });
 
-    const result = Object.values(videosByQuery);
-    console.log('Final grouped videos result:', result);
-
-    return result;
+    return Object.values(videosByQuery);
   } catch (error) {
     console.error('Error getting TikTok videos with queries:', error);
     throw new Error('Failed to get TikTok videos with queries');

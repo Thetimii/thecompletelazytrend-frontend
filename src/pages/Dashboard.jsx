@@ -72,31 +72,37 @@ const Dashboard = () => {
         setQueries([]);
       }
 
-      // Fetch all videos regardless of selected query
-      // We'll filter them in the VideosTab component
-      try {
-        console.log('Fetching all TikTok videos');
-        const videosData = await getTikTokVideos();
-        console.log('All videos data:', videosData?.length || 0, 'videos');
-        setVideos(videosData || []);
-      } catch (error) {
-        console.warn('Error fetching TikTok videos, table might not exist yet:', error);
-        console.error('Detailed error:', error);
-        setVideos([]);
-      }
-
       // Fetch videos grouped by query for the current user
+      // We'll use this data for both grouped and filtered views
       if (user?.id) {
         try {
           console.log('Fetching videos by query for user:', user.id);
           const videosByQueryData = await getTikTokVideosByUserIdWithQueries(user.id);
-          console.log('Videos by query data:', videosByQueryData);
+
+          // Set the videos by query data
           setVideosByQuery(videosByQueryData || []);
+
+          // Also extract all videos for the filtered view
+          const allVideos = [];
+          if (videosByQueryData && videosByQueryData.length > 0) {
+            videosByQueryData.forEach(group => {
+              if (group.videos && group.videos.length > 0) {
+                allVideos.push(...group.videos);
+              }
+            });
+          }
+
+          console.log('Total videos extracted:', allVideos.length);
+          setVideos(allVideos);
         } catch (error) {
-          console.warn('Error fetching videos by query, table might not exist yet:', error);
-          console.error('Detailed error:', error);
+          console.warn('Error fetching videos by query:', error);
           setVideosByQuery([]);
+          setVideos([]);
         }
+      } else {
+        console.log('No user ID available, cannot fetch videos');
+        setVideosByQuery([]);
+        setVideos([]);
       }
 
       // Fetch recommendations for the current user
