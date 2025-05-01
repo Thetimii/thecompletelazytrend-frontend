@@ -6,47 +6,7 @@
     <title>The Complete Lazy Trend</title>
     <link href="/dist/output.css" rel="stylesheet">
 
-    <!-- Handle SPA routing for custom domains -->
-    <script type="text/javascript">
-      // Single Page Apps for GitHub Pages or custom domains
-      (function(l) {
-        if (l.search[1] === '/' ) {
-          var decoded = l.search.slice(1).split('&').map(function(s) {
-            return s.replace(/~and~/g, '&')
-          }).join('?');
-          window.history.replaceState(null, null,
-              l.pathname.slice(0, -1) + decoded + l.hash
-          );
-        }
-      }(window.location))
-    </script>
-
-    <!-- Fix for SPA routing on page refresh -->
-    <script>
-      // This ensures that when the page is refreshed, the correct route is maintained
-      (function() {
-        // Don't run this script on the server
-        if (typeof window === 'undefined') return;
-
-        // Get the current path
-        const path = window.location.pathname;
-
-        // If we're on a route that's not the root, make sure it's properly handled
-        if (path !== '/' && !path.includes('.')) {
-          // Store the current path in sessionStorage
-          sessionStorage.setItem('lastPath', path);
-        }
-
-        // On page load, check if we have a stored path
-        window.addEventListener('load', function() {
-          const storedPath = sessionStorage.getItem('lastPath');
-          if (storedPath && window.location.pathname === '/') {
-            // If we're at the root but have a stored path, navigate to it
-            window.history.replaceState(null, null, storedPath);
-          }
-        });
-      })();
-    </script>
+    <!-- Using HashRouter for SPA routing - no custom scripts needed -->
   </head>
   <body class="bg-primary-50 dark:bg-primary-900">
     <div id="root"></div>

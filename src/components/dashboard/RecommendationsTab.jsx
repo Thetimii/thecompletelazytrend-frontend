@@ -8,19 +8,12 @@ const RecommendationsTab = ({ userProfile }) => {
   const [initialCheckDone, setInitialCheckDone] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
 
-  // Simulate analysis progress
+  // Set a fixed progress value instead of constantly updating
   useEffect(() => {
     if (!recommendation && initialCheckDone && !error) {
-      // Only start the progress animation if we've checked and there's no recommendation yet
-      const interval = setInterval(() => {
-        setAnalysisProgress(prev => {
-          // Cap at 95% to show it's still "working" until the actual data arrives
-          const newProgress = prev + (Math.random() * 5);
-          return newProgress > 95 ? 95 : newProgress;
-        });
-      }, 5000); // Update every 5 seconds
-
-      return () => clearInterval(interval);
+      // Just set a fixed progress value of 80% to indicate it's working
+      // but not constantly updating
+      setAnalysisProgress(80);
     }
   }, [recommendation, initialCheckDone, error]);
 
@@ -83,20 +76,7 @@ const RecommendationsTab = ({ userProfile }) => {
     }
   };
 
-  // Render loading state
-  if (loading) {
-    return (
-      <div className="animate-fade-in">
-        <div className="flex items-center mb-8">
-          <h2 className="text-3xl font-bold gradient-text">Recommendations</h2>
-        </div>
-        <div className="dashboard-card p-10 flex justify-center items-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-4 border-primary-200 border-t-accent-500"></div>
-          <span className="ml-3 text-primary-600 dark:text-primary-400">Loading recommendations...</span>
-        </div>
-      </div>
-    );
-  }
+  // Skip loading state and go straight to content or empty state
 
   // Render error state
   if (error) {
