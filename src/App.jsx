@@ -7,7 +7,7 @@ import Onboarding from './pages/Onboarding';
 import Payment from './pages/Payment';
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentCancel from './pages/PaymentCancel';
-import Navbar from './components/Navbar';
+import PublicNavbar from './components/PublicNavbar';
 import ProtectedRoute from './components/ProtectedRoute';
 import SubscriptionMiddleware from './middleware/SubscriptionMiddleware';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -96,68 +96,60 @@ function AppContent() {
   }, [isDarkMode]);
 
   return (
-    <div className="min-h-screen bg-primary-50 dark:bg-primary-900 transition-colors duration-300">
-      {/* Only show Navbar on non-dashboard pages */}
-      {window.location.pathname !== '/' && (
-        <Navbar isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
-      )}
-      <div className="container mx-auto px-4 py-8">
-        <Routes>
-          <Route
-            path="/login"
-            element={isAuthenticated ? <Navigate to="/" /> : <Login />}
-          />
-          <Route
-            path="/signup"
-            element={isAuthenticated ? <Navigate to="/" /> : <Signup />}
-          />
-          <Route
-            path="/onboarding"
-            element={
-              <ProtectedRoute>
-                <Onboarding />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/payment"
-            element={
-              <ProtectedRoute>
-                <Payment />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/payment-success"
-            element={
-              <ProtectedRoute>
-                <PaymentSuccess />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/payment-cancel"
-            element={
-              <ProtectedRoute>
-                <PaymentCancel />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <OnboardingCheck>
-                  <SubscriptionMiddleware>
-                    <Dashboard />
-                  </SubscriptionMiddleware>
-                </OnboardingCheck>
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </div>
-    </div>
+    <Routes>
+      <Route
+        path="/login"
+        element={isAuthenticated ? <Navigate to="/" /> : <Login />}
+      />
+      <Route
+        path="/signup"
+        element={isAuthenticated ? <Navigate to="/" /> : <Signup />}
+      />
+      <Route
+        path="/onboarding"
+        element={
+          <ProtectedRoute>
+            <Onboarding />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/payment"
+        element={
+          <ProtectedRoute>
+            <Payment />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/payment-success"
+        element={
+          <ProtectedRoute>
+            <PaymentSuccess />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/payment-cancel"
+        element={
+          <ProtectedRoute>
+            <PaymentCancel />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <OnboardingCheck>
+              <SubscriptionMiddleware>
+                <Dashboard />
+              </SubscriptionMiddleware>
+            </OnboardingCheck>
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
   );
 }
 
