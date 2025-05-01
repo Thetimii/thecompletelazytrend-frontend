@@ -25,6 +25,7 @@ import {
 import Sidebar from '../components/Sidebar';
 import SummaryTab from '../components/dashboard/SummaryTab';
 import VideosTab from '../components/dashboard/VideosTab';
+import RecommendationsTab from '../components/dashboard/RecommendationsTab';
 import EmailScheduleTab from '../components/dashboard/EmailScheduleTab';
 import SettingsTab from '../components/dashboard/SettingsTab';
 
@@ -326,6 +327,12 @@ const Dashboard = () => {
                 videosByQuery={videosByQuery}
                 selectedQueryId={selectedQueryId}
                 setSelectedQueryId={setSelectedQueryId}
+              />
+            )}
+
+            {activeTab === 'recommendations' && (
+              <RecommendationsTab
+                userProfile={userProfile}
               />
             )}
 

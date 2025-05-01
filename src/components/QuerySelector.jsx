@@ -39,9 +39,6 @@ const QuerySelector = ({ queries, selectedQueryId, onSelectQuery }) => {
     }
   }, [searchTerm, uniqueQueriesArray]);
 
-  console.log('Unique queries:', uniqueQueriesArray.length, 'out of', queries.length);
-  console.log('Filtered queries:', filteredQueries.length);
-
   return (
     <div className="mb-0 space-y-4">
       <div>

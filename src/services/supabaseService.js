@@ -231,10 +231,7 @@ export const getTikTokVideosByUserIdWithQueries = async (userId) => {
       .select('*')
       .in('trend_query_id', queryIds);
 
-    // Log the first video for debugging
-    if (videos && videos.length > 0) {
-      console.log('Sample video data:', videos[0]);
-    }
+    // Process video data from database
 
     if (videosError) {
       console.error('Error getting TikTok videos:', videosError);
@@ -287,6 +284,37 @@ export const getTikTokVideosByUserIdWithQueries = async (userId) => {
   }
 };
 
+/**
+ * Get the latest recommendation for a user
+ * @param {string} userId - User ID (not auth ID)
+ * @returns {Promise<Object>} - Latest recommendation
+ */
+export const getLatestRecommendationByUserId = async (userId) => {
+  try {
+    if (!userId) {
+      console.warn('No user ID provided to getLatestRecommendationByUserId');
+      return null;
+    }
+
+    const { data, error } = await supabase
+      .from('recommendations')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(`Error getting latest recommendation: ${error.message}`);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error getting latest recommendation:', error);
+    throw new Error('Failed to get latest recommendation');
+  }
+};
+
 export default {
   getTrendQueries,
   getTrendQueriesByUserId,
@@ -294,5 +322,6 @@ export default {
   getTikTokVideosByTrendQueryId,
   getRecommendations,
   getRecommendationsByUserId,
-  getTikTokVideosByUserIdWithQueries
+  getTikTokVideosByUserIdWithQueries,
+  getLatestRecommendationByUserId
 };

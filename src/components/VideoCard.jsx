@@ -3,8 +3,6 @@ import React, { useState } from 'react';
 const VideoCard = ({ video }) => {
   const [isHovered, setIsHovered] = useState(false);
 
-  console.log('Video data in card:', video);
-
   // Extract hashtags from description if available
   const extractHashtags = (text) => {
     if (!text) return [];
@@ -58,16 +56,7 @@ const VideoCard = ({ video }) => {
     }
   }
 
-  // Log thumbnail info for debugging
-  console.log('Thumbnail info:', {
-    videoId: video.id,
-    thumbnailUrl,
-    originalUrl: video.thumbnail_url || video.cover_url || video.thumbnail || video.cover || '',
-    thumbnail_url: video.thumbnail_url,
-    cover_url: video.cover_url,
-    thumbnail: video.thumbnail,
-    cover: video.cover
-  });
+  // Thumbnail info is now properly processed
 
   // Get engagement metrics with fallbacks
   const views = video.views || video.play_count || 0;

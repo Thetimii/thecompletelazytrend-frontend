@@ -6,12 +6,7 @@ const VideosTab = ({ queries, videos, videosByQuery, selectedQueryId, setSelecte
   // Always use filtered mode
   const [viewMode, setViewMode] = useState('filtered');
 
-  console.log('VideosTab props:', {
-    queriesCount: queries?.length || 0,
-    videosCount: videos?.length || 0,
-    videosByQueryCount: videosByQuery?.length || 0,
-    selectedQueryId
-  });
+  // VideosTab component with filtered view
 
   // Function to render videos in filtered mode (using the existing filter dropdown)
   const renderFilteredVideos = () => {
@@ -20,7 +15,7 @@ const VideosTab = ({ queries, videos, videosByQuery, selectedQueryId, setSelecte
       ? videos.filter(video => video.trend_query_id === selectedQueryId)
       : videos;
 
-    console.log('Filtered videos:', filteredVideos.length, 'Selected query ID:', selectedQueryId);
+    // Process filtered videos based on selected query
 
     if (filteredVideos.length === 0) {
       return (
@@ -63,7 +58,7 @@ const VideosTab = ({ queries, videos, videosByQuery, selectedQueryId, setSelecte
 
   // Function to render videos grouped by search query
   const renderGroupedVideos = () => {
-    console.log('Rendering grouped videos with data:', videosByQuery);
+    // Process grouped videos data
 
     if (!videosByQuery || videosByQuery.length === 0) {
       return (
