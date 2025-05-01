@@ -94,7 +94,7 @@ const Login = () => {
 
       // Force a small delay to ensure the auth state is updated
       setTimeout(() => {
-        navigate('/');
+        navigate('/dashboard');
       }, 500);
     } catch (err) {
       console.error("Login error:", err);

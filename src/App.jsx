@@ -12,6 +12,8 @@ import LandingPage from './pages/LandingPage';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import CookiePolicy from './pages/CookiePolicy';
+import Contact from './pages/Contact';
+import About from './pages/About';
 import PublicNavbar from './components/PublicNavbar';
 import ProtectedRoute from './components/ProtectedRoute';
 import SubscriptionMiddleware from './middleware/SubscriptionMiddleware';
@@ -107,6 +109,8 @@ function AppContent() {
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/terms" element={<TermsOfService />} />
       <Route path="/cookies" element={<CookiePolicy />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/about" element={<About />} />
 
       {/* Authentication Routes */}
       <Route

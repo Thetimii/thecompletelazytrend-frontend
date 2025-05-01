@@ -25,11 +25,11 @@ const PricingCard = ({ title, price, features, isPopular, ctaText }) => {
             </li>
           ))}
         </ul>
-        <Link 
-          to="/signup" 
+        <Link
+          to="/signup"
           className={`block w-full py-3 px-4 text-center rounded-lg font-medium transition-colors ${
-            isPopular 
-              ? 'bg-accent-500 hover:bg-accent-600 text-white' 
+            isPopular
+              ? 'bg-accent-500 hover:bg-accent-600 text-white'
               : 'bg-primary-100 hover:bg-primary-200 text-primary-800 dark:bg-primary-700 dark:hover:bg-primary-600 dark:text-primary-100'
           }`}
         >
@@ -41,48 +41,21 @@ const PricingCard = ({ title, price, features, isPopular, ctaText }) => {
 };
 
 const PricingSection = () => {
-  const plans = [
-    {
-      title: "Basic",
-      price: 29,
-      features: [
-        "Weekly trend analysis",
-        "5 niche keywords",
-        "Basic content recommendations",
-        "Email notifications",
-        "Dashboard access"
-      ],
-      ctaText: "Start Free Trial"
-    },
-    {
-      title: "Pro",
-      price: 49,
-      features: [
-        "Daily trend analysis",
-        "15 niche keywords",
-        "Advanced content recommendations",
-        "Priority email notifications",
-        "Full dashboard access",
-        "Performance analytics"
-      ],
-      isPopular: true,
-      ctaText: "Start Free Trial"
-    },
-    {
-      title: "Business",
-      price: 99,
-      features: [
-        "Real-time trend analysis",
-        "Unlimited niche keywords",
-        "Premium content recommendations",
-        "Custom email schedule",
-        "Advanced dashboard",
-        "Comprehensive analytics",
-        "Priority support"
-      ],
-      ctaText: "Contact Sales"
-    }
-  ];
+  const plan = {
+    title: "LazyTrend Premium",
+    price: 49.95,
+    features: [
+      "Daily trend analysis",
+      "Personalized content recommendations",
+      "Daily email updates",
+      "Full dashboard access",
+      "Performance analytics",
+      "Optimized for your business",
+      "7-day free trial"
+    ],
+    isPopular: true,
+    ctaText: "Start Free Trial"
+  };
 
   return (
     <section id="pricing" className="py-20 bg-gray-50 dark:bg-primary-900">
@@ -90,26 +63,23 @@ const PricingSection = () => {
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-primary-900 dark:text-white">Simple, Transparent Pricing</h2>
           <p className="text-xl text-primary-600 dark:text-primary-400 max-w-3xl mx-auto">
-            Choose the plan that's right for your content creation needs.
+            One plan, everything you need for your content creation success.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {plans.map((plan, index) => (
-            <PricingCard
-              key={index}
-              title={plan.title}
-              price={plan.price}
-              features={plan.features}
-              isPopular={plan.isPopular}
-              ctaText={plan.ctaText}
-            />
-          ))}
+        <div className="max-w-md mx-auto">
+          <PricingCard
+            title={plan.title}
+            price={plan.price}
+            features={plan.features}
+            isPopular={plan.isPopular}
+            ctaText={plan.ctaText}
+          />
         </div>
 
         <div className="mt-12 text-center">
-          <p className="text-primary-600 dark:text-primary-400">
-            All plans include a 7-day free trial. No credit card required to start.
+          <p className="text-primary-600 dark:text-primary-400 max-w-2xl mx-auto">
+            Start with a 7-day free trial. Credit card required to prevent abuse, but you won't be charged until your trial ends. Cancel anytime during the trial period.
           </p>
         </div>
       </div>

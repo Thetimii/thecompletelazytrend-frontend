@@ -43,15 +43,23 @@ const FAQSection = () => {
     },
     {
       question: "How often will I receive new trend insights?",
-      answer: "Depending on your plan, you'll receive trend insights weekly or daily. You can also customize your email notification schedule to receive updates when it's most convenient for you."
+      answer: "You'll receive daily trend insights and recommendations via email. You can also access the latest insights anytime through your dashboard."
     },
     {
       question: "Can I use LazyTrend for multiple niches or businesses?",
-      answer: "Yes! Our Business plan allows you to track multiple niches or businesses. For Basic and Pro plans, you can change your niche focus at any time from your dashboard settings."
+      answer: "LazyTrend is optimized specifically for your business. It's not designed as a general research tool for multiple niches. This focused approach allows us to provide more accurate and relevant recommendations for your specific business needs."
     },
     {
-      question: "What if I'm not satisfied with the service?",
-      answer: "We offer a 7-day free trial so you can test LazyTrend before committing. If you're not satisfied after subscribing, we offer a 30-day money-back guarantee. Simply contact our support team."
+      question: "Do I need to provide my credit card for the free trial?",
+      answer: "Yes, we require a credit card to start your free trial. This helps prevent abuse of our system. You won't be charged until your 7-day trial period ends, and you can cancel anytime during the trial with no charges."
+    },
+    {
+      question: "What happens after my free trial ends?",
+      answer: "After your 7-day free trial, you'll be automatically charged $49.95 per month for continued access to LazyTrend. You can cancel anytime from your account settings."
+    },
+    {
+      question: "Do you offer refunds if I'm not satisfied?",
+      answer: "We offer a comprehensive 7-day free trial so you can fully test LazyTrend before committing. Because of this trial period, we don't offer refunds after your subscription begins. We encourage you to make full use of the trial to ensure LazyTrend meets your needs."
     },
     {
       question: "Can LazyTrend help with other social platforms besides TikTok?",
@@ -81,8 +89,8 @@ const FAQSection = () => {
 
         <div className="mt-12 text-center">
           <p className="text-primary-700 dark:text-primary-300 mb-4">Still have questions?</p>
-          <a 
-            href="mailto:support@lazy-trends.com" 
+          <a
+            href="mailto:support@lazy-trends.com"
             className="text-accent-500 hover:text-accent-600 font-medium"
           >
             Contact our support team
