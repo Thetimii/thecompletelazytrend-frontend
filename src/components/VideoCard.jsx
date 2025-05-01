@@ -17,7 +17,44 @@ const VideoCard = ({ video }) => {
   const hashtags = video.hashtags || extractHashtags(video.description || video.caption);
 
   // Get thumbnail URL - try all possible fields
-  const thumbnailUrl = video.thumbnail_url || video.cover_url || video.thumbnail || '';
+  let thumbnailUrl = '';
+
+  // Check for direct image URLs in various fields
+  if (video.thumbnail_url) thumbnailUrl = video.thumbnail_url;
+  else if (video.cover_url) thumbnailUrl = video.cover_url;
+  else if (video.thumbnail) thumbnailUrl = video.thumbnail;
+  else if (video.cover) thumbnailUrl = video.cover;
+
+  // If we have a video URL but no thumbnail, try to extract from the video URL
+  if (!thumbnailUrl && video.video_url) {
+    // TikTok video URLs often contain the video ID which can be used to construct a thumbnail URL
+    const videoIdMatch = video.video_url.match(/\/video\/(\d+)/);
+    if (videoIdMatch && videoIdMatch[1]) {
+      const videoId = videoIdMatch[1];
+      thumbnailUrl = `https://p16-sign-va.tiktokcdn.com/obj/tos-maliva-p-0068/${videoId}`;
+    }
+  }
+
+  // If the URL doesn't start with http, it might be a relative URL
+  // Try to fix it by adding the TikTok domain if needed
+  if (thumbnailUrl && !thumbnailUrl.startsWith('http')) {
+    if (thumbnailUrl.startsWith('//')) {
+      thumbnailUrl = 'https:' + thumbnailUrl;
+    } else if (thumbnailUrl.startsWith('/')) {
+      thumbnailUrl = 'https://www.tiktok.com' + thumbnailUrl;
+    }
+  }
+
+  // Log thumbnail info for debugging
+  console.log('Thumbnail info:', {
+    videoId: video.id,
+    thumbnailUrl,
+    originalUrl: video.thumbnail_url || video.cover_url || video.thumbnail || video.cover || '',
+    thumbnail_url: video.thumbnail_url,
+    cover_url: video.cover_url,
+    thumbnail: video.thumbnail,
+    cover: video.cover
+  });
 
   // Get engagement metrics with fallbacks
   const views = video.views || video.play_count || 0;

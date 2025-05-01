@@ -231,6 +231,11 @@ export const getTikTokVideosByUserIdWithQueries = async (userId) => {
       .select('*')
       .in('trend_query_id', queryIds);
 
+    // Log the first video for debugging
+    if (videos && videos.length > 0) {
+      console.log('Sample video data:', videos[0]);
+    }
+
     if (videosError) {
       console.error('Error getting TikTok videos:', videosError);
       throw new Error(`Error getting TikTok videos: ${videosError.message}`);

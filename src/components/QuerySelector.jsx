@@ -1,6 +1,25 @@
 import React from 'react';
 
 const QuerySelector = ({ queries, selectedQueryId, onSelectQuery }) => {
+  // Remove duplicate queries by creating a map of unique query texts
+  const uniqueQueries = {};
+
+  // Process queries to get only unique ones based on the query text
+  queries.forEach(query => {
+    // Only add if we don't already have this query text
+    // This will keep only the first occurrence of each query text
+    if (query.query && !uniqueQueries[query.query.toLowerCase()]) {
+      uniqueQueries[query.query.toLowerCase()] = query;
+    }
+  });
+
+  // Convert back to array and sort alphabetically
+  const uniqueQueriesArray = Object.values(uniqueQueries).sort((a, b) =>
+    a.query.localeCompare(b.query)
+  );
+
+  console.log('Unique queries:', uniqueQueriesArray.length, 'out of', queries.length);
+
   return (
     <div className="mb-0">
       <label htmlFor="query-select" className="block text-sm font-medium text-primary-600 dark:text-primary-300 mb-2">
@@ -14,7 +33,7 @@ const QuerySelector = ({ queries, selectedQueryId, onSelectQuery }) => {
           className="select appearance-none pr-10 transition-all duration-300 hover:border-accent-400 dark:hover:border-accent-500"
         >
           <option value="">All Queries</option>
-          {queries.map((query) => (
+          {uniqueQueriesArray.map((query) => (
             <option key={query.id} value={query.id}>
               {query.query}
             </option>
