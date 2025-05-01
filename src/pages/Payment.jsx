@@ -84,17 +84,13 @@ const Payment = () => {
 
           <div className="mb-6">
             <h2 className="text-xl font-semibold mb-2">Subscription Details</h2>
-            <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">
-              <p className="font-bold">7-Day Free Trial</p>
-              <p>Try it risk-free! You won't be charged until your trial ends.</p>
-            </div>
             <p className="text-gray-700 mb-1">Plan: The Complete Lazy Trend</p>
-            <p className="text-gray-700 mb-4">Price: $29.99/month after trial</p>
+            <p className="text-gray-700 mb-4">Price: $29.99/month</p>
             <ul className="list-disc pl-5 text-gray-700 mb-4">
               <li>Unlimited TikTok trend analysis</li>
               <li>Personalized content recommendations</li>
               <li>Weekly email reports</li>
-              <li>Cancel anytime before trial ends - no charge</li>
+              <li>Cancel anytime</li>
             </ul>
           </div>
         </div>
@@ -116,7 +112,7 @@ const Payment = () => {
               <span>Processing...</span>
             </div>
           ) : (
-            'Start Your Free 7-Day Trial'
+            'Proceed to Payment'
           )}
         </button>
       </div>

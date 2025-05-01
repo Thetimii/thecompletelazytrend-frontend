@@ -18,39 +18,52 @@
 
 @layer components {
   .card {
-    @apply bg-white dark:bg-primary-800 rounded-lg shadow-card transition-all duration-300 hover:shadow-card-hover;
+    @apply backdrop-blur-sm bg-white/80 dark:bg-primary-800/80 rounded-lg shadow-card transition-all duration-300 hover:shadow-card-hover border border-primary-100/50 dark:border-primary-700/50;
   }
 
   .btn {
-    @apply px-4 py-2 rounded-md font-medium transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply px-4 py-2 rounded-md font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 hover:scale-105;
   }
 
   .btn-primary {
-    @apply bg-accent-600 hover:bg-accent-700 text-white focus:ring-accent-500;
+    @apply bg-gradient-to-r from-accent-600 to-accent-500 hover:from-accent-700 hover:to-accent-600 text-white focus:ring-accent-500 shadow-md hover:shadow-lg;
   }
 
   .btn-secondary {
-    @apply bg-primary-100 hover:bg-primary-200 text-primary-800 dark:bg-primary-700 dark:hover:bg-primary-600 dark:text-primary-50 focus:ring-primary-400;
+    @apply bg-primary-100 hover:bg-primary-200 text-primary-800 dark:bg-primary-700 dark:hover:bg-primary-600 dark:text-primary-50 focus:ring-primary-400 shadow-sm hover:shadow-md;
   }
 
   .btn-danger {
-    @apply bg-red-600 hover:bg-red-700 text-white focus:ring-red-500;
+    @apply bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white focus:ring-red-500 shadow-md hover:shadow-lg;
   }
 
   .input {
-    @apply w-full px-3 py-2 border border-primary-200 dark:border-primary-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500 dark:bg-primary-700 dark:text-primary-50;
+    @apply w-full px-3 py-2 border border-primary-200/70 dark:border-primary-600/70 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500 dark:bg-primary-700/90 dark:text-primary-50 backdrop-blur-sm;
   }
 
   .select {
-    @apply w-full px-3 py-2 border border-primary-200 dark:border-primary-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500 dark:bg-primary-700 dark:text-primary-50;
+    @apply w-full px-3 py-2 border border-primary-200/70 dark:border-primary-600/70 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500 dark:bg-primary-700/90 dark:text-primary-50 backdrop-blur-sm;
   }
 
   .tab {
-    @apply px-4 py-2 font-medium text-primary-600 dark:text-primary-300 border-b-2 border-transparent hover:text-accent-600 dark:hover:text-accent-400 hover:border-accent-500 transition-colors duration-150;
+    @apply px-4 py-2 font-medium text-primary-600 dark:text-primary-300 border-b-2 border-transparent hover:text-accent-600 dark:hover:text-accent-400 hover:border-accent-500 transition-all duration-300;
   }
 
   .tab-active {
     @apply text-accent-600 dark:text-accent-400 border-accent-500;
+  }
+
+  /* Glassmorphic card with hover effect */
+  .glass-card {
+    @apply backdrop-blur-md bg-white/40 dark:bg-primary-800/40 rounded-xl shadow-lg border border-white/20 dark:border-primary-700/30 transition-all duration-300 hover:shadow-xl hover:bg-white/50 dark:hover:bg-primary-800/50 hover:scale-[1.02];
+  }
+
+  /* Background grid pattern */
+  .bg-grid-pattern {
+    background-image:
+      linear-gradient(to right, rgba(100, 116, 139, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(100, 116, 139, 0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
   }
 }
 

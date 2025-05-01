@@ -95,35 +95,8 @@ function AppContent() {
     localStorage.setItem('darkMode', isDarkMode);
   }, [isDarkMode]);
 
-  // Listen for system preference changes
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e) => {
-      // Only change if user hasn't set a preference
-      if (!localStorage.getItem('darkMode')) {
-        setIsDarkMode(e.matches);
-      }
-    };
-
-    // Modern browsers
-    try {
-      mediaQuery.addEventListener('change', handleChange);
-      return () => mediaQuery.removeEventListener('change', handleChange);
-    } catch (e) {
-      // Fallback for Safari < 14
-      console.warn('Using deprecated mediaQuery API');
-      // These are deprecated but still work in older browsers
-      // @ts-ignore - TypeScript will complain but we need this for older browsers
-      mediaQuery.addListener(handleChange);
-      return () => {
-        // @ts-ignore - TypeScript will complain but we need this for older browsers
-        mediaQuery.removeListener(handleChange);
-      };
-    }
-  }, []);
-
   return (
-    <div className="min-h-screen bg-primary-50 dark:bg-primary-900 transition-colors duration-300">
+    <div className={`min-h-screen bg-primary-50 dark:bg-primary-900 transition-colors duration-300 ${isDarkMode ? 'dark' : ''}`}>
       {/* Only show Navbar on non-dashboard pages */}
       {window.location.pathname !== '/' && (
         <Navbar isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
