@@ -20,48 +20,59 @@ const Onboarding = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    // This flag prevents the effect from running multiple times
+    let isInitialRender = true;
+
     // Check if user already completed onboarding
     const checkUserProfile = async () => {
-      if (user?.id) {
-        try {
-          const profile = await getUserProfile(user.id);
+      if (!user?.id) {
+        console.log('No user ID available for onboarding check');
+        return;
+      }
 
-          if (profile) {
-            // If user has already completed onboarding, redirect to dashboard
-            if (profile.onboarding_completed) {
-              navigate('/');
-              return;
-            }
+      console.log('Checking user profile for onboarding status');
 
-            // Pre-fill form with existing data
-            setFormData({
-              full_name: profile.full_name || '',
-              business_name: profile.business_name || '',
-              business_description: profile.business_description || '',
-              website: profile.website || '',
-              phone: profile.phone || ''
-            });
+      try {
+        const profile = await getUserProfile(user.id);
+        console.log('User profile for onboarding:', profile);
+
+        if (profile) {
+          // If user has already completed onboarding, redirect to dashboard
+          if (profile.onboarding_completed) {
+            console.log('User has completed onboarding, redirecting to dashboard');
+            navigate('/');
+            return;
           }
-        } catch (err) {
-          console.error('Error checking user profile:', err);
+
+          // Pre-fill form with existing data
+          console.log('Pre-filling form with existing data');
+          setFormData({
+            full_name: profile.full_name || '',
+            business_name: profile.business_name || '',
+            business_description: profile.business_description || '',
+            website: profile.website || '',
+            phone: profile.phone || ''
+          });
+        } else {
+          console.log('No existing profile found for user');
         }
+      } catch (err) {
+        console.error('Error checking user profile:', err);
       }
     };
 
-    // Only run once when the component mounts
-    // This prevents the effect from running again when auth state changes
-    const initialCheck = async () => {
-      await checkUserProfile();
-      // Set a flag in sessionStorage to prevent multiple checks
-      sessionStorage.setItem('onboardingChecked', 'true');
-    };
-
-    // Check if we've already done the initial check
-    const hasChecked = sessionStorage.getItem('onboardingChecked');
-    if (!hasChecked) {
-      initialCheck();
+    // Only run on initial render and when user changes
+    if (isInitialRender && user?.id) {
+      console.log('Initial onboarding check for user:', user.email);
+      checkUserProfile();
+      isInitialRender = false;
     }
-  }, [navigate]);
+
+    // Cleanup function
+    return () => {
+      isInitialRender = false;
+    };
+  }, [user, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
