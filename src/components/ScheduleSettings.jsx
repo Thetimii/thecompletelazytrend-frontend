@@ -104,13 +104,15 @@ const ScheduleSettings = ({ user, userProfile, onUpdate }) => {
       setError(null);
       setSuccess(false);
 
-      // Save the updated preferences
+      // Save the updated preferences - preserve all existing profile data
       const updatedProfile = await saveUserProfile({
+        ...userProfile, // Keep all existing profile data
         id: userProfile.id,
         auth_id: user.id,
         email_notifications: isEnabled,
         email_time_hour: parseInt(hour, 10),
-        timezone: timezone
+        timezone: timezone,
+        updated_at: new Date().toISOString()
       });
 
       // Update the user profile in the auth context

@@ -19,6 +19,9 @@ const Onboarding = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Use a ref to track if the effect has run
+  const hasRunEffect = React.useRef(false);
+
   useEffect(() => {
     // Check if user already completed onboarding
     const checkUserProfile = async () => {
@@ -49,19 +52,11 @@ const Onboarding = () => {
     };
 
     // Only run once when the component mounts
-    // This prevents the effect from running again when auth state changes
-    const initialCheck = async () => {
-      await checkUserProfile();
-      // Set a flag in sessionStorage to prevent multiple checks
-      sessionStorage.setItem('onboardingChecked', 'true');
-    };
-
-    // Check if we've already done the initial check
-    const hasChecked = sessionStorage.getItem('onboardingChecked');
-    if (!hasChecked) {
-      initialCheck();
+    if (!hasRunEffect.current && user?.id) {
+      checkUserProfile();
+      hasRunEffect.current = true;
     }
-  }, [navigate]);
+  }, [user, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
