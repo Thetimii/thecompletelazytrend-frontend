@@ -182,7 +182,7 @@ export const getRecommendationsByUserId = async (userId) => {
       .from('recommendations')
       .select('*')
       .eq('user_id', userId)
-      .order('created_at', { ascending: true });
+      .order('created_at', { ascending: false });
 
     if (userError) {
       throw new Error(`Error getting recommendations: ${userError.message}`);
@@ -216,7 +216,7 @@ export const getRecommendationsByUserId = async (userId) => {
       .from('recommendations')
       .select('*')
       .eq('user_id', userProfile.auth_id)
-      .order('created_at', { ascending: true });
+      .order('created_at', { ascending: false });
 
     if (authError) {
       throw new Error(`Error getting recommendations by auth_id: ${authError.message}`);
@@ -262,10 +262,12 @@ export const getTikTokVideosByUserIdWithQueries = async (userId) => {
     const queryIds = queries.map(query => query.id);
 
     // Step 3: Get all tiktok_videos where trend_query_id is in that list
+    // Order by created_at descending to get newest videos first
     const { data: videos, error: videosError } = await supabase
       .from('tiktok_videos')
       .select('*')
-      .in('trend_query_id', queryIds);
+      .in('trend_query_id', queryIds)
+      .order('created_at', { ascending: false });
 
     // Process video data from database
 
@@ -313,7 +315,23 @@ export const getTikTokVideosByUserIdWithQueries = async (userId) => {
       });
     });
 
-    return Object.values(videosByQuery);
+    // Convert to array and ensure videos in each group are sorted by created_at (newest first)
+    const result = Object.values(videosByQuery);
+
+    // Sort videos within each group by created_at (newest first)
+    result.forEach(group => {
+      if (group.videos && group.videos.length > 0) {
+        group.videos.sort((a, b) => {
+          // If created_at is available, use it for sorting
+          if (a.created_at && b.created_at) {
+            return new Date(b.created_at) - new Date(a.created_at);
+          }
+          return 0;
+        });
+      }
+    });
+
+    return result;
   } catch (error) {
     console.error('Error getting TikTok videos with queries:', error);
     throw new Error('Failed to get TikTok videos with queries');
