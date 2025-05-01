@@ -14,7 +14,14 @@ const VideosTab = ({ queries, videos, videosByQuery, selectedQueryId, setSelecte
 
   // Function to render videos in filtered mode (using the existing filter dropdown)
   const renderFilteredVideos = () => {
-    if (videos.length === 0) {
+    // Get filtered videos based on selected query
+    const filteredVideos = selectedQueryId
+      ? videos.filter(video => video.trend_query_id === selectedQueryId)
+      : videos;
+
+    console.log('Filtered videos:', filteredVideos.length, 'Selected query ID:', selectedQueryId);
+
+    if (filteredVideos.length === 0) {
       return (
         <div className="dashboard-card p-10 text-center">
           <div className="flex flex-col items-center">
@@ -25,7 +32,9 @@ const VideosTab = ({ queries, videos, videosByQuery, selectedQueryId, setSelecte
             </div>
             <h3 className="text-xl font-semibold mb-2 text-primary-800 dark:text-primary-100">No Videos Found</h3>
             <p className="text-primary-600 dark:text-primary-400 max-w-md mx-auto">
-              Try selecting a different query or run the workflow in the Settings tab to analyze TikTok videos.
+              {selectedQueryId
+                ? "No videos found for this search query. Try selecting a different query."
+                : "Try selecting a specific query or run the workflow in the Settings tab to analyze TikTok videos."}
             </p>
           </div>
         </div>
@@ -35,9 +44,9 @@ const VideosTab = ({ queries, videos, videosByQuery, selectedQueryId, setSelecte
     return (
       <div className="transition-all duration-500">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {videos.map((video, index) => (
+          {filteredVideos.map((video, index) => (
             <div
-              key={video.id}
+              key={video.id || index}
               className="animate-slide-up"
               style={{
                 animationDelay: `${index * 0.1}s`

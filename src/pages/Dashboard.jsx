@@ -72,24 +72,17 @@ const Dashboard = () => {
         setQueries([]);
       }
 
-      // Fetch data based on selected query
-      if (selectedQueryId) {
-        try {
-          const videosData = await getTikTokVideosByTrendQueryId(selectedQueryId);
-          setVideos(videosData || []);
-        } catch (error) {
-          console.warn('Error fetching TikTok videos, table might not exist yet:', error);
-          setVideos([]);
-        }
-      } else {
-        // Fetch all videos
-        try {
-          const videosData = await getTikTokVideos();
-          setVideos(videosData || []);
-        } catch (error) {
-          console.warn('Error fetching TikTok videos, table might not exist yet:', error);
-          setVideos([]);
-        }
+      // Fetch all videos regardless of selected query
+      // We'll filter them in the VideosTab component
+      try {
+        console.log('Fetching all TikTok videos');
+        const videosData = await getTikTokVideos();
+        console.log('All videos data:', videosData?.length || 0, 'videos');
+        setVideos(videosData || []);
+      } catch (error) {
+        console.warn('Error fetching TikTok videos, table might not exist yet:', error);
+        console.error('Detailed error:', error);
+        setVideos([]);
       }
 
       // Fetch videos grouped by query for the current user
