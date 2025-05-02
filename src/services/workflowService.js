@@ -14,10 +14,10 @@ const api = axios.create({
  * Run the complete workflow (generate queries, scrape videos, analyze, reconstruct)
  * @param {string} businessDescription - Description of the business
  * @param {string} userId - User ID
- * @param {number} videosPerQuery - Number of videos to fetch per query (default: 1 for testing)
+ * @param {number} videosPerQuery - Number of videos to fetch per query (default: 5)
  * @returns {Promise<Object>} - Workflow results
  */
-export const runCompleteWorkflow = async (businessDescription, userId, videosPerQuery = 1) => {
+export const runCompleteWorkflow = async (businessDescription, userId, videosPerQuery = 5) => {
   try {
     const response = await api.post(buildApiUrl('/complete-workflow'), {
       businessDescription,
@@ -57,7 +57,7 @@ export const generateQueries = async (businessDescription) => {
  * @param {number} videosPerQuery - Number of videos to fetch per query
  * @returns {Promise<Object>} - Scraped videos
  */
-export const scrapeTikTokVideos = async (searchQueries, userId, videosPerQuery = 1) => {
+export const scrapeTikTokVideos = async (searchQueries, userId, videosPerQuery = 5) => {
   try {
     const response = await api.post(buildApiUrl('/scrape-tiktoks'), {
       searchQueries,
@@ -102,13 +102,13 @@ export const analyzeVideos = async (videos, businessDescription) => {
 export const summarizeTrends = async (analyzedVideos, businessDescription, userId = null) => {
   try {
     console.log('Summarizing trends from analyzed videos:', analyzedVideos.length);
-    
+
     const response = await api.post(buildApiUrl('/summarize-trends'), {
       analyzedVideos,
       businessDescription,
       userId
     });
-    
+
     return response.data;
   } catch (error) {
     console.error('Error summarizing trends:', error);
@@ -125,12 +125,12 @@ export const summarizeTrends = async (analyzedVideos, businessDescription, userI
 export const deleteVideos = async (fileNames, videoIds = []) => {
   try {
     console.log('Deleting videos from storage bucket:', fileNames.length);
-    
+
     const response = await api.post(buildApiUrl('/delete-videos'), {
       fileNames,
       videoIds
     });
-    
+
     return response.data;
   } catch (error) {
     console.error('Error deleting videos:', error);
