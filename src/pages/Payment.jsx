@@ -55,15 +55,6 @@ const Payment = () => {
         throw new Error('API URL is not configured. Please check your environment variables.');
       }
 
-      // Get Rewardful referral ID if available
-      let referralId = null;
-      if (window.Rewardful && window.Rewardful.referral) {
-        referralId = window.Rewardful.referral;
-        console.log('Rewardful referral ID found:', referralId);
-      } else {
-        console.log('No Rewardful referral ID found');
-      }
-
       // Create checkout session directly
       const response = await fetch(`${apiUrl}/api/create-checkout-session`, {
         method: 'POST',
@@ -76,7 +67,6 @@ const Payment = () => {
           priceId: import.meta.env.VITE_STRIPE_PRICE_ID || 'price_1REaY3G4vQYDStWYZu4rRLu5',
           successUrl: `${window.location.origin}/payment-success`,
           cancelUrl: `${window.location.origin}/payment-cancel`,
-          referral: referralId, // Pass the referral ID to the server
         }),
       });
 

@@ -18,15 +18,6 @@ export const createCheckoutSession = async (userId, email) => {
 
     console.log('Creating checkout session with API URL:', import.meta.env.VITE_API_URL || '');
 
-    // Get Rewardful referral ID if available
-    let referralId = null;
-    if (window.Rewardful && window.Rewardful.referral) {
-      referralId = window.Rewardful.referral;
-      console.log('Rewardful referral ID found:', referralId);
-    } else {
-      console.log('No Rewardful referral ID found');
-    }
-
     // Call the backend API to create a checkout session
     const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/create-checkout-session`, {
       method: 'POST',
@@ -39,7 +30,6 @@ export const createCheckoutSession = async (userId, email) => {
         priceId: import.meta.env.VITE_STRIPE_PRICE_ID || 'price_1REaY3G4vQYDStWYZu4rRLu5',
         successUrl: `${window.location.origin}/payment-success?redirect=true`,
         cancelUrl: `${window.location.origin}/payment-cancel`,
-        referral: referralId, // Pass the referral ID to the server
       }),
     });
 
