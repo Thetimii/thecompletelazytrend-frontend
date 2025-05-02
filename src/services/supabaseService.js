@@ -182,14 +182,29 @@ export const getRecommendationsByUserId = async (userId) => {
       return [];
     }
 
-    // Get all recommendations where user_id matches the provided userId
-    // This is the correct approach - user_id in the recommendations table
-    // should match the user's ID from the users table
-    const { data, error } = await supabase
+    // Get all recommendations where user_id contains the provided userId
+    // We need to use a more flexible approach since the IDs might not match exactly
+    console.log(`Searching for recommendations with user_id containing: ${userId}`);
+
+    // First get all recommendations to check manually
+    const { data: allRecs, error } = await supabase
       .from('recommendations')
       .select('*')
-      .or(`user_id.eq.${userId}`)
       .order('created_at', { ascending: false });
+
+    // Filter recommendations that have a user_id that contains our userId
+    // This handles cases where the format might be slightly different
+    const data = allRecs ? allRecs.filter(rec => {
+      // Check if the user_id contains our userId or vice versa
+      const recUserId = rec.user_id ? rec.user_id.toString() : '';
+      const ourUserId = userId ? userId.toString() : '';
+
+      // Log for debugging
+      console.log(`Comparing rec.user_id: ${recUserId} with userId: ${ourUserId}`);
+
+      // Check if either ID contains the other
+      return recUserId.includes(ourUserId) || ourUserId.includes(recUserId);
+    }) : [];
 
     if (error) {
       throw new Error(`Error getting recommendations: ${error.message}`);
@@ -323,16 +338,32 @@ export const getLatestRecommendationByUserId = async (userId) => {
       return null;
     }
 
-    // Get the latest recommendation where user_id matches the provided userId
-    // This is the correct approach - user_id in the recommendations table
-    // should match the user's ID from the users table
-    const { data, error } = await supabase
+    // Get all recommendations to find the one with a matching user_id
+    // We need to use a more flexible approach since the IDs might not match exactly
+    console.log(`Searching for latest recommendation with user_id containing: ${userId}`);
+
+    // First get all recommendations to check manually
+    const { data: allRecs, error } = await supabase
       .from('recommendations')
       .select('*')
-      .or(`user_id.eq.${userId}`)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
+      .order('created_at', { ascending: false });
+
+    // Filter recommendations that have a user_id that contains our userId
+    // This handles cases where the format might be slightly different
+    const matchingRecs = allRecs ? allRecs.filter(rec => {
+      // Check if the user_id contains our userId or vice versa
+      const recUserId = rec.user_id ? rec.user_id.toString() : '';
+      const ourUserId = userId ? userId.toString() : '';
+
+      // Log for debugging
+      console.log(`Comparing rec.user_id: ${recUserId} with userId: ${ourUserId}`);
+
+      // Check if either ID contains the other
+      return recUserId.includes(ourUserId) || ourUserId.includes(recUserId);
+    }) : [];
+
+    // Get the latest matching recommendation
+    const data = matchingRecs.length > 0 ? matchingRecs[0] : null;
 
     if (error) {
       throw new Error(`Error getting latest recommendation: ${error.message}`);

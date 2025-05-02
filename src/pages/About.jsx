@@ -29,37 +29,37 @@ const About = () => {
         <div className="container mx-auto px-6 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">About LazyTrend</h1>
           <p className="text-xl max-w-3xl mx-auto">
-            We're on a mission to help content creators save time and create better content by leveraging the power of trend analysis.
+            I'm on a mission to help content creators save time and create better content by leveraging the power of trend analysis.
           </p>
         </div>
       </section>
 
-      {/* Our Story */}
+      {/* My Story */}
       <section className="py-16 bg-white dark:bg-primary-950">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold mb-8 text-primary-900 dark:text-white">Our Story</h2>
+            <h2 className="text-3xl font-bold mb-8 text-primary-900 dark:text-white">My Story</h2>
             <div className="prose prose-lg max-w-none text-primary-700 dark:text-primary-300">
               <p>
-                LazyTrend was born out of frustration. As content creators ourselves, we spent countless hours scrolling through TikTok, trying to identify trends and patterns that could inform our content strategy. It was time-consuming, inefficient, and frankly, exhausting.
+                LazyTrend was born out of frustration. As a learning marketer myself, I spent countless hours scrolling through TikTok, trying to identify trends and patterns that could inform content strategy. It was time-consuming, inefficient, and frankly, exhausting.
               </p>
               <p>
-                We knew there had to be a better way. So, we built LazyTrend – a platform that automatically analyzes trending content on TikTok and provides personalized recommendations based on what's working in your specific niche.
+                I knew there had to be a better way. So, I built LazyTrend – a platform that automatically analyzes trending content on TikTok and provides personalized recommendations based on what's working in your specific niche.
               </p>
               <p>
-                Since our launch, we've helped thousands of content creators save time and create more engaging content that resonates with their audience. Our mission is simple: to make trend discovery effortless so you can focus on what you do best – creating amazing content.
+                My mission is simple: to make trend discovery effortless so you can focus on what you do best – creating amazing content.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Our Values */}
+      {/* My Values */}
       <section className="py-16 bg-gray-50 dark:bg-primary-900">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold mb-8 text-primary-900 dark:text-white">Our Values</h2>
-            
+            <h2 className="text-3xl font-bold mb-8 text-primary-900 dark:text-white">My Values</h2>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="bg-white dark:bg-primary-800 p-6 rounded-lg shadow-md">
                 <div className="w-12 h-12 bg-accent-100 dark:bg-accent-900/30 rounded-full flex items-center justify-center mb-4 text-accent-500">
@@ -69,10 +69,10 @@ const About = () => {
                 </div>
                 <h3 className="text-xl font-bold mb-3 text-primary-900 dark:text-white">Efficiency</h3>
                 <p className="text-primary-600 dark:text-primary-400">
-                  We believe your time is valuable. Our platform is designed to save you hours of research so you can focus on creating.
+                  I believe your time is valuable. This platform is designed to save you hours of research so you can focus on creating.
                 </p>
               </div>
-              
+
               <div className="bg-white dark:bg-primary-800 p-6 rounded-lg shadow-md">
                 <div className="w-12 h-12 bg-accent-100 dark:bg-accent-900/30 rounded-full flex items-center justify-center mb-4 text-accent-500">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -81,22 +81,22 @@ const About = () => {
                 </div>
                 <h3 className="text-xl font-bold mb-3 text-primary-900 dark:text-white">Innovation</h3>
                 <p className="text-primary-600 dark:text-primary-400">
-                  We're constantly improving our algorithms and adding new features to provide you with the most accurate trend insights.
+                  I'm constantly improving the algorithms and adding new features to provide you with the most accurate trend insights.
                 </p>
               </div>
-              
+
               <div className="bg-white dark:bg-primary-800 p-6 rounded-lg shadow-md">
                 <div className="w-12 h-12 bg-accent-100 dark:bg-accent-900/30 rounded-full flex items-center justify-center mb-4 text-accent-500">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold mb-3 text-primary-900 dark:text-white">Community</h3>
+                <h3 className="text-xl font-bold mb-3 text-primary-900 dark:text-white">Simplicity</h3>
                 <p className="text-primary-600 dark:text-primary-400">
-                  We're building a community of forward-thinking content creators who want to stay ahead of trends and grow their audience.
+                  I believe in keeping things simple and straightforward. LazyTrend is designed to be intuitive and easy to use, without unnecessary complexity.
                 </p>
               </div>
-              
+
               <div className="bg-white dark:bg-primary-800 p-6 rounded-lg shadow-md">
                 <div className="w-12 h-12 bg-accent-100 dark:bg-accent-900/30 rounded-full flex items-center justify-center mb-4 text-accent-500">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -105,7 +105,7 @@ const About = () => {
                 </div>
                 <h3 className="text-xl font-bold mb-3 text-primary-900 dark:text-white">Trust</h3>
                 <p className="text-primary-600 dark:text-primary-400">
-                  We're committed to providing reliable, actionable insights that you can trust to inform your content strategy.
+                  I'm committed to providing reliable, actionable insights that you can trust to inform your content strategy.
                 </p>
               </div>
             </div>
@@ -113,14 +113,14 @@ const About = () => {
         </div>
       </section>
 
-      {/* Team Section */}
+      {/* About the Creator */}
       <section className="py-16 bg-white dark:bg-primary-950">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold mb-8 text-primary-900 dark:text-white">Meet Our Team</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="text-center">
+            <h2 className="text-3xl font-bold mb-8 text-primary-900 dark:text-white">About the Creator</h2>
+
+            <div className="flex flex-col items-center">
+              <div className="text-center max-w-md">
                 <div className="w-32 h-32 rounded-full bg-gray-200 dark:bg-primary-800 mx-auto mb-4 overflow-hidden">
                   <div className="w-full h-full bg-accent-100 dark:bg-accent-900/30 flex items-center justify-center text-accent-500">
                     <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -128,40 +128,13 @@ const About = () => {
                     </svg>
                   </div>
                 </div>
-                <h3 className="text-xl font-bold mb-1 text-primary-900 dark:text-white">Sarah Johnson</h3>
-                <p className="text-accent-500 mb-2">CEO & Founder</p>
-                <p className="text-primary-600 dark:text-primary-400 text-sm">
-                  Former content strategist with a passion for data-driven content creation.
+                <h3 className="text-xl font-bold mb-1 text-primary-900 dark:text-white">Tim Sager</h3>
+                <p className="text-accent-500 mb-4">Founder & Developer</p>
+                <p className="text-primary-600 dark:text-primary-400">
+                  I'm a marketer and developer with a passion for automation and data-driven content creation. I built LazyTrend to solve my own frustrations with trend discovery, and now I'm excited to share it with other content creators who want to save time and create more effective content.
                 </p>
-              </div>
-              
-              <div className="text-center">
-                <div className="w-32 h-32 rounded-full bg-gray-200 dark:bg-primary-800 mx-auto mb-4 overflow-hidden">
-                  <div className="w-full h-full bg-accent-100 dark:bg-accent-900/30 flex items-center justify-center text-accent-500">
-                    <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                    </svg>
-                  </div>
-                </div>
-                <h3 className="text-xl font-bold mb-1 text-primary-900 dark:text-white">Michael Chen</h3>
-                <p className="text-accent-500 mb-2">CTO</p>
-                <p className="text-primary-600 dark:text-primary-400 text-sm">
-                  AI specialist with expertise in trend analysis and machine learning.
-                </p>
-              </div>
-              
-              <div className="text-center">
-                <div className="w-32 h-32 rounded-full bg-gray-200 dark:bg-primary-800 mx-auto mb-4 overflow-hidden">
-                  <div className="w-full h-full bg-accent-100 dark:bg-accent-900/30 flex items-center justify-center text-accent-500">
-                    <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                    </svg>
-                  </div>
-                </div>
-                <h3 className="text-xl font-bold mb-1 text-primary-900 dark:text-white">Emily Rodriguez</h3>
-                <p className="text-accent-500 mb-2">Head of Customer Success</p>
-                <p className="text-primary-600 dark:text-primary-400 text-sm">
-                  Dedicated to ensuring our customers get the most out of LazyTrend.
+                <p className="text-primary-600 dark:text-primary-400 mt-4">
+                  With a background in both marketing and software development, I bring a unique perspective to content strategy and trend analysis. LazyTrend represents my vision for making data-driven content creation accessible to everyone.
                 </p>
               </div>
             </div>
@@ -174,7 +147,7 @@ const About = () => {
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-6">Ready to Transform Your Content Strategy?</h2>
           <p className="text-xl mb-8 max-w-3xl mx-auto">
-            Join thousands of content creators who are saving time and creating better content with LazyTrend.
+            Start saving time and creating better content with LazyTrend's powerful trend analysis tools.
           </p>
           <Link to="/signup" className="btn bg-white text-accent-600 hover:bg-gray-100 hover:text-accent-700 text-lg px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
             Start Your Free Trial

@@ -15,7 +15,7 @@ const PaymentSuccess = () => {
     const processPayment = async () => {
       if (!sessionId || !user) {
         // If no session ID or user, redirect to dashboard anyway
-        navigate('/', { replace: true });
+        navigate('/dashboard', { replace: true });
         return;
       }
 
@@ -27,11 +27,11 @@ const PaymentSuccess = () => {
         await fetchUserProfile(user.id);
 
         // Redirect to dashboard immediately
-        navigate('/', { replace: true });
+        navigate('/dashboard', { replace: true });
       } catch (err) {
         console.error('Error processing payment success:', err);
         // Even if there's an error, redirect to dashboard
-        navigate('/', { replace: true });
+        navigate('/dashboard', { replace: true });
       }
     };
 

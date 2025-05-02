@@ -53,7 +53,7 @@ const HeroSection = () => {
               <svg className="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
               </svg>
-              <span>No credit card required for trial</span>
+              <span> Credit card required for trial</span>
             </div>
           </div>
           <div className="lg:w-1/2 relative">

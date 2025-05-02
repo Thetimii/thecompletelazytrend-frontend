@@ -66,9 +66,9 @@ const Signup = () => {
 
         // Check if email confirmation is required
         if (data.session) {
-          // User is automatically signed in, redirect to dashboard
+          // User is automatically signed in, redirect to onboarding
           setTimeout(() => {
-            navigate('/');
+            navigate('/onboarding');
           }, 1500);
         } else {
           // Email confirmation required
