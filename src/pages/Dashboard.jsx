@@ -159,17 +159,17 @@ const Dashboard = () => {
           setVideosByQuery(videosByQueryData || []);
 
           // Also extract all videos for the filtered view
-          const allVideos = [];
+          const extractedVideos = [];
           if (videosByQueryData && videosByQueryData.length > 0) {
             videosByQueryData.forEach(group => {
               if (group.videos && group.videos.length > 0) {
-                allVideos.push(...group.videos);
+                extractedVideos.push(...group.videos);
               }
             });
           }
 
-          console.log('Total videos extracted:', allVideos.length);
-          setVideos(allVideos);
+          console.log('Total videos extracted:', extractedVideos.length);
+          setVideos(extractedVideos);
         } catch (error) {
           console.warn('Error fetching videos by query:', error);
           setVideosByQuery([]);
@@ -198,7 +198,7 @@ const Dashboard = () => {
       // Update cache with new data
       setDataCache({
         queries: queriesData || [],
-        videos: allVideos || [], // Use allVideos instead of videos to avoid stale data
+        videos: videos || [], // Use the current videos state
         videosByQuery: videosByQueryData || [],
         recommendations: recommendationsData || [],
         lastFetched: Date.now()
