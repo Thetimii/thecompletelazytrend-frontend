@@ -103,9 +103,11 @@ const Dashboard = () => {
       const cacheValid = cacheAge < 5 * 60 * 1000; // 5 minutes
 
       if (!forceRefresh && cacheValid && dataCache.queries && dataCache.videos && dataCache.videosByQuery && dataCache.recommendations) {
-        // Use cached data - only log once
-        if (activeTab === 'summary') {
+        // Use cached data - only log once per session to avoid console spam
+        const cacheLogKey = `cache_log_${dataCache.lastFetched}`;
+        if (!sessionStorage.getItem(cacheLogKey)) {
           console.log('Using cached data from', new Date(dataCache.lastFetched).toLocaleTimeString());
+          sessionStorage.setItem(cacheLogKey, 'true');
         }
         setQueries(dataCache.queries);
         setVideos(dataCache.videos);
@@ -196,7 +198,7 @@ const Dashboard = () => {
       // Update cache with new data
       setDataCache({
         queries: queriesData || [],
-        videos: videos || [],
+        videos: allVideos || [], // Use allVideos instead of videos to avoid stale data
         videosByQuery: videosByQueryData || [],
         recommendations: recommendationsData || [],
         lastFetched: Date.now()
@@ -208,7 +210,7 @@ const Dashboard = () => {
       setError('Failed to load dashboard data. Please try again later.');
       setLoading(false);
     }
-  }, [user, userProfile, dataCache]);
+  }, [user, userProfile]);
 
   // Initial data fetch when component mounts or user/profile changes
   useEffect(() => {
@@ -240,19 +242,20 @@ const Dashboard = () => {
             sessionStorage.setItem(`logged_${activeTab}`, 'true');
           }
           fetchData();
-          // Mark this tab as having data
-          tabsWithDataRef.current[activeTab] = true;
         } else {
           // Only log once per session
           if (!sessionStorage.getItem(`logged_${activeTab}`)) {
             console.log(`Tab changed to ${activeTab}, using existing data`);
             sessionStorage.setItem(`logged_${activeTab}`, 'true');
           }
-          tabsWithDataRef.current[activeTab] = true;
         }
+
+        // Mark this tab as having data regardless of whether we fetched or not
+        tabsWithDataRef.current[activeTab] = true;
       }
     }
-  }, [activeTab, fetchData, queries.length, videos.length, videosByQuery.length, recommendations.length]);
+    // Only depend on activeTab and fetchData, use refs for the data length checks
+  }, [activeTab, fetchData]);
 
   // Effect to apply dark mode
   useEffect(() => {
