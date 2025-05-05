@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getLatestRecommendationByUserId } from '../../services/supabaseService';
 import { formatContentIdeas, formatSummary } from '../../utils/textFormatters';
 
-const RecommendationsTab = ({ userProfile }) => {
+const RecommendationsTab = ({ userProfile, onRefresh }) => {
   const [recommendation, setRecommendation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -56,7 +56,10 @@ const RecommendationsTab = ({ userProfile }) => {
   // Get formatted summary using our utility function
   const getCombinedSummary = () => {
     if (!recommendation?.combined_summary) return '';
-    return formatSummary(recommendation.combined_summary);
+    // Make sure we get the full text without any truncation
+    const fullText = formatSummary(recommendation.combined_summary);
+    console.log('Full summary text:', fullText); // Log for debugging
+    return fullText;
   };
 
   // Skip loading state and go straight to content or empty state
@@ -121,7 +124,19 @@ const RecommendationsTab = ({ userProfile }) => {
           </div>
 
           <div className="mt-6 text-sm text-primary-500 dark:text-primary-400">
-            <p>You don't need to refresh the page. Your recommendations will appear automatically when ready.</p>
+            <p className="mb-4">You don't need to refresh the page. Your recommendations will appear automatically when ready.</p>
+
+            {onRefresh && (
+              <button
+                onClick={onRefresh}
+                className="mt-2 btn btn-secondary px-6 py-2 flex items-center mx-auto"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+                </svg>
+                Check for Updates
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -134,8 +149,20 @@ const RecommendationsTab = ({ userProfile }) => {
 
   return (
     <div className="animate-fade-in">
-      <div className="flex items-center mb-8">
+      <div className="flex items-center justify-between mb-8">
         <h2 className="text-3xl font-bold gradient-text">Recommendations</h2>
+        {onRefresh && (
+          <button
+            onClick={onRefresh}
+            className="p-2 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-800 transition-all duration-300 text-primary-500 flex items-center"
+            title="Refresh recommendations"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+            </svg>
+            <span>Refresh</span>
+          </button>
+        )}
       </div>
 
       {/* Trend Summary */}
@@ -148,7 +175,7 @@ const RecommendationsTab = ({ userProfile }) => {
         </div>
 
         <div className="bg-white dark:bg-primary-800 p-6 rounded-lg border border-primary-100 dark:border-primary-700">
-          <p className="text-primary-700 dark:text-primary-300 whitespace-pre-line leading-relaxed">
+          <p className="text-primary-700 dark:text-primary-300 whitespace-pre-line leading-relaxed break-words">
             {combinedSummary}
           </p>
         </div>
