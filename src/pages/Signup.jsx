@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabaseService';
 import { saveUserProfile } from '../services/userService';
@@ -64,14 +64,6 @@ const Signup = () => {
 
         setSuccess(true);
 
-        // Track signup with Reditus for referral tracking
-        if (window.gr) {
-          console.log('Tracking signup with Reditus:', data.user.email);
-          window.gr('track', 'conversion', { email: data.user.email });
-        } else {
-          console.warn('Reditus tracking not available');
-        }
-
         // Check if email confirmation is required
         if (data.session) {
           // User is automatically signed in, redirect to onboarding
@@ -87,15 +79,6 @@ const Signup = () => {
       } else {
         // Email confirmation required
         setSuccess(true);
-
-        // Track signup with Reditus for referral tracking (fallback case)
-        if (window.gr && email) {
-          console.log('Tracking signup with Reditus (fallback):', email);
-          window.gr('track', 'conversion', { email: email });
-        } else {
-          console.warn('Reditus tracking not available or email missing');
-        }
-
         setTimeout(() => {
           navigate('/login');
         }, 3000);
