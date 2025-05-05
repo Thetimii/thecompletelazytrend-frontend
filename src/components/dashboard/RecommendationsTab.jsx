@@ -77,13 +77,13 @@ const RecommendationsTab = ({ userProfile, onRefresh }) => {
     fetchRecommendation(true);
   }, [onRefresh, fetchRecommendation]);
 
+  // Create a ref to track if we've already run the effect
+  const hasRunInitialFetchRef = useRef(false);
+
   // Only fetch data when the component mounts
   useEffect(() => {
-    // Use a ref to track if we've already run this effect
-    const hasRunRef = useRef(false);
-
-    if (userProfile?.id && !hasRunRef.current) {
-      hasRunRef.current = true;
+    if (userProfile?.id && !hasRunInitialFetchRef.current) {
+      hasRunInitialFetchRef.current = true;
       // Only log once per session
       if (!sessionStorage.getItem('logged_initial_recommendation_fetch')) {
         console.log('Initial fetch for recommendations');

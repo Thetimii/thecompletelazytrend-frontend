@@ -215,19 +215,19 @@ const Dashboard = () => {
     fetchData();
   }, [fetchData, user?.id, userProfile?.id]);
 
+  // Create a ref to track if we've already loaded data for each tab
+  const tabsWithDataRef = React.useRef({
+    summary: false,
+    videos: false,
+    recommendations: false
+  });
+
   // Effect to handle tab changes - only runs when activeTab changes
   useEffect(() => {
-    // Use a ref to track if we've already loaded data for this tab
-    const tabsWithData = React.useRef({
-      summary: false,
-      videos: false,
-      recommendations: false
-    });
-
     // Only refetch data when switching to tabs that need fresh data
     if ((activeTab === 'summary' || activeTab === 'videos' || activeTab === 'recommendations')) {
       // Check if we need to load data for this tab
-      if (!tabsWithData.current[activeTab]) {
+      if (!tabsWithDataRef.current[activeTab]) {
         const tabNeedsData =
           (activeTab === 'summary' && (queries.length === 0 || videos.length === 0 || recommendations.length === 0)) ||
           (activeTab === 'videos' && (videos.length === 0 || videosByQuery.length === 0)) ||
@@ -241,18 +241,18 @@ const Dashboard = () => {
           }
           fetchData();
           // Mark this tab as having data
-          tabsWithData.current[activeTab] = true;
+          tabsWithDataRef.current[activeTab] = true;
         } else {
           // Only log once per session
           if (!sessionStorage.getItem(`logged_${activeTab}`)) {
             console.log(`Tab changed to ${activeTab}, using existing data`);
             sessionStorage.setItem(`logged_${activeTab}`, 'true');
           }
-          tabsWithData.current[activeTab] = true;
+          tabsWithDataRef.current[activeTab] = true;
         }
       }
     }
-  }, [activeTab, fetchData]);
+  }, [activeTab, fetchData, queries.length, videos.length, videosByQuery.length, recommendations.length]);
 
   // Effect to apply dark mode
   useEffect(() => {
