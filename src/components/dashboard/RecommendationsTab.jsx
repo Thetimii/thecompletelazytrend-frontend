@@ -18,49 +18,63 @@ const RecommendationsTab = ({ userProfile, onRefresh }) => {
     }
   }, [recommendation, initialCheckDone, error]);
 
-  useEffect(() => {
-    const fetchRecommendation = async () => {
-      try {
-        setLoading(true);
-        if (userProfile?.id) {
-          // Use the real user ID, not the auth ID
-          const latestRecommendation = await getLatestRecommendationByUserId(userProfile.id);
-          setRecommendation(latestRecommendation);
+  // Memoize the fetch function to prevent unnecessary re-renders
+  const fetchRecommendation = React.useCallback(async () => {
+    try {
+      setLoading(true);
+      if (userProfile?.id) {
+        // Use the real user ID, not the auth ID
+        const latestRecommendation = await getLatestRecommendationByUserId(userProfile.id);
+        setRecommendation(latestRecommendation);
 
-          // If we found a recommendation, set progress to 100%
-          if (latestRecommendation) {
-            setAnalysisProgress(100);
-          }
+        // If we found a recommendation, set progress to 100%
+        if (latestRecommendation) {
+          setAnalysisProgress(100);
         }
-      } catch (err) {
-        console.error('Error fetching recommendation:', err);
-        setError('Failed to load recommendation data');
-      } finally {
-        setLoading(false);
-        setInitialCheckDone(true);
       }
-    };
+    } catch (err) {
+      console.error('Error fetching recommendation:', err);
+      setError('Failed to load recommendation data');
+    } finally {
+      setLoading(false);
+      setInitialCheckDone(true);
+    }
+  }, [userProfile?.id]);
 
+  // Handle refresh button click
+  const handleRefresh = React.useCallback(() => {
+    // Call the parent's onRefresh if available
+    if (onRefresh) {
+      onRefresh();
+    }
+    // Also refresh our local data
     fetchRecommendation();
+  }, [onRefresh, fetchRecommendation]);
+
+  // Only fetch data when the component mounts or when userProfile changes
+  useEffect(() => {
+    // Only fetch if we don't already have a recommendation
+    if (!recommendation || !initialCheckDone) {
+      fetchRecommendation();
+    }
 
     // Don't poll for updates - just check once when the component mounts
     // This prevents constant searching for recommendations
-  }, [userProfile]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userProfile?.id]);
 
   // Get formatted content ideas using our utility function
-  const getContentIdeas = () => {
+  const contentIdeas = React.useMemo(() => {
     if (!recommendation?.content_ideas) return [];
     return formatContentIdeas(recommendation.content_ideas);
-  };
+  }, [recommendation?.content_ideas]);
 
   // Get formatted summary using our utility function
-  const getCombinedSummary = () => {
+  const getCombinedSummary = React.useMemo(() => {
     if (!recommendation?.combined_summary) return '';
     // Make sure we get the full text without any truncation
-    const fullText = formatSummary(recommendation.combined_summary);
-    console.log('Full summary text:', fullText); // Log for debugging
-    return fullText;
-  };
+    return formatSummary(recommendation.combined_summary);
+  }, [recommendation?.combined_summary]);
 
   // Skip loading state and go straight to content or empty state
 
@@ -126,17 +140,15 @@ const RecommendationsTab = ({ userProfile, onRefresh }) => {
           <div className="mt-6 text-sm text-primary-500 dark:text-primary-400">
             <p className="mb-4">You don't need to refresh the page. Your recommendations will appear automatically when ready.</p>
 
-            {onRefresh && (
-              <button
-                onClick={onRefresh}
-                className="mt-2 btn btn-secondary px-6 py-2 flex items-center mx-auto"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
-                </svg>
-                Check for Updates
-              </button>
-            )}
+            <button
+              onClick={handleRefresh}
+              className="mt-2 btn btn-secondary px-6 py-2 flex items-center mx-auto"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+              </svg>
+              Check for Updates
+            </button>
           </div>
         </div>
       </div>
@@ -144,25 +156,22 @@ const RecommendationsTab = ({ userProfile, onRefresh }) => {
   }
 
   // Render recommendation data
-  const contentIdeas = getContentIdeas();
-  const combinedSummary = getCombinedSummary();
+  const combinedSummary = getCombinedSummary;
 
   return (
     <div className="animate-fade-in">
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-3xl font-bold gradient-text">Recommendations</h2>
-        {onRefresh && (
-          <button
-            onClick={onRefresh}
-            className="p-2 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-800 transition-all duration-300 text-primary-500 flex items-center"
-            title="Refresh recommendations"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
-            </svg>
-            <span>Refresh</span>
-          </button>
-        )}
+        <button
+          onClick={handleRefresh}
+          className="p-2 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-800 transition-all duration-300 text-primary-500 flex items-center"
+          title="Refresh recommendations"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+          </svg>
+          <span>Refresh</span>
+        </button>
       </div>
 
       {/* Trend Summary */}
