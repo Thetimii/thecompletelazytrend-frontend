@@ -1,65 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import StatCard from '../StatCard';
-import { getLatestRecommendationByUserId } from '../../services/supabaseService';
 import { formatSummary } from '../../utils/textFormatters';
 
 const SummaryTab = ({ queries, videos, recommendations, userProfile, onTabChange, onRefresh }) => {
-  const [latestRecommendation, setLatestRecommendation] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [initialCheckDone, setInitialCheckDone] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
 
-  // Set a fixed progress value instead of constantly updating
-  useEffect(() => {
-    if (!latestRecommendation && initialCheckDone) {
-      // Just set a fixed progress value of 80% to indicate it's working
-      // but not constantly updating
-      setAnalysisProgress(80);
+  // Find the latest recommendation from the recommendations passed from parent
+  const latestRecommendation = useMemo(() => {
+    if (!recommendations || recommendations.length === 0) {
+      return null;
     }
-  }, [latestRecommendation, initialCheckDone]);
 
-  // Use a ref to track if we've already fetched data
-  const hasFetchedRef = React.useRef(false);
+    // Sort recommendations by created_at in descending order and take the first one
+    return [...recommendations]
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      .find(rec => rec.user_id === userProfile?.id);
+  }, [recommendations, userProfile?.id]);
 
-  // Store the last user ID to prevent unnecessary refetching
-  const lastUserIdRef = React.useRef(null);
-
+  // Set a fixed progress value if no recommendation is available
   useEffect(() => {
-    const fetchLatestRecommendation = async () => {
-      // Skip if we've already fetched for this user
-      if (hasFetchedRef.current && lastUserIdRef.current === userProfile?.id) {
-        console.log('Skipping recommendation fetch in SummaryTab - already fetched for this user');
-        return;
-      }
-
-      try {
-        setLoading(true);
-        if (userProfile?.id) {
-          console.log('Fetching recommendation in SummaryTab for user ID:', userProfile.id);
-
-          // Update our tracking refs
-          hasFetchedRef.current = true;
-          lastUserIdRef.current = userProfile?.id;
-
-          const latest = await getLatestRecommendationByUserId(userProfile.id);
-          setLatestRecommendation(latest);
-
-          // If we found a recommendation, set progress to 100%
-          if (latest) {
-            setAnalysisProgress(100);
-          }
-        }
-      } catch (err) {
-        console.error('Error fetching latest recommendation:', err);
-      } finally {
-        setLoading(false);
-        setInitialCheckDone(true);
-      }
-    };
-
-    fetchLatestRecommendation();
-    // Don't poll for updates - just check once when the component mounts
-  }, [userProfile?.id]);
+    if (!latestRecommendation) {
+      // Just set a fixed progress value of 80% to indicate it's working
+      setAnalysisProgress(80);
+    } else {
+      setAnalysisProgress(100);
+    }
+  }, [latestRecommendation]);
   return (
     <div className="animate-fade-in">
       <div className="flex items-center mb-8">
@@ -152,36 +119,32 @@ const SummaryTab = ({ queries, videos, recommendations, userProfile, onTabChange
             </div>
             <h3 className="text-xl font-semibold mb-2 text-primary-800 dark:text-primary-100">AI Analysis in Progress</h3>
 
-            {initialCheckDone && (
-              <>
-                <p className="text-primary-600 dark:text-primary-400 max-w-md mx-auto mb-6">
-                  Our AI is analyzing TikTok videos to generate your first recommendation. This will be ready in approximately {Math.max(1, Math.round((100 - Math.round(analysisProgress)) / 10))} {Math.round((100 - analysisProgress) / 10) === 1 ? 'minute' : 'minutes'}.
-                </p>
+            <p className="text-primary-600 dark:text-primary-400 max-w-md mx-auto mb-6">
+              Our AI is analyzing TikTok videos to generate your first recommendation. This will be ready in approximately {Math.max(1, Math.round((100 - Math.round(analysisProgress)) / 10))} {Math.round((100 - analysisProgress) / 10) === 1 ? 'minute' : 'minutes'}.
+            </p>
 
-                {/* Progress bar */}
-                <div className="w-full max-w-md mx-auto bg-primary-100 dark:bg-primary-800 rounded-full h-4 mb-4 overflow-hidden">
-                  <div
-                    className="bg-accent-500 h-full rounded-full transition-all duration-1000 ease-out"
-                    style={{ width: `${Math.round(analysisProgress)}%` }}
-                  ></div>
-                </div>
+            {/* Progress bar */}
+            <div className="w-full max-w-md mx-auto bg-primary-100 dark:bg-primary-800 rounded-full h-4 mb-4 overflow-hidden">
+              <div
+                className="bg-accent-500 h-full rounded-full transition-all duration-1000 ease-out"
+                style={{ width: `${Math.round(analysisProgress)}%` }}
+              ></div>
+            </div>
 
-                <div className="text-sm text-primary-500 dark:text-primary-400 mb-4">
-                  Analysis progress: {Math.round(analysisProgress)}%
-                </div>
+            <div className="text-sm text-primary-500 dark:text-primary-400 mb-4">
+              Analysis progress: {Math.round(analysisProgress)}%
+            </div>
 
-                {/* Refresh button */}
-                <button
-                  onClick={onRefresh}
-                  className="mt-4 btn btn-secondary px-6 py-2 flex items-center mx-auto"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
-                  </svg>
-                  Check for Updates
-                </button>
-              </>
-            )}
+            {/* Refresh button */}
+            <button
+              onClick={onRefresh}
+              className="mt-4 btn btn-secondary px-6 py-2 flex items-center mx-auto"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+              </svg>
+              Check for Updates
+            </button>
           </div>
         )}
       </div>
