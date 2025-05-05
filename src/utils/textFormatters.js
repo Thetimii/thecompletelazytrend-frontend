@@ -8,19 +8,19 @@
  * - Adding proper spacing after punctuation
  * - Ensuring proper paragraph breaks
  * - Removing excessive whitespace
- * 
+ *
  * @param {string} text - The text to clean
  * @returns {string} - The cleaned text
  */
 export const cleanupText = (text) => {
   if (!text) return '';
-  
+
   // Convert to string if it's not already
   const textStr = typeof text === 'string' ? text : String(text);
-  
+
   return textStr
-    // Remove hashtags
-    .replace(/#\w+/g, '')
+    // Remove hashtags (including those with special characters)
+    .replace(/#[^\s]+/g, '')
     // Ensure space after period, comma, exclamation, question mark if followed by a letter
     .replace(/([.!?,;:])([A-Za-z])/g, '$1 $2')
     // Replace multiple spaces with a single space
@@ -38,15 +38,15 @@ export const cleanupText = (text) => {
  * - Cleaning each idea with cleanupText
  * - Ensuring each idea starts with a capital letter
  * - Ensuring each idea ends with proper punctuation
- * 
+ *
  * @param {Array|string} contentIdeas - Array of content ideas or JSON string
  * @returns {Array} - Array of formatted content ideas
  */
 export const formatContentIdeas = (contentIdeas) => {
   if (!contentIdeas) return [];
-  
+
   let ideas = [];
-  
+
   // Parse JSON string if needed
   if (typeof contentIdeas === 'string') {
     try {
@@ -62,20 +62,20 @@ export const formatContentIdeas = (contentIdeas) => {
   } else {
     ideas = [String(contentIdeas)];
   }
-  
+
   // Clean up each idea
   return ideas.map(idea => {
     // Clean the text
     let cleanIdea = cleanupText(idea);
-    
+
     // Ensure it starts with a capital letter
     cleanIdea = cleanIdea.charAt(0).toUpperCase() + cleanIdea.slice(1);
-    
+
     // Ensure it ends with proper punctuation
     if (!/[.!?]$/.test(cleanIdea)) {
       cleanIdea += '.';
     }
-    
+
     return cleanIdea;
   });
 };
@@ -85,16 +85,16 @@ export const formatContentIdeas = (contentIdeas) => {
  * - Cleaning the text
  * - Breaking it into proper paragraphs
  * - Ensuring proper formatting
- * 
+ *
  * @param {string} summary - The summary text
  * @returns {string} - Formatted summary
  */
 export const formatSummary = (summary) => {
   if (!summary) return '';
-  
+
   // Convert to string if it's not already
   const summaryStr = typeof summary === 'string' ? summary : String(summary);
-  
+
   try {
     // Check if it's a JSON string and parse it
     const parsed = JSON.parse(summaryStr);
@@ -112,7 +112,7 @@ export const formatSummary = (summary) => {
   } catch (e) {
     // Not JSON, continue with normal text processing
   }
-  
+
   // Apply general text cleanup
   return cleanupText(summaryStr);
 };
