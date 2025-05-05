@@ -27,7 +27,7 @@ export const createCheckoutSession = async (userId, email) => {
       body: JSON.stringify({
         userId,
         email,
-        priceId: import.meta.env.VITE_STRIPE_PRICE_ID || 'price_1REaY3G4vQYDStWYZu4rRLu5',
+        priceId: import.meta.env.VITE_STRIPE_PRICE_ID || 'price_1RKJ9LG4vQYDStWYwbdkHlvJ',
         successUrl: `${window.location.origin}/payment-success?redirect=true`,
         cancelUrl: `${window.location.origin}/payment-cancel`,
       }),

@@ -16,6 +16,6 @@ services:
       - key: VITE_STRIPE_PRODUCT_ID
         value: prod_S8sIksYYQAe6tW
       - key: VITE_STRIPE_PRICE_ID
-        value: price_1REaY3G4vQYDStWYZu4rRLu5
+        value: price_1RKJ9LG4vQYDStWYwbdkHlvJ
       - key: VITE_STRIPE_CONNECT_ACCOUNT_ID
         value: we_1RH6CRG4vQYDStWYJIIk27cL
