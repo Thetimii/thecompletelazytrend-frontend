@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { getLatestRecommendationByUserId } from '../../services/supabaseService';
 import { formatContentIdeas, formatSummary } from '../../utils/textFormatters';
 
@@ -8,6 +8,12 @@ const RecommendationsTab = ({ userProfile, onRefresh }) => {
   const [error, setError] = useState(null);
   const [initialCheckDone, setInitialCheckDone] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
+
+  // Use a ref to track if we've already fetched data
+  const hasFetchedRef = useRef(false);
+
+  // Store the last user ID to prevent unnecessary refetching
+  const lastUserIdRef = useRef(null);
 
   // Set a fixed progress value instead of constantly updating
   useEffect(() => {
@@ -19,18 +25,28 @@ const RecommendationsTab = ({ userProfile, onRefresh }) => {
   }, [recommendation, initialCheckDone, error]);
 
   // Memoize the fetch function to prevent unnecessary re-renders
-  const fetchRecommendation = React.useCallback(async () => {
+  const fetchRecommendation = React.useCallback(async (force = false) => {
+    // Skip if we're already loading or if we don't have a user ID
+    if ((!force && loading) || !userProfile?.id) return;
+
+    // Skip if we've already fetched for this user and we're not forcing a refresh
+    if (!force && hasFetchedRef.current && lastUserIdRef.current === userProfile.id) {
+      return;
+    }
+
     try {
       setLoading(true);
-      if (userProfile?.id) {
-        // Use the real user ID, not the auth ID
-        const latestRecommendation = await getLatestRecommendationByUserId(userProfile.id);
-        setRecommendation(latestRecommendation);
+      // Update our tracking refs
+      hasFetchedRef.current = true;
+      lastUserIdRef.current = userProfile.id;
 
-        // If we found a recommendation, set progress to 100%
-        if (latestRecommendation) {
-          setAnalysisProgress(100);
-        }
+      // Use the real user ID, not the auth ID
+      const latestRecommendation = await getLatestRecommendationByUserId(userProfile.id);
+      setRecommendation(latestRecommendation);
+
+      // If we found a recommendation, set progress to 100%
+      if (latestRecommendation) {
+        setAnalysisProgress(100);
       }
     } catch (err) {
       console.error('Error fetching recommendation:', err);
@@ -39,7 +55,7 @@ const RecommendationsTab = ({ userProfile, onRefresh }) => {
       setLoading(false);
       setInitialCheckDone(true);
     }
-  }, [userProfile?.id]);
+  }, [userProfile?.id, loading]);
 
   // Handle refresh button click
   const handleRefresh = React.useCallback(() => {
@@ -47,19 +63,15 @@ const RecommendationsTab = ({ userProfile, onRefresh }) => {
     if (onRefresh) {
       onRefresh();
     }
-    // Also refresh our local data
-    fetchRecommendation();
+    // Force refresh our local data
+    fetchRecommendation(true);
   }, [onRefresh, fetchRecommendation]);
 
   // Only fetch data when the component mounts or when userProfile changes
   useEffect(() => {
-    // Only fetch if we don't already have a recommendation
-    if (!recommendation || !initialCheckDone) {
+    if (userProfile?.id) {
       fetchRecommendation();
     }
-
-    // Don't poll for updates - just check once when the component mounts
-    // This prevents constant searching for recommendations
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userProfile?.id]);
 
@@ -70,7 +82,7 @@ const RecommendationsTab = ({ userProfile, onRefresh }) => {
   }, [recommendation?.content_ideas]);
 
   // Get formatted summary using our utility function
-  const getCombinedSummary = React.useMemo(() => {
+  const combinedSummary = React.useMemo(() => {
     if (!recommendation?.combined_summary) return '';
     // Make sure we get the full text without any truncation
     return formatSummary(recommendation.combined_summary);
@@ -143,11 +155,12 @@ const RecommendationsTab = ({ userProfile, onRefresh }) => {
             <button
               onClick={handleRefresh}
               className="mt-2 btn btn-secondary px-6 py-2 flex items-center mx-auto"
+              disabled={loading}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 mr-2 ${loading ? 'animate-spin' : ''}`} viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
               </svg>
-              Check for Updates
+              {loading ? 'Loading...' : 'Check for Updates'}
             </button>
           </div>
         </div>
@@ -156,8 +169,6 @@ const RecommendationsTab = ({ userProfile, onRefresh }) => {
   }
 
   // Render recommendation data
-  const combinedSummary = getCombinedSummary;
-
   return (
     <div className="animate-fade-in">
       <div className="flex items-center justify-between mb-8">
@@ -166,11 +177,12 @@ const RecommendationsTab = ({ userProfile, onRefresh }) => {
           onClick={handleRefresh}
           className="p-2 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-800 transition-all duration-300 text-primary-500 flex items-center"
           title="Refresh recommendations"
+          disabled={loading}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 mr-1 ${loading ? 'animate-spin' : ''}`} viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
           </svg>
-          <span>Refresh</span>
+          <span>{loading ? 'Loading...' : 'Refresh'}</span>
         </button>
       </div>
 

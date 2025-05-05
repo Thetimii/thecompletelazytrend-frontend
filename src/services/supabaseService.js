@@ -182,7 +182,7 @@ export const getRecommendationsByUserId = async (userId) => {
       return [];
     }
 
-    console.log(`Fetching recommendations for user ID: ${userId}`);
+    // Skip logging to reduce console noise
 
     // First try exact match with the user_id
     let { data, error } = await supabase
@@ -193,7 +193,7 @@ export const getRecommendationsByUserId = async (userId) => {
 
     // If no results or error, try with a more flexible approach
     if ((!data || data.length === 0) && !error) {
-      console.log('No exact matches found, trying with flexible matching');
+      // Skip logging to reduce console noise
 
       // Get recommendations with a filter
       const { data: allRecs, error: flexError } = await supabase
@@ -219,7 +219,7 @@ export const getRecommendationsByUserId = async (userId) => {
       throw new Error(`Error getting recommendations: ${error.message}`);
     }
 
-    console.log(`Found ${data?.length || 0} recommendations for user: ${userId}`);
+    // Skip logging to reduce console noise
     return data || [];
   } catch (error) {
     console.error('Error getting recommendations:', error);
@@ -347,7 +347,7 @@ export const getLatestRecommendationByUserId = async (userId) => {
       return null;
     }
 
-    console.log(`Fetching latest recommendation for user ID: ${userId}`);
+    // Skip logging to reduce console noise
 
     // First try exact match with the user_id
     let { data, error } = await supabase
@@ -360,7 +360,7 @@ export const getLatestRecommendationByUserId = async (userId) => {
 
     // If no results or error, try with a more flexible approach
     if ((!data || error?.code === 'PGRST116') && (!error || error?.code === 'PGRST116')) {
-      console.log('No exact match found, trying with flexible matching');
+      // Skip logging to reduce console noise
 
       // Get recommendations with a filter
       const { data: allRecs, error: flexError } = await supabase
@@ -389,11 +389,7 @@ export const getLatestRecommendationByUserId = async (userId) => {
       throw new Error(`Error getting latest recommendation: ${error.message}`);
     }
 
-    if (data) {
-      console.log(`Found latest recommendation for user: ${userId}`);
-    } else {
-      console.log(`No recommendation found for user: ${userId}`);
-    }
+    // Skip logging to reduce console noise
 
     return data;
   } catch (error) {
