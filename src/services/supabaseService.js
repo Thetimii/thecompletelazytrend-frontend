@@ -182,29 +182,38 @@ export const getRecommendationsByUserId = async (userId) => {
       return [];
     }
 
-    // Get all recommendations where user_id contains the provided userId
-    // We need to use a more flexible approach since the IDs might not match exactly
-    console.log(`Searching for recommendations with user_id containing: ${userId}`);
+    console.log(`Fetching recommendations for user ID: ${userId}`);
 
-    // First get all recommendations to check manually
-    const { data: allRecs, error } = await supabase
+    // First try exact match with the user_id
+    let { data, error } = await supabase
       .from('recommendations')
       .select('*')
+      .eq('user_id', userId)
       .order('created_at', { ascending: false });
 
-    // Filter recommendations that have a user_id that contains our userId
-    // This handles cases where the format might be slightly different
-    const data = allRecs ? allRecs.filter(rec => {
-      // Check if the user_id contains our userId or vice versa
-      const recUserId = rec.user_id ? rec.user_id.toString() : '';
-      const ourUserId = userId ? userId.toString() : '';
+    // If no results or error, try with a more flexible approach
+    if ((!data || data.length === 0) && !error) {
+      console.log('No exact matches found, trying with flexible matching');
 
-      // Log for debugging
-      console.log(`Comparing rec.user_id: ${recUserId} with userId: ${ourUserId}`);
+      // Get recommendations with a filter
+      const { data: allRecs, error: flexError } = await supabase
+        .from('recommendations')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-      // Check if either ID contains the other
-      return recUserId.includes(ourUserId) || ourUserId.includes(recUserId);
-    }) : [];
+      if (!flexError && allRecs) {
+        // Convert userId to string for comparison
+        const ourUserId = userId.toString();
+
+        // Filter recommendations that have a user_id that contains our userId
+        data = allRecs.filter(rec => {
+          const recUserId = rec.user_id ? rec.user_id.toString() : '';
+          return recUserId.includes(ourUserId) || ourUserId.includes(recUserId);
+        });
+      } else if (flexError) {
+        error = flexError;
+      }
+    }
 
     if (error) {
       throw new Error(`Error getting recommendations: ${error.message}`);
@@ -338,34 +347,45 @@ export const getLatestRecommendationByUserId = async (userId) => {
       return null;
     }
 
-    // Get all recommendations to find the one with a matching user_id
-    // We need to use a more flexible approach since the IDs might not match exactly
-    console.log(`Searching for latest recommendation with user_id containing: ${userId}`);
+    console.log(`Fetching latest recommendation for user ID: ${userId}`);
 
-    // First get all recommendations to check manually
-    const { data: allRecs, error } = await supabase
+    // First try exact match with the user_id
+    let { data, error } = await supabase
       .from('recommendations')
       .select('*')
-      .order('created_at', { ascending: false });
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
 
-    // Filter recommendations that have a user_id that contains our userId
-    // This handles cases where the format might be slightly different
-    const matchingRecs = allRecs ? allRecs.filter(rec => {
-      // Check if the user_id contains our userId or vice versa
-      const recUserId = rec.user_id ? rec.user_id.toString() : '';
-      const ourUserId = userId ? userId.toString() : '';
+    // If no results or error, try with a more flexible approach
+    if ((!data || error?.code === 'PGRST116') && (!error || error?.code === 'PGRST116')) {
+      console.log('No exact match found, trying with flexible matching');
 
-      // Log for debugging
-      console.log(`Comparing rec.user_id: ${recUserId} with userId: ${ourUserId}`);
+      // Get recommendations with a filter
+      const { data: allRecs, error: flexError } = await supabase
+        .from('recommendations')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-      // Check if either ID contains the other
-      return recUserId.includes(ourUserId) || ourUserId.includes(recUserId);
-    }) : [];
+      if (!flexError && allRecs && allRecs.length > 0) {
+        // Convert userId to string for comparison
+        const ourUserId = userId.toString();
 
-    // Get the latest matching recommendation
-    const data = matchingRecs.length > 0 ? matchingRecs[0] : null;
+        // Filter recommendations that have a user_id that contains our userId
+        const matchingRecs = allRecs.filter(rec => {
+          const recUserId = rec.user_id ? rec.user_id.toString() : '';
+          return recUserId.includes(ourUserId) || ourUserId.includes(recUserId);
+        });
 
-    if (error) {
+        // Get the latest matching recommendation
+        data = matchingRecs.length > 0 ? matchingRecs[0] : null;
+      } else if (flexError && flexError.code !== 'PGRST116') {
+        error = flexError;
+      }
+    }
+
+    if (error && error.code !== 'PGRST116') {
       throw new Error(`Error getting latest recommendation: ${error.message}`);
     }
 

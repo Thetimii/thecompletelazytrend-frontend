@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   getTrendQueries,
   getTikTokVideos,
@@ -49,6 +49,13 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('summary');
+  const [dataCache, setDataCache] = useState({
+    queries: null,
+    videos: null,
+    videosByQuery: null,
+    recommendations: null,
+    lastFetched: null
+  });
   const [isDarkMode, setIsDarkMode] = useState(() => {
     // Check if user has a preference stored
     const savedMode = localStorage.getItem('darkMode');
@@ -57,10 +64,54 @@ const Dashboard = () => {
     return savedMode ? savedMode === 'true' : prefersDark;
   });
 
-  // Define fetchData function first
-  const fetchData = async () => {
+  // Helper function to add timeout to promises
+  const fetchWithTimeout = async (fetchFunction, timeout = 10000) => {
+    return Promise.race([
+      fetchFunction(),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Request timed out')), timeout)
+      )
+    ]);
+  };
+
+  // Helper function to retry failed requests
+  const fetchWithRetry = async (fetchFn, maxRetries = 2) => {
+    let lastError;
+
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        return await fetchFn();
+      } catch (error) {
+        console.warn(`Attempt ${attempt + 1} failed:`, error);
+        lastError = error;
+        // Wait before retrying (exponential backoff)
+        await new Promise(r => setTimeout(r, 1000 * Math.pow(2, attempt)));
+      }
+    }
+
+    throw lastError;
+  };
+
+  // Define fetchData function with memoization
+  const fetchData = useCallback(async (forceRefresh = false) => {
     try {
       setLoading(true);
+
+      // Check if we have cached data and it's less than 5 minutes old
+      const now = Date.now();
+      const cacheAge = dataCache.lastFetched ? now - dataCache.lastFetched : Infinity;
+      const cacheValid = cacheAge < 5 * 60 * 1000; // 5 minutes
+
+      if (!forceRefresh && cacheValid && dataCache.queries && dataCache.videos && dataCache.videosByQuery && dataCache.recommendations) {
+        // Use cached data
+        console.log('Using cached data from', new Date(dataCache.lastFetched).toLocaleTimeString());
+        setQueries(dataCache.queries);
+        setVideos(dataCache.videos);
+        setVideosByQuery(dataCache.videosByQuery);
+        setRecommendations(dataCache.recommendations);
+        setLoading(false);
+        return;
+      }
 
       // Make sure we have the user profile
       if (!userProfile && user?.id) {
@@ -71,27 +122,34 @@ const Dashboard = () => {
       // Use the user ID from the profile (not the auth ID)
       const userId = userProfile?.id;
       console.log('Using user ID from profile:', userId);
-      console.log('User profile:', userProfile);
+
+      let queriesData = [];
+      let videosByQueryData = [];
+      let recommendationsData = [];
 
       try {
-        // Fetch queries for the current user
-        const queriesData = userId
-          ? await getTrendQueriesByUserId(userId)
-          : await getTrendQueries();
+        // Fetch queries for the current user with timeout and retry
+        queriesData = await fetchWithRetry(() =>
+          fetchWithTimeout(() =>
+            userId ? getTrendQueriesByUserId(userId) : getTrendQueries()
+          )
+        );
         console.log('Queries data:', queriesData?.length || 0, 'queries');
         setQueries(queriesData || []);
       } catch (error) {
-        console.warn('Error fetching trend queries, table might not exist yet:', error);
+        console.warn('Error fetching trend queries:', error);
         setQueries([]);
       }
 
       // Fetch videos grouped by query for the current user
-      // We'll use this data for both grouped and filtered views
       if (userId) {
         try {
           console.log('Fetching videos by query for user ID:', userId);
-          const videosByQueryData = await getTikTokVideosByUserIdWithQueries(userId);
-          console.log('Videos by query data:', videosByQueryData);
+          videosByQueryData = await fetchWithRetry(() =>
+            fetchWithTimeout(() =>
+              getTikTokVideosByUserIdWithQueries(userId)
+            )
+          );
 
           // Set the videos by query data
           setVideosByQuery(videosByQueryData || []);
@@ -110,7 +168,6 @@ const Dashboard = () => {
           setVideos(allVideos);
         } catch (error) {
           console.warn('Error fetching videos by query:', error);
-          console.error('Detailed error:', error);
           setVideosByQuery([]);
           setVideos([]);
         }
@@ -122,16 +179,26 @@ const Dashboard = () => {
 
       // Fetch recommendations for the current user
       try {
-        const recommendationsData = userId
-          ? await getRecommendationsByUserId(userId)
-          : await getRecommendations();
+        recommendationsData = await fetchWithRetry(() =>
+          fetchWithTimeout(() =>
+            userId ? getRecommendationsByUserId(userId) : getRecommendations()
+          )
+        );
         console.log('Recommendations data:', recommendationsData?.length || 0, 'recommendations');
         setRecommendations(recommendationsData || []);
       } catch (error) {
-        console.warn('Error fetching recommendations, table might not exist yet:', error);
-        console.error('Detailed error:', error);
+        console.warn('Error fetching recommendations:', error);
         setRecommendations([]);
       }
+
+      // Update cache with new data
+      setDataCache({
+        queries: queriesData || [],
+        videos: videos || [],
+        videosByQuery: videosByQueryData || [],
+        recommendations: recommendationsData || [],
+        lastFetched: Date.now()
+      });
 
       setLoading(false);
     } catch (err) {
@@ -139,21 +206,31 @@ const Dashboard = () => {
       setError('Failed to load dashboard data. Please try again later.');
       setLoading(false);
     }
-  };
+  }, [user, userProfile, dataCache]);
 
-  // Then use it in useEffect
+  // Initial data fetch when component mounts or user/profile changes
   useEffect(() => {
     fetchData();
-  }, [selectedQueryId, user?.id, userProfile?.id]);
+  }, [fetchData, user?.id, userProfile?.id]);
 
-  // Add an effect to refresh data when tab changes to ensure fresh data
+  // Optimized effect to refresh data when tab changes
   useEffect(() => {
     // Only refetch data when switching to tabs that need fresh data
-    if (activeTab === 'summary' || activeTab === 'videos' || activeTab === 'recommendations') {
-      console.log(`Tab changed to ${activeTab}, refreshing data...`);
-      fetchData();
+    // AND only if the data hasn't been loaded yet or needs refreshing
+    if ((activeTab === 'summary' || activeTab === 'videos' || activeTab === 'recommendations')) {
+      const tabNeedsData =
+        (activeTab === 'summary' && (queries.length === 0 || videos.length === 0 || recommendations.length === 0)) ||
+        (activeTab === 'videos' && (videos.length === 0 || videosByQuery.length === 0)) ||
+        (activeTab === 'recommendations' && recommendations.length === 0);
+
+      if (tabNeedsData) {
+        console.log(`Tab changed to ${activeTab}, refreshing data...`);
+        fetchData();
+      } else {
+        console.log(`Tab changed to ${activeTab}, using existing data`);
+      }
     }
-  }, [activeTab]);
+  }, [activeTab, fetchData, queries.length, videos.length, videosByQuery.length, recommendations.length]);
 
   // Effect to apply dark mode
   useEffect(() => {
@@ -317,6 +394,21 @@ const Dashboard = () => {
       {/* Main Content */}
       <div className="ml-20 lg:ml-64 h-screen transition-all duration-300 relative z-10 overflow-y-auto">
         <div className="p-8">
+          {/* Header with refresh button */}
+          <div className="flex justify-between items-center mb-4">
+            <div></div> {/* Empty div for flex spacing */}
+            <button
+              onClick={() => fetchData(true)} // Force refresh
+              className="p-2 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-800 transition-all duration-300 text-primary-500 flex items-center"
+              title="Refresh data"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+              </svg>
+              <span>Refresh</span>
+            </button>
+          </div>
+
           {/* Tab Content */}
           <div className="animate-fade-in max-w-7xl mx-auto">
             {activeTab === 'summary' && (
@@ -326,6 +418,7 @@ const Dashboard = () => {
                 recommendations={recommendations}
                 userProfile={userProfile}
                 onTabChange={setActiveTab}
+                onRefresh={() => fetchData(true)}
               />
             )}
 
@@ -336,12 +429,14 @@ const Dashboard = () => {
                 videosByQuery={videosByQuery}
                 selectedQueryId={selectedQueryId}
                 setSelectedQueryId={setSelectedQueryId}
+                onRefresh={() => fetchData(true)}
               />
             )}
 
             {activeTab === 'recommendations' && (
               <RecommendationsTab
                 userProfile={userProfile}
+                onRefresh={() => fetchData(true)}
               />
             )}
 
