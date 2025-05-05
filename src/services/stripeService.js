@@ -18,7 +18,33 @@ export const createCheckoutSession = async (userId, email) => {
 
     console.log('Creating checkout session with API URL:', import.meta.env.VITE_API_URL || '');
 
+    // First, check if the backend is available
+    try {
+      const testResponse = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/stripe-test`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (testResponse.ok) {
+        const testData = await testResponse.json();
+        console.log('Stripe test response:', testData);
+
+        // If we're using a mock Stripe in production, show a warning
+        if (testData.mockStripe && import.meta.env.PROD) {
+          console.warn('WARNING: Using mock Stripe in production environment!');
+        }
+      } else {
+        console.warn('Stripe test endpoint not available or returned an error');
+      }
+    } catch (testError) {
+      console.warn('Error testing Stripe configuration:', testError);
+    }
+
     // Call the backend API to create a checkout session
+    console.log('Sending checkout request with price ID:', import.meta.env.VITE_STRIPE_PRICE_ID || 'price_1RKJ9LG4vQYDStWYwbdkHlvJ');
+
     const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/create-checkout-session`, {
       method: 'POST',
       headers: {
@@ -33,16 +59,28 @@ export const createCheckoutSession = async (userId, email) => {
       }),
     });
 
+    console.log('Response status:', response.status);
+
     if (!response.ok) {
       let errorMessage = 'Failed to create checkout session';
+      let errorDetails = '';
+
       try {
         const errorData = await response.json();
+        console.error('Error response data:', errorData);
         errorMessage = errorData.message || errorMessage;
+        errorDetails = errorData.details || errorData.error || '';
       } catch (jsonError) {
         console.error('Error parsing error response:', jsonError);
         errorMessage += ` (Status: ${response.status})`;
       }
-      throw new Error(errorMessage);
+
+      // For development, provide more detailed error information
+      if (import.meta.env.DEV) {
+        throw new Error(`${errorMessage}\n${errorDetails}`);
+      } else {
+        throw new Error(errorMessage);
+      }
     }
 
     let data;
