@@ -103,8 +103,10 @@ const Dashboard = () => {
       const cacheValid = cacheAge < 5 * 60 * 1000; // 5 minutes
 
       if (!forceRefresh && cacheValid && dataCache.queries && dataCache.videos && dataCache.videosByQuery && dataCache.recommendations) {
-        // Use cached data
-        console.log('Using cached data from', new Date(dataCache.lastFetched).toLocaleTimeString());
+        // Use cached data - only log once
+        if (activeTab === 'summary') {
+          console.log('Using cached data from', new Date(dataCache.lastFetched).toLocaleTimeString());
+        }
         setQueries(dataCache.queries);
         setVideos(dataCache.videos);
         setVideosByQuery(dataCache.videosByQuery);
@@ -213,24 +215,44 @@ const Dashboard = () => {
     fetchData();
   }, [fetchData, user?.id, userProfile?.id]);
 
-  // Optimized effect to refresh data when tab changes
+  // Effect to handle tab changes - only runs when activeTab changes
   useEffect(() => {
-    // Only refetch data when switching to tabs that need fresh data
-    // AND only if the data hasn't been loaded yet or needs refreshing
-    if ((activeTab === 'summary' || activeTab === 'videos' || activeTab === 'recommendations')) {
-      const tabNeedsData =
-        (activeTab === 'summary' && (queries.length === 0 || videos.length === 0 || recommendations.length === 0)) ||
-        (activeTab === 'videos' && (videos.length === 0 || videosByQuery.length === 0)) ||
-        (activeTab === 'recommendations' && recommendations.length === 0);
+    // Use a ref to track if we've already loaded data for this tab
+    const tabsWithData = React.useRef({
+      summary: false,
+      videos: false,
+      recommendations: false
+    });
 
-      if (tabNeedsData) {
-        console.log(`Tab changed to ${activeTab}, refreshing data...`);
-        fetchData();
-      } else {
-        console.log(`Tab changed to ${activeTab}, using existing data`);
+    // Only refetch data when switching to tabs that need fresh data
+    if ((activeTab === 'summary' || activeTab === 'videos' || activeTab === 'recommendations')) {
+      // Check if we need to load data for this tab
+      if (!tabsWithData.current[activeTab]) {
+        const tabNeedsData =
+          (activeTab === 'summary' && (queries.length === 0 || videos.length === 0 || recommendations.length === 0)) ||
+          (activeTab === 'videos' && (videos.length === 0 || videosByQuery.length === 0)) ||
+          (activeTab === 'recommendations' && recommendations.length === 0);
+
+        if (tabNeedsData) {
+          // Only log once per session
+          if (!sessionStorage.getItem(`logged_${activeTab}`)) {
+            console.log(`Tab changed to ${activeTab}, refreshing data...`);
+            sessionStorage.setItem(`logged_${activeTab}`, 'true');
+          }
+          fetchData();
+          // Mark this tab as having data
+          tabsWithData.current[activeTab] = true;
+        } else {
+          // Only log once per session
+          if (!sessionStorage.getItem(`logged_${activeTab}`)) {
+            console.log(`Tab changed to ${activeTab}, using existing data`);
+            sessionStorage.setItem(`logged_${activeTab}`, 'true');
+          }
+          tabsWithData.current[activeTab] = true;
+        }
       }
     }
-  }, [activeTab, fetchData, queries.length, videos.length, videosByQuery.length, recommendations.length]);
+  }, [activeTab, fetchData]);
 
   // Effect to apply dark mode
   useEffect(() => {
