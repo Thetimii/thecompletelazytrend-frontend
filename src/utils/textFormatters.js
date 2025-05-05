@@ -18,9 +18,19 @@ export const cleanupText = (text) => {
   // Convert to string if it's not already
   const textStr = typeof text === 'string' ? text : String(text);
 
-  return textStr
-    // Remove hashtags (including those with special characters)
-    .replace(/#[^\s]+/g, '')
+  // First, remove all hashtag patterns (including those with special characters)
+  let cleanedText = textStr
+    // Remove hashtags at the beginning of lines or after spaces
+    .replace(/(^|\s)#[^\s]+/g, '$1')
+    // Remove hashtags with special formatting like **#hashtag**
+    .replace(/\*\*#[^*\s]+\*\*/g, '')
+    // Remove hashtags with plus signs like #+hashtag
+    .replace(/#\+[^\s]+/g, '')
+    // Remove any remaining hashtags
+    .replace(/#[^\s]+/g, '');
+
+  // Now apply other formatting
+  return cleanedText
     // Ensure space after period, comma, exclamation, question mark if followed by a letter
     .replace(/([.!?,;:])([A-Za-z])/g, '$1 $2')
     // Replace multiple spaces with a single space
@@ -29,6 +39,8 @@ export const cleanupText = (text) => {
     .replace(/\n{3,}/g, '\n\n')
     // Ensure proper spacing around list markers
     .replace(/(\d+\.)([^\s])/g, '$1 $2')
+    // Remove any "+" markers that might be used with hashtags
+    .replace(/\+\+/g, '')
     // Trim whitespace
     .trim();
 };
@@ -68,6 +80,17 @@ export const formatContentIdeas = (contentIdeas) => {
     // Clean the text
     let cleanIdea = cleanupText(idea);
 
+    // Additional cleanup for content ideas - remove any remaining hashtag patterns
+    // This handles cases where hashtags might be in the middle of text or have special formatting
+    cleanIdea = cleanIdea
+      // Remove any remaining hashtag-like patterns (e.g., "**#hashtag**")
+      .replace(/\*\*#[^*]+\*\*/g, '')
+      // Remove any remaining hashtags with special characters
+      .replace(/#[^\s.,!?]+/g, '')
+      // Clean up any double spaces created by removals
+      .replace(/\s+/g, ' ')
+      .trim();
+
     // Ensure it starts with a capital letter
     cleanIdea = cleanIdea.charAt(0).toUpperCase() + cleanIdea.slice(1);
 
@@ -76,8 +99,19 @@ export const formatContentIdeas = (contentIdeas) => {
       cleanIdea += '.';
     }
 
+    // Remove any empty bullet points or list markers left behind
+    cleanIdea = cleanIdea
+      .replace(/^[\d*+•-]+\.\s*$/g, '')
+      .replace(/^[\d*+•-]+\.\s+$/g, '')
+      .trim();
+
+    // If the idea became empty after cleaning, return null so we can filter it out
+    if (!cleanIdea || cleanIdea === '.') {
+      return null;
+    }
+
     return cleanIdea;
-  });
+  }).filter(Boolean); // Filter out any null/empty ideas
 };
 
 /**
@@ -114,5 +148,17 @@ export const formatSummary = (summary) => {
   }
 
   // Apply general text cleanup
-  return cleanupText(summaryStr);
+  let cleanedSummary = cleanupText(summaryStr);
+
+  // Additional cleanup for summaries - remove any remaining hashtag patterns
+  cleanedSummary = cleanedSummary
+    // Remove any remaining hashtag-like patterns (e.g., "**#hashtag**")
+    .replace(/\*\*#[^*]+\*\*/g, '')
+    // Remove any remaining hashtags with special characters
+    .replace(/#[^\s.,!?]+/g, '')
+    // Clean up any double spaces created by removals
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  return cleanedSummary;
 };
