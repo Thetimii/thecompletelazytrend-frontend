@@ -31,7 +31,10 @@ const RecommendationsTab = ({ userProfile, onRefresh }) => {
 
     // Skip if we've already fetched for this user and we're not forcing a refresh
     if (!force && hasFetchedRef.current && lastUserIdRef.current === userProfile.id) {
-      return;
+      // If we already have a recommendation, just return it
+      if (recommendation) {
+        return;
+      }
     }
 
     try {
@@ -42,6 +45,13 @@ const RecommendationsTab = ({ userProfile, onRefresh }) => {
 
       // Use the real user ID, not the auth ID
       const latestRecommendation = await getLatestRecommendationByUserId(userProfile.id);
+
+      // Only log once per session
+      if (!sessionStorage.getItem('logged_recommendation_fetch')) {
+        console.log('Fetched recommendation:', latestRecommendation ? 'Found' : 'Not found');
+        sessionStorage.setItem('logged_recommendation_fetch', 'true');
+      }
+
       setRecommendation(latestRecommendation);
 
       // If we found a recommendation, set progress to 100%
@@ -55,7 +65,7 @@ const RecommendationsTab = ({ userProfile, onRefresh }) => {
       setLoading(false);
       setInitialCheckDone(true);
     }
-  }, [userProfile?.id, loading]);
+  }, [userProfile?.id, loading, recommendation]);
 
   // Handle refresh button click
   const handleRefresh = React.useCallback(() => {
@@ -67,13 +77,22 @@ const RecommendationsTab = ({ userProfile, onRefresh }) => {
     fetchRecommendation(true);
   }, [onRefresh, fetchRecommendation]);
 
-  // Only fetch data when the component mounts or when userProfile changes
+  // Only fetch data when the component mounts
   useEffect(() => {
-    if (userProfile?.id) {
+    // Use a ref to track if we've already run this effect
+    const hasRunRef = useRef(false);
+
+    if (userProfile?.id && !hasRunRef.current) {
+      hasRunRef.current = true;
+      // Only log once per session
+      if (!sessionStorage.getItem('logged_initial_recommendation_fetch')) {
+        console.log('Initial fetch for recommendations');
+        sessionStorage.setItem('logged_initial_recommendation_fetch', 'true');
+      }
       fetchRecommendation();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userProfile?.id]);
+  }, []);
 
   // Get formatted content ideas using our utility function
   const contentIdeas = React.useMemo(() => {
@@ -105,6 +124,26 @@ const RecommendationsTab = ({ userProfile, onRefresh }) => {
           </div>
           <h3 className="text-xl font-semibold mb-2 text-primary-800 dark:text-primary-100">Error Loading Recommendations</h3>
           <p className="text-primary-600 dark:text-primary-400">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Render loading state
+  if (loading) {
+    return (
+      <div className="animate-fade-in">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-3xl font-bold gradient-text">Recommendations</h2>
+          <div className="p-2 text-primary-500">
+            <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </div>
+        </div>
+        <div className="dashboard-card p-10 text-center">
+          <p className="text-primary-600 dark:text-primary-400">Loading recommendations...</p>
         </div>
       </div>
     );
