@@ -103,19 +103,8 @@ const RecommendationsTab = ({ userProfile, onRefresh }) => {
   if (error) {
     return (
       <div className="animate-fade-in">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center mb-8">
           <h2 className="text-3xl font-bold gradient-text">Recommendations</h2>
-          <button
-            onClick={handleRefresh}
-            className="p-2 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-800 transition-all duration-300 text-primary-500 flex items-center"
-            title="Refresh recommendations"
-            disabled={loading}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 mr-1 ${loading ? 'animate-spin' : ''}`} viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
-            </svg>
-            <span>{loading ? 'Loading...' : 'Refresh'}</span>
-          </button>
         </div>
         <div className="dashboard-card p-10 text-center">
           <div className="text-red-500 mb-4">
@@ -134,14 +123,8 @@ const RecommendationsTab = ({ userProfile, onRefresh }) => {
   if (loading) {
     return (
       <div className="animate-fade-in">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center mb-8">
           <h2 className="text-3xl font-bold gradient-text">Recommendations</h2>
-          <div className="p-2 text-primary-500">
-            <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-          </div>
         </div>
         <div className="dashboard-card p-10 text-center">
           <p className="text-primary-600 dark:text-primary-400">Loading recommendations...</p>
@@ -157,19 +140,8 @@ const RecommendationsTab = ({ userProfile, onRefresh }) => {
 
     return (
       <div className="animate-fade-in">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center mb-8">
           <h2 className="text-3xl font-bold gradient-text">Recommendations</h2>
-          <button
-            onClick={handleRefresh}
-            className="p-2 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-800 transition-all duration-300 text-primary-500 flex items-center"
-            title="Refresh recommendations"
-            disabled={loading}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 mr-1 ${loading ? 'animate-spin' : ''}`} viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
-            </svg>
-            <span>{loading ? 'Loading...' : 'Refresh'}</span>
-          </button>
         </div>
         <div className="dashboard-card p-10 text-center">
           <div className="w-16 h-16 bg-primary-100 dark:bg-primary-800 rounded-full flex items-center justify-center mb-4 mx-auto">
@@ -211,19 +183,8 @@ const RecommendationsTab = ({ userProfile, onRefresh }) => {
   // Render recommendation data
   return (
     <div className="animate-fade-in">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center mb-8">
         <h2 className="text-3xl font-bold gradient-text">Recommendations</h2>
-        <button
-          onClick={handleRefresh}
-          className="p-2 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-800 transition-all duration-300 text-primary-500 flex items-center"
-          title="Refresh recommendations"
-          disabled={loading}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 mr-1 ${loading ? 'animate-spin' : ''}`} viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
-          </svg>
-          <span>{loading ? 'Loading...' : 'Refresh'}</span>
-        </button>
       </div>
 
       {/* Trend Summary */}

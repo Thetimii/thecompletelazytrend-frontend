@@ -18,11 +18,29 @@ const SummaryTab = ({ queries, videos, recommendations, userProfile, onTabChange
     }
   }, [latestRecommendation, initialCheckDone]);
 
+  // Use a ref to track if we've already fetched data
+  const hasFetchedRef = React.useRef(false);
+
+  // Store the last user ID to prevent unnecessary refetching
+  const lastUserIdRef = React.useRef(null);
+
   useEffect(() => {
     const fetchLatestRecommendation = async () => {
+      // Skip if we've already fetched for this user
+      if (hasFetchedRef.current && lastUserIdRef.current === userProfile?.id) {
+        console.log('Skipping recommendation fetch in SummaryTab - already fetched for this user');
+        return;
+      }
+
       try {
         setLoading(true);
         if (userProfile?.id) {
+          console.log('Fetching recommendation in SummaryTab for user ID:', userProfile.id);
+
+          // Update our tracking refs
+          hasFetchedRef.current = true;
+          lastUserIdRef.current = userProfile?.id;
+
           const latest = await getLatestRecommendationByUserId(userProfile.id);
           setLatestRecommendation(latest);
 
@@ -41,7 +59,7 @@ const SummaryTab = ({ queries, videos, recommendations, userProfile, onTabChange
 
     fetchLatestRecommendation();
     // Don't poll for updates - just check once when the component mounts
-  }, [userProfile]);
+  }, [userProfile?.id]);
   return (
     <div className="animate-fade-in">
       <div className="flex items-center mb-8">
