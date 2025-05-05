@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     }
 
     // Get the recipient email from environment variables
-    const recipientEmail = process.env.FEEDBACK_EMAIL || process.env.EMAIL_FROM || 'support@lazy-trends.com';
+    const recipientEmail = process.env.FEEDBACK_EMAIL || process.env.EMAIL_FROM || 'info@lazy-trends.com';
 
     // Prepare email data
     const emailData = {
