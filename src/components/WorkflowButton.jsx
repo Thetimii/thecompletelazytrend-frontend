@@ -36,6 +36,14 @@ const WorkflowButton = ({ onComplete }) => {
         1 // Just 1 video per query for testing
       );
 
+      // Track Lead event with Meta Pixel when user generates content ideas
+      if (window.fbq) {
+        fbq('track', 'Lead', {
+          content_name: 'content_ideas_generation',
+          content_category: 'workflow'
+        });
+      }
+
       setResult(response);
 
       if (onComplete) {

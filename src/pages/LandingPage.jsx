@@ -9,9 +9,17 @@ import Footer from '../components/landing/Footer';
 import DarkModeToggle from '../components/DarkModeToggle';
 
 const LandingPage = () => {
-  // Scroll to top when component mounts
+  // Scroll to top when component mounts and track page view
   useEffect(() => {
     window.scrollTo(0, 0);
+
+    // Track ViewContent event with Meta Pixel
+    if (window.fbq) {
+      fbq('track', 'ViewContent', {
+        content_name: 'landing_page',
+        content_category: 'homepage'
+      });
+    }
   }, []);
 
   return (

@@ -64,6 +64,14 @@ const Signup = () => {
 
         setSuccess(true);
 
+        // Track registration completion with Meta Pixel
+        if (window.fbq) {
+          fbq('track', 'CompleteRegistration', {
+            content_name: 'user_registration',
+            status: 'successful'
+          });
+        }
+
         // Check if email confirmation is required
         if (data.session) {
           // User is automatically signed in, redirect to onboarding
