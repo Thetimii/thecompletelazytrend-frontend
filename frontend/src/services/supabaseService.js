@@ -182,7 +182,7 @@ export const getRecommendationsByUserId = async (userId) => {
       return [];
     }
 
-    console.log(`Fetching recommendations for user ID: ${userId}`);
+    // Skip logging to reduce console noise
 
     // First try exact match with the user_id
     let { data, error } = await supabase
@@ -193,7 +193,7 @@ export const getRecommendationsByUserId = async (userId) => {
 
     // If no results or error, try with a more flexible approach
     if ((!data || data.length === 0) && !error) {
-      console.log('No exact matches found, trying with flexible matching');
+      // Skip logging to reduce console noise
 
       // Get recommendations with a filter
       const { data: allRecs, error: flexError } = await supabase
@@ -219,7 +219,7 @@ export const getRecommendationsByUserId = async (userId) => {
       throw new Error(`Error getting recommendations: ${error.message}`);
     }
 
-    console.log(`Found ${data?.length || 0} recommendations for user: ${userId}`);
+    // Skip logging to reduce console noise
     return data || [];
   } catch (error) {
     console.error('Error getting recommendations:', error);
@@ -347,55 +347,54 @@ export const getLatestRecommendationByUserId = async (userId) => {
       return null;
     }
 
-    console.log(`Fetching latest recommendation for user ID: ${userId}`);
+    console.log('Fetching recommendation for user ID:', userId);
 
     // First try exact match with the user_id
-    let { data, error } = await supabase
+    let { data } = await supabase
       .from('recommendations')
       .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
-      .limit(1)
-      .single();
+      .limit(1);
 
-    // If no results or error, try with a more flexible approach
-    if ((!data || error?.code === 'PGRST116') && (!error || error?.code === 'PGRST116')) {
-      console.log('No exact match found, trying with flexible matching');
+    // If we got data, return the first item
+    if (data && data.length > 0) {
+      console.log('Found recommendation with exact match');
+      return data[0];
+    }
 
-      // Get recommendations with a filter
-      const { data: allRecs, error: flexError } = await supabase
-        .from('recommendations')
-        .select('*')
-        .order('created_at', { ascending: false });
+    // If no results with exact match, try with a more flexible approach
+    console.log('No exact match found, trying flexible match');
+    const { data: allRecs, error: flexError } = await supabase
+      .from('recommendations')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-      if (!flexError && allRecs && allRecs.length > 0) {
-        // Convert userId to string for comparison
-        const ourUserId = userId.toString();
+    if (flexError) {
+      console.error('Error fetching all recommendations:', flexError);
+      throw new Error(`Error getting recommendations: ${flexError.message}`);
+    }
 
-        // Filter recommendations that have a user_id that contains our userId
-        const matchingRecs = allRecs.filter(rec => {
-          const recUserId = rec.user_id ? rec.user_id.toString() : '';
-          return recUserId.includes(ourUserId) || ourUserId.includes(recUserId);
-        });
+    if (allRecs && allRecs.length > 0) {
+      // Convert userId to string for comparison
+      const ourUserId = userId.toString();
 
-        // Get the latest matching recommendation
-        data = matchingRecs.length > 0 ? matchingRecs[0] : null;
-      } else if (flexError && flexError.code !== 'PGRST116') {
-        error = flexError;
+      // Filter recommendations that have a user_id that contains our userId
+      const matchingRecs = allRecs.filter(rec => {
+        if (!rec.user_id) return false;
+        const recUserId = rec.user_id.toString();
+        return recUserId.includes(ourUserId) || ourUserId.includes(recUserId);
+      });
+
+      // Get the latest matching recommendation
+      if (matchingRecs.length > 0) {
+        console.log('Found recommendation with flexible match');
+        return matchingRecs[0];
       }
     }
 
-    if (error && error.code !== 'PGRST116') {
-      throw new Error(`Error getting latest recommendation: ${error.message}`);
-    }
-
-    if (data) {
-      console.log(`Found latest recommendation for user: ${userId}`);
-    } else {
-      console.log(`No recommendation found for user: ${userId}`);
-    }
-
-    return data;
+    console.log('No recommendations found for user');
+    return null;
   } catch (error) {
     console.error('Error getting latest recommendation:', error);
     throw new Error('Failed to get latest recommendation');

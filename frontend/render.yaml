@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: thecompletelazytrend-frontend
+    env: static
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: https://thecompletelazytrend-backend.onrender.com
+      - key: VITE_STRIPE_PUBLIC_KEY
+        value: pk_live_51RERMjG4vQYDStWY80yELhyq6RKUiRwvcuLjiVpXF0Pt9zOp0EKFlGWKYic7DQrStSB717etXBjVH5a7K2qdV74W00jeZOiZcz
+      - key: VITE_STRIPE_PRODUCT_ID
+        value: prod_S8sIksYYQAe6tW
+      - key: VITE_STRIPE_PRICE_ID
+        value: price_1RKJ9LG4vQYDStWYwbdkHlvJ
+      - key: VITE_STRIPE_CONNECT_ACCOUNT_ID
+        value: we_1RH6CRG4vQYDStWYJIIk27cL
