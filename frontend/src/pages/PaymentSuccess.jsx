@@ -41,9 +41,6 @@ const PaymentSuccess = () => {
 
         // Set processing to false to show success message
         setProcessing(false);
-
-        // Redirect to the dashboard payment success page
-        navigate('/dashboard/payment-success', { replace: true });
       } catch (err) {
         console.error('Error processing payment success:', err);
         // Even if there's an error, show the success page
@@ -86,6 +83,19 @@ const PaymentSuccess = () => {
               </p>
             </div>
 
+            <div className="mb-8 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 text-blue-700 dark:text-blue-300 p-4 rounded-lg">
+              <h3 className="font-bold mb-2">What's happening now:</h3>
+              <p className="mb-2">Our system is now automatically analyzing TikTok trends for you. Here's what we're doing:</p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Collecting and analyzing the latest TikTok trends</li>
+                <li>Generating personalized content recommendations for your niche</li>
+                <li>Creating AI-powered content ideas tailored to your business</li>
+                <li>Setting up your daily email reports</li>
+                <li>Preparing your dashboard with actionable insights</li>
+              </ul>
+              <p className="mt-2">This automated analysis is running in the background and will be ready for you when you access your dashboard.</p>
+            </div>
+
             <div className="mb-8 bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 text-green-700 dark:text-green-300 p-4 rounded-lg">
               <h3 className="font-bold mb-2">What's included in your subscription:</h3>
               <ul className="list-disc pl-5 space-y-1">
@@ -105,8 +115,8 @@ const PaymentSuccess = () => {
                     <span className="text-accent-600 font-bold">1</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-primary-800 dark:text-primary-200">Explore your dashboard</h4>
-                    <p className="text-primary-600 dark:text-primary-400">Get familiar with all the features and tools available to you.</p>
+                    <h4 className="font-semibold text-primary-800 dark:text-primary-200">Click "Go to Dashboard" below</h4>
+                    <p className="text-primary-600 dark:text-primary-400">Your dashboard is now being prepared with your first set of trend insights.</p>
                   </div>
                 </div>
 
@@ -115,8 +125,8 @@ const PaymentSuccess = () => {
                     <span className="text-accent-600 font-bold">2</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-primary-800 dark:text-primary-200">Generate your first content ideas</h4>
-                    <p className="text-primary-600 dark:text-primary-400">Use our AI to create engaging TikTok content ideas tailored to your business.</p>
+                    <h4 className="font-semibold text-primary-800 dark:text-primary-200">Explore your personalized trends</h4>
+                    <p className="text-primary-600 dark:text-primary-400">Browse through the trending topics and content ideas we've automatically generated for you.</p>
                   </div>
                 </div>
 
@@ -126,7 +136,7 @@ const PaymentSuccess = () => {
                   </div>
                   <div>
                     <h4 className="font-semibold text-primary-800 dark:text-primary-200">Check your email</h4>
-                    <p className="text-primary-600 dark:text-primary-400">We've sent you a welcome email with important information about your subscription.</p>
+                    <p className="text-primary-600 dark:text-primary-400">We've sent you a welcome email with important information about your subscription and your first trend report.</p>
                   </div>
                 </div>
               </div>
@@ -134,10 +144,10 @@ const PaymentSuccess = () => {
 
             <div className="text-center">
               <Link
-                to="/dashboard/payment-success"
+                to="/dashboard"
                 className="btn btn-primary py-3 px-8 text-lg inline-flex items-center"
               >
-                Continue to Dashboard
+                Go to Dashboard
                 <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
                 </svg>
