@@ -48,19 +48,7 @@ const HeroSection = () => {
               <a href="#how-it-works" className="btn btn-outline text-lg px-8 py-4">
                 See How It Works
               </a>
-              <button
-                className="btn btn-secondary text-lg px-8 py-4"
-                onClick={() => {
-                  // Track ShareDiscount event with Meta Pixel
-                  if (window.fbq) {
-                    fbq('trackCustom', 'ShareDiscount', {promotion: 'share_discount_10%'});
-                  }
-                  // Add share functionality here (e.g., open share dialog)
-                  alert('Share this discount with your friends: 10% off with code FRIEND10');
-                }}
-              >
-                Share Discount
-              </button>
+              
             </div>
             <div className="mt-8 text-primary-600 dark:text-primary-400 flex items-center">
               <svg className="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
