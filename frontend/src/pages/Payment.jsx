@@ -74,7 +74,7 @@ const Payment = () => {
           userId: user?.id,
           email: user?.email,
           priceId: import.meta.env.VITE_STRIPE_PRICE_ID || 'price_1RKJ9LG4vQYDStWYwbdkHlvJ',
-          successUrl: `${window.location.origin}/payment-success`,
+          successUrl: `${window.location.origin}/dashboard/payment-success`,
           cancelUrl: `${window.location.origin}/payment-cancel`,
         }),
       });

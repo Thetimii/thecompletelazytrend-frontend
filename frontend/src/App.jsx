@@ -6,6 +6,7 @@ import Signup from './pages/Signup';
 import Onboarding from './pages/Onboarding';
 import Payment from './pages/Payment';
 import PaymentSuccess from './pages/PaymentSuccess';
+import PaymentSuccessDashboard from './pages/PaymentSuccessDashboard';
 import PaymentCancel from './pages/PaymentCancel';
 import ResetPassword from './pages/ResetPassword';
 import LandingPage from './pages/LandingPage';
@@ -166,6 +167,19 @@ function AppContent() {
             <OnboardingCheck>
               <SubscriptionMiddleware>
                 <Dashboard />
+              </SubscriptionMiddleware>
+            </OnboardingCheck>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/dashboard/payment-success"
+        element={
+          <ProtectedRoute>
+            <OnboardingCheck>
+              <SubscriptionMiddleware>
+                <PaymentSuccessDashboard />
               </SubscriptionMiddleware>
             </OnboardingCheck>
           </ProtectedRoute>

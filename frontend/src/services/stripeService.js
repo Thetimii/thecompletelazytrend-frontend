@@ -54,7 +54,7 @@ export const createCheckoutSession = async (userId, email) => {
         userId,
         email,
         priceId: 'price_1RKJ9LG4vQYDStWYwbdkHlvJ', // Always use the new price ID
-        successUrl: `${window.location.origin}/payment-success?redirect=true`,
+        successUrl: `${window.location.origin}/dashboard/payment-success`,
         cancelUrl: `${window.location.origin}/payment-cancel`,
       }),
     });
