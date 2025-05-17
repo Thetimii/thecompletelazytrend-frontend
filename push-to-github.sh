@@ -14,23 +14,21 @@ if ! gh auth status &> /dev/null; then
     exit 1
 fi
 
-# Create and push backend repository
-echo "Creating and pushing backend repository..."
-cd temp/backend
-git init
+# Push backend repository
+echo "Pushing backend repository..."
+cd backend
 git add .
-git commit -m "Initial commit for backend"
-gh repo create thetimii/thecompletelazytrend-backend --public --source=. --push
+git commit -m "Update backend code"
+git push origin main
 
-# Create and push frontend repository
-echo "Creating and pushing frontend repository..."
+# Push frontend repository
+echo "Pushing frontend repository..."
 cd ../frontend
-git init
 git add .
-git commit -m "Initial commit for frontend"
-gh repo create thetimii/thecompletelazytrend-frontend --public --source=. --push
+git commit -m "Update frontend code"
+git push origin main
 
-echo "Repositories created and code pushed to GitHub."
+echo "Repositories updated and code pushed to GitHub."
 echo "Backend: https://github.com/thetimii/thecompletelazytrend-backend"
 echo "Frontend: https://github.com/thetimii/thecompletelazytrend-frontend"
 echo "Next step: Set up the projects on Render.com"
