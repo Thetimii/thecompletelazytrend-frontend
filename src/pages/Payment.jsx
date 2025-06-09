@@ -47,6 +47,15 @@ const Payment = () => {
       setLoading(true);
       setError(null);
 
+      // Track InitiateCheckout event with Meta Pixel
+      if (window.fbq) {
+        fbq('track', 'InitiateCheckout', {
+          content_name: 'subscription_checkout',
+          currency: 'USD',
+          value: 49.95
+        });
+      }
+
       // Define API URL with fallback
       const apiUrl = import.meta.env.VITE_API_URL || 'https://thecompletelazytrend-backend.onrender.com';
       console.log('Using API URL:', apiUrl);

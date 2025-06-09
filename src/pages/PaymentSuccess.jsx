@@ -26,6 +26,9 @@ const PaymentSuccess = () => {
         // Refresh user profile
         await fetchUserProfile(user.id);
 
+        // Track purchase event
+        fbq('track', 'Purchase', {currency: "USD", value: 30.00});
+
         // Redirect to dashboard immediately
         navigate('/dashboard', { replace: true });
       } catch (err) {

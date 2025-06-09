@@ -28,7 +28,7 @@ const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
       // Send form data to backend
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'https://thecompletelazytrend-backend.onrender.com'}/api/feedback`, {
@@ -43,11 +43,19 @@ const Contact = () => {
           userName: formData.name
         }),
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to send message');
       }
-      
+
+      // Track Contact event with Meta Pixel
+      if (window.fbq) {
+        fbq('track', 'Contact', {
+          content_category: formData.subject,
+          content_name: 'contact_form_submission'
+        });
+      }
+
       setSubmitStatus('success');
       setFormData({
         name: '',
@@ -60,7 +68,7 @@ const Contact = () => {
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
-      
+
       // Reset status after 5 seconds
       setTimeout(() => {
         setSubmitStatus(null);
@@ -134,19 +142,19 @@ const Contact = () => {
 
             <div className="bg-white dark:bg-primary-900 rounded-lg shadow-md p-8">
               <h2 className="text-2xl font-bold mb-6 text-primary-900 dark:text-white">Send Us a Message</h2>
-              
+
               {submitStatus === 'success' && (
                 <div className="mb-6 p-4 bg-green-100 dark:bg-green-900/30 border-l-4 border-green-500 text-green-700 dark:text-green-300">
                   <p>Your message has been sent successfully! We'll get back to you soon.</p>
                 </div>
               )}
-              
+
               {submitStatus === 'error' && (
                 <div className="mb-6 p-4 bg-red-100 dark:bg-red-900/30 border-l-4 border-red-500 text-red-700 dark:text-red-300">
                   <p>There was an error sending your message. Please try again later.</p>
                 </div>
               )}
-              
+
               <form onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                   <div>
@@ -180,7 +188,7 @@ const Contact = () => {
                     />
                   </div>
                 </div>
-                
+
                 <div className="mb-6">
                   <label htmlFor="subject" className="block text-sm font-medium text-primary-700 dark:text-primary-300 mb-1">
                     Subject
@@ -196,7 +204,7 @@ const Contact = () => {
                     placeholder="How can we help you?"
                   />
                 </div>
-                
+
                 <div className="mb-6">
                   <label htmlFor="message" className="block text-sm font-medium text-primary-700 dark:text-primary-300 mb-1">
                     Message
@@ -212,7 +220,7 @@ const Contact = () => {
                     placeholder="Your message here..."
                   ></textarea>
                 </div>
-                
+
                 <button
                   type="submit"
                   disabled={isSubmitting}
