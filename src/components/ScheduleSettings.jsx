@@ -186,7 +186,7 @@ const ScheduleSettings = ({ user, userProfile, onUpdate }) => {
               <select
                 value={timezone}
                 onChange={(e) => setTimezone(e.target.value)}
-                className="select"
+                className="block w-full px-3 py-2 bg-white dark:bg-primary-700 border border-primary-300 dark:border-primary-600 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 text-primary-900 dark:text-primary-100"
               >
                 {timezones.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -206,7 +206,7 @@ const ScheduleSettings = ({ user, userProfile, onUpdate }) => {
               <select
                 value={hour}
                 onChange={(e) => setHour(e.target.value)}
-                className="select"
+                className="block w-full px-3 py-2 bg-white dark:bg-primary-700 border border-primary-300 dark:border-primary-600 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 text-primary-900 dark:text-primary-100"
               >
                 {hourOptions.map((option) => (
                   <option key={option.value} value={option.value}>
