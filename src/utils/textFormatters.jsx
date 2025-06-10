@@ -10,6 +10,7 @@ import React from 'react';
  * - Adding proper spacing after punctuation
  * - Ensuring proper paragraph breaks
  * - Removing excessive whitespace
+ * - Removing formatting artifacts
  *
  * @param {string} text - The text to clean
  * @returns {string} - The cleaned text
@@ -33,6 +34,23 @@ export const cleanupText = (text) => {
 
   // Now apply other formatting
   return cleanedText
+    // Remove escaped quotes and newlines first
+    .replace(/\\"/g, '"')
+    .replace(/\\n/g, ' ')
+    .replace(/\\\\/g, '\\')
+    // Remove triple dashes
+    .replace(/---/g, '')
+    // Remove section markers like "### 4."
+    .replace(/###\s*\d+\./g, '')
+    // Remove numbered section markers like "4."
+    .replace(/^\d+\.\s*/gm, '')
+    // Remove markdown headers
+    .replace(/^#+\s*/gm, '')
+    // Remove bold markers
+    .replace(/\*\*/g, '')
+    // Remove leading asterisks and dashes
+    .replace(/^\*\s*/gm, '')
+    .replace(/^-\s*/gm, '')
     // Ensure space after period, comma, exclamation, question mark if followed by a letter
     .replace(/([.!?,;:])([A-Za-z])/g, '$1 $2')
     // Replace multiple spaces with a single space
@@ -82,22 +100,32 @@ export const formatContentIdeas = (contentIdeas) => {
     // Clean the text
     let cleanIdea = cleanupText(idea);
 
-    // Additional cleanup for content ideas - remove any remaining hashtag patterns
-    // This handles cases where hashtags might be in the middle of text or have special formatting
+    // Additional cleanup for content ideas - remove any remaining formatting artifacts
     cleanIdea = cleanIdea
       // Remove any remaining hashtag-like patterns (e.g., "**#hashtag**")
       .replace(/\*\*#[^*]+\*\*/g, '')
       // Remove any remaining hashtags with special characters
       .replace(/#[^\s.,!?]+/g, '')
+      // Remove section markers and numbered lists
+      .replace(/^\d+\.\s*/g, '')
+      .replace(/###\s*\d+\./g, '')
+      // Remove markdown formatting
+      .replace(/\*\*/g, '')
+      .replace(/^#+\s*/g, '')
+      // Remove dashes and asterisks
+      .replace(/^[-*]\s*/g, '')
+      .replace(/---/g, '')
       // Clean up any double spaces created by removals
       .replace(/\s+/g, ' ')
       .trim();
 
     // Ensure it starts with a capital letter
-    cleanIdea = cleanIdea.charAt(0).toUpperCase() + cleanIdea.slice(1);
+    if (cleanIdea.length > 0) {
+      cleanIdea = cleanIdea.charAt(0).toUpperCase() + cleanIdea.slice(1);
+    }
 
     // Ensure it ends with proper punctuation
-    if (!/[.!?]$/.test(cleanIdea)) {
+    if (cleanIdea.length > 0 && !/[.!?]$/.test(cleanIdea)) {
       cleanIdea += '.';
     }
 
@@ -108,12 +136,60 @@ export const formatContentIdeas = (contentIdeas) => {
       .trim();
 
     // If the idea became empty after cleaning, return null so we can filter it out
-    if (!cleanIdea || cleanIdea === '.') {
+    if (!cleanIdea || cleanIdea === '.' || cleanIdea.length < 3) {
       return null;
     }
 
     return cleanIdea;
   }).filter(Boolean); // Filter out any null/empty ideas
+};
+
+/**
+ * Formats a summary specifically for dashboard preview by:
+ * - Extracting the most relevant summary content
+ * - Cleaning up formatting artifacts
+ * - Providing fallback text
+ *
+ * @param {string} summary - The summary text (may be JSON)
+ * @returns {string} - Formatted summary for dashboard preview
+ */
+export const formatDashboardSummary = (summary) => {
+  if (!summary) return 'No trend summary available';
+
+  // Convert to string if it's not already
+  const summaryStr = typeof summary === 'string' ? summary : String(summary);
+
+  try {
+    // Try to parse as JSON first
+    const parsed = JSON.parse(summaryStr);
+    if (typeof parsed === 'object' && parsed !== null) {
+      // Priority order for extracting summary content
+      const summaryFields = [
+        'observations', 
+        'keyTakeaways', 
+        'trendSummary', 
+        'strategySummary',
+        'rawContent'
+      ];
+      
+      for (const field of summaryFields) {
+        if (parsed[field] && typeof parsed[field] === 'string') {
+          const cleanedContent = cleanupText(parsed[field]);
+          if (cleanedContent.length > 20) { // Make sure we have substantial content
+            return cleanedContent;
+          }
+        }
+      }
+      
+      // If no good field found, stringify the whole thing
+      return cleanupText(JSON.stringify(parsed, null, 2));
+    }
+  } catch (e) {
+    // Not JSON, continue with normal text processing
+  }
+
+  // Apply cleanup for non-JSON content
+  return cleanupText(summaryStr);
 };
 
 /**
@@ -140,6 +216,10 @@ export const formatSummary = (summary) => {
         return cleanupText(parsed.trendSummary);
       } else if (parsed.strategySummary) {
         return cleanupText(parsed.strategySummary);
+      } else if (parsed.observations) {
+        return cleanupText(parsed.observations);
+      } else if (parsed.keyTakeaways) {
+        return cleanupText(parsed.keyTakeaways);
       } else {
         // Otherwise stringify it nicely
         return cleanupText(JSON.stringify(parsed, null, 2));
@@ -152,12 +232,25 @@ export const formatSummary = (summary) => {
   // Apply general text cleanup
   let cleanedSummary = cleanupText(summaryStr);
 
-  // Additional cleanup for summaries - remove any remaining hashtag patterns
+  // Additional cleanup for summaries - remove any remaining formatting artifacts
   cleanedSummary = cleanedSummary
+    // Remove escaped quotes and newlines
+    .replace(/\\"/g, '"')
+    .replace(/\\n/g, ' ')
+    .replace(/\\\\/g, '\\')
     // Remove any remaining hashtag-like patterns (e.g., "**#hashtag**")
     .replace(/\*\*#[^*]+\*\*/g, '')
     // Remove any remaining hashtags with special characters
     .replace(/#[^\s.,!?]+/g, '')
+    // Remove section markers and numbered lists
+    .replace(/^\d+\.\s*/gm, '')
+    .replace(/###\s*\d+\./g, '')
+    // Remove markdown formatting
+    .replace(/\*\*/g, '')
+    .replace(/^#+\s*/gm, '')
+    // Remove dashes and asterisks
+    .replace(/^[-*]\s*/gm, '')
+    .replace(/---/g, '')
     // Clean up any double spaces created by removals
     .replace(/\s+/g, ' ')
     .trim();
@@ -174,9 +267,14 @@ const cleanSimpleListItemText = (text) => {
   return text.replace(/^- /, '')
              .replace(/\n/g, ' ')
              .replace(/\*\*/g, '') // Remove bold markers
-             .replace(/###\s*\d+\./g, '') // Remove section markers
+             .replace(/###\s*\d+\./g, '') // Remove section markers like "### 4."
              .replace(/^\*\s*/, '') // Remove leading asterisks
              .replace(/^--\s*/, '') // Remove leading dashes
+             .replace(/^---\s*/, '') // Remove triple dashes
+             .replace(/^\d+\.\s*/, '') // Remove numbered list markers like "1. "
+             .replace(/^#+\s*/, '') // Remove markdown headers
+             .replace(/\s*---\s*/g, ' ') // Remove dashes in the middle
+             .replace(/\s+/g, ' ') // Normalize whitespace
              .trim();
 };
 
@@ -197,6 +295,11 @@ export const formatTextToJsx = (str, title, listMarker = '\\n- ') => {
   cleanedStr = cleanedStr.replace(/---/g, '').trim(); // Remove "---"
   cleanedStr = cleanedStr.replace(/###\s*\d+\./g, '').trim(); // Remove "### 2." markers
   cleanedStr = cleanedStr.replace(/^\*\s*/gm, ''); // Remove leading asterisks from lines
+  cleanedStr = cleanedStr.replace(/^#+\s*/gm, ''); // Remove markdown headers
+  cleanedStr = cleanedStr.replace(/^\d+\.\s*/gm, ''); // Remove numbered list markers
+  cleanedStr = cleanedStr.replace(/\s*---\s*/g, ' '); // Remove dashes in the middle
+  cleanedStr = cleanedStr.replace(/\s+/g, ' '); // Normalize multiple spaces
+  cleanedStr = cleanedStr.trim();
 
   const items = cleanedStr.split(listMarker)
     .map(item => cleanSimpleListItemText(item))
@@ -204,9 +307,16 @@ export const formatTextToJsx = (str, title, listMarker = '\\n- ') => {
 
   if (items.length === 0 || (items.length === 1 && cleanedStr.indexOf(listMarker) === -1 && !cleanedStr.startsWith('- '))) {
     // Single block of text or does not appear to be a list
+    // Clean the text further for paragraph display
+    const paragraphText = cleanedStr
+      .replace(/^[-*]\s*/gm, '') // Remove any remaining list markers
+      .replace(/^\d+\.\s*/gm, '') // Remove numbered list markers
+      .replace(/\s+/g, ' ') // Normalize whitespace
+      .trim();
+      
     return (
       <div className="text-primary-700 dark:text-primary-300 whitespace-pre-line leading-relaxed break-words">
-        {cleanedStr.split('\n').map((paragraph, index) => (
+        {paragraphText.split('\n').map((paragraph, index) => (
           <p key={index} className="mb-2 last:mb-0">{paragraph || '\u00A0'}</p>
         ))}
       </div>
@@ -232,7 +342,13 @@ export const formatSampleScriptToJsx = (scriptStr) => {
     return <p className="text-primary-600 dark:text-primary-400 italic">No sample script provided.</p>;
   }
 
-  const cleanedScriptStr = scriptStr.replace(/\*\*/g, ''); // Remove bold markers
+  // Clean up the script string first
+  let cleanedScriptStr = scriptStr.replace(/\*\*/g, ''); // Remove bold markers
+  cleanedScriptStr = cleanedScriptStr.replace(/---/g, ''); // Remove triple dashes
+  cleanedScriptStr = cleanedScriptStr.replace(/###\s*\d+\./g, ''); // Remove section markers
+  cleanedScriptStr = cleanedScriptStr.replace(/^\d+\.\s*/gm, ''); // Remove numbered list markers
+  cleanedScriptStr = cleanedScriptStr.replace(/^#+\s*/gm, ''); // Remove markdown headers
+  cleanedScriptStr = cleanedScriptStr.replace(/\s+/g, ' ').trim(); // Normalize whitespace
 
   const visualCuesMatch = cleanedScriptStr.match(/Visual Cues:([\s\S]*?)(Voiceover\/Script:|$)/i);
   const voiceoverMatch = cleanedScriptStr.match(/Voiceover\/Script:([\s\S]*)/i);
@@ -274,13 +390,24 @@ export const formatHashtagStrategyToJsx = (str) => {
     return <p className="text-primary-600 dark:text-primary-400 italic">No hashtag strategy provided.</p>;
   }
 
-  const cleanedStr = str.replace(/\*\*/g, ''); // Remove bold markers
+  // Clean up the string first
+  let cleanedStr = str.replace(/\*\*/g, ''); // Remove bold markers
+  cleanedStr = cleanedStr.replace(/---/g, ''); // Remove triple dashes
+  cleanedStr = cleanedStr.replace(/###\s*\d+\./g, ''); // Remove section markers
+  cleanedStr = cleanedStr.replace(/^\d+\.\s*/gm, ''); // Remove numbered list markers
+  cleanedStr = cleanedStr.replace(/^#+\s*/gm, ''); // Remove markdown headers
+  cleanedStr = cleanedStr.trim();
+
   const sectionTitlesRegex = /^(Primary \(Niche\):|Secondary \(Trending\/Regional\):|Broad Appeal:)/i;
   let sections = [];
   let currentSection = null;
 
   cleanedStr.split('\n').forEach(line => {
     line = line.trim();
+    if (!line || line === '---' || line.match(/^###\s*\d+/) || line.match(/^\d+\.\s*$/)) {
+      return; // Skip empty lines, dashes, and section markers
+    }
+    
     const titleMatch = line.match(sectionTitlesRegex);
     if (titleMatch) {
       if (currentSection) sections.push(currentSection);
@@ -293,7 +420,7 @@ export const formatHashtagStrategyToJsx = (str) => {
           currentSection.items.push(contentAfterTitle); 
         }
       }
-    } else if (currentSection && line && !line.startsWith("---") && !line.match(/^\s*\d\.\s*$/) && !line.match(/^###\s*\d+/)) {
+    } else if (currentSection && line) {
       if (line.startsWith('- ')) {
         currentSection.items.push(cleanSimpleListItemText(line));
       } else if (line.startsWith('#')) {

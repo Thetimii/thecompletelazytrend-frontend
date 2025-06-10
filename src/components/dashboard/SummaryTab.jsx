@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import StatCard from '../StatCard';
-import { formatSummary } from '../../utils/textFormatters';
+import { formatDashboardSummary } from '../../utils/textFormatters';
 
 const SummaryTab = ({ queries, videos, recommendations, userProfile, onTabChange, onRefresh }) => {
   const [loading, setLoading] = useState(false);
@@ -94,7 +94,7 @@ const SummaryTab = ({ queries, videos, recommendations, userProfile, onTabChange
                 </h4>
                 <div className="bg-white dark:bg-primary-800 p-4 rounded-lg border border-primary-100 dark:border-primary-700 mb-4">
                   <p className="text-primary-700 dark:text-primary-300 whitespace-pre-line leading-relaxed line-clamp-4">
-                    {formatSummary(latestRecommendation.combined_summary)}
+                    {formatDashboardSummary(latestRecommendation.combined_summary)}
                   </p>
                 </div>
               </div>
