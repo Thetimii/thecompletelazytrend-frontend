@@ -6,7 +6,7 @@ import {
   formatTextToJsx,
   formatSampleScriptToJsx,
   formatHashtagStrategyToJsx
-} from '../../utils/textFormatters';
+} from '../../utils/textFormatters.jsx';
 
 const RecommendationsTab = ({ userProfile, onRefresh }) => {
   const [recommendation, setRecommendation] = useState(null);
