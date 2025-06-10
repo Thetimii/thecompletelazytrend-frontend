@@ -92,21 +92,62 @@ const RecommendationsTab = ({ userProfile, onRefresh }) => {
 
   // Get formatted content ideas using our utility function
   const contentIdeas = React.useMemo(() => {
-    if (!recommendation?.content_ideas) return [];
-    return formatContentIdeas(recommendation.content_ideas);
-  }, [recommendation?.content_ideas]);
+    // First try to get from content_ideas field
+    if (recommendation?.content_ideas) {
+      return formatContentIdeas(recommendation.content_ideas);
+    }
+    
+    // If not available, try to extract from combined_summary JSON
+    try {
+      const parsed = JSON.parse(recommendation?.combined_summary || '{}');
+      if (parsed.contentThemes && Array.isArray(parsed.contentThemes)) {
+        return formatContentIdeas(parsed.contentThemes);
+      }
+    } catch (e) {
+      // If parsing fails, return empty array
+    }
+    
+    return [];
+  }, [recommendation?.content_ideas, recommendation?.combined_summary]);
 
   // Get formatted summary using our utility function
   const combinedSummary = React.useMemo(() => {
     if (!recommendation?.combined_summary) return '';
-    // Make sure we get the full text without any truncation
-    return formatSummary(recommendation.combined_summary); // Keep this for simple string summary
+    
+    // Try to parse as JSON first to extract key takeaways for summary
+    try {
+      const parsed = JSON.parse(recommendation.combined_summary);
+      if (parsed.keyTakeaways) {
+        return formatSummary(parsed.keyTakeaways);
+      }
+    } catch (e) {
+      // If not JSON, use the raw text
+    }
+    
+    return formatSummary(recommendation.combined_summary);
   }, [recommendation?.combined_summary]);
 
   // --- New Memoized JSX Formatted Sections ---
   const marketingStrategy = React.useMemo(() => {
-    return recommendation?.marketing_strategy || {};
-  }, [recommendation?.marketing_strategy]);
+    if (!recommendation?.combined_summary) return {};
+    
+    try {
+      // Try to parse the combined_summary as JSON
+      const parsed = JSON.parse(recommendation.combined_summary);
+      
+      // If it's an object, return it directly
+      if (typeof parsed === 'object' && parsed !== null) {
+        return parsed;
+      }
+      
+      // If it's a string, it might contain the raw content
+      return { rawContent: parsed };
+    } catch (error) {
+      // If parsing fails, treat it as raw content
+      console.log('Could not parse combined_summary as JSON, treating as raw text');
+      return { rawContent: recommendation.combined_summary };
+    }
+  }, [recommendation?.combined_summary]);
 
   const observationsJsx = React.useMemo(() => {
     const observations = marketingStrategy.observations || marketingStrategy.rawContent;
@@ -243,9 +284,15 @@ const RecommendationsTab = ({ userProfile, onRefresh }) => {
         </div>
 
         <div className="bg-white dark:bg-primary-800 p-6 rounded-lg border border-primary-100 dark:border-primary-700">
-          <p className="text-primary-700 dark:text-primary-300 whitespace-pre-line leading-relaxed break-words">
-            {combinedSummary}
-          </p>
+          {combinedSummary && !combinedSummary.startsWith('{') ? (
+            <p className="text-primary-700 dark:text-primary-300 whitespace-pre-line leading-relaxed break-words">
+              {combinedSummary}
+            </p>
+          ) : (
+            <p className="text-primary-600 dark:text-primary-400 italic">
+              Detailed recommendations are available in the sections below.
+            </p>
+          )}
         </div>
       </div>
 

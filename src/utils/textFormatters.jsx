@@ -171,7 +171,13 @@ export const formatSummary = (summary) => {
  * @returns {string} - Cleaned text.
  */
 const cleanSimpleListItemText = (text) => {
-  return text.replace(/^- /, '').replace(/\n/g, ' ').trim();
+  return text.replace(/^- /, '')
+             .replace(/\n/g, ' ')
+             .replace(/\*\*/g, '') // Remove bold markers
+             .replace(/###\s*\d+\./g, '') // Remove section markers
+             .replace(/^\*\s*/, '') // Remove leading asterisks
+             .replace(/^--\s*/, '') // Remove leading dashes
+             .trim();
 };
 
 /**
@@ -189,17 +195,19 @@ export const formatTextToJsx = (str, title, listMarker = '\\n- ') => {
   let cleanedStr = str.replace(/\*\*/g, ''); // Remove bold markers
   cleanedStr = cleanedStr.replace(/^\s*\d\.\s*([\w\s()]+:)?/i, ''); // Remove leading "1. Title:" or "1. "
   cleanedStr = cleanedStr.replace(/---/g, '').trim(); // Remove "---"
+  cleanedStr = cleanedStr.replace(/###\s*\d+\./g, '').trim(); // Remove "### 2." markers
+  cleanedStr = cleanedStr.replace(/^\*\s*/gm, ''); // Remove leading asterisks from lines
 
   const items = cleanedStr.split(listMarker)
     .map(item => cleanSimpleListItemText(item))
-    .filter(item => item);
+    .filter(item => item && item.length > 0);
 
   if (items.length === 0 || (items.length === 1 && cleanedStr.indexOf(listMarker) === -1 && !cleanedStr.startsWith('- '))) {
     // Single block of text or does not appear to be a list
     return (
       <div className="text-primary-700 dark:text-primary-300 whitespace-pre-line leading-relaxed break-words">
         {cleanedStr.split('\n').map((paragraph, index) => (
-          <p key={index} className="mb-2 last:mb-0">{paragraph || '\u00A0'}</p> // Use non-breaking space for empty lines to maintain spacing
+          <p key={index} className="mb-2 last:mb-0">{paragraph || '\u00A0'}</p>
         ))}
       </div>
     );
@@ -282,28 +290,32 @@ export const formatHashtagStrategyToJsx = (str) => {
         if (contentAfterTitle.startsWith('- ')) {
           currentSection.items.push(cleanSimpleListItemText(contentAfterTitle));
         } else {
-          // If content after title is not a list item, treat it as a paragraph for that section
           currentSection.items.push(contentAfterTitle); 
         }
       }
-    } else if (currentSection && line && !line.startsWith("---") && !line.match(/^\s*\d\.\s*$/)) {
+    } else if (currentSection && line && !line.startsWith("---") && !line.match(/^\s*\d\.\s*$/) && !line.match(/^###\s*\d+/)) {
       if (line.startsWith('- ')) {
         currentSection.items.push(cleanSimpleListItemText(line));
-      } else if (currentSection.items.length > 0 && !currentSection.items[currentSection.items.length-1].includes('\n')) {
-        // Append to last item if it's not a list item itself (part of a paragraph)
-        // This logic might be too complex, simpler to treat each non-list line as a new paragraph/item
-        // For now, let's treat each line as a potential list item or a standalone paragraph within the section
+      } else if (line.startsWith('#')) {
+        // Handle hashtags directly
         currentSection.items.push(line);
-      }
-       else {
-        currentSection.items.push(line); // Treat as a separate item/paragraph
+      } else {
+        currentSection.items.push(line);
       }
     }
   });
   if (currentSection) sections.push(currentSection);
 
   if (sections.length === 0) {
-     // If no sections parsed, treat the whole block with formatTextToJsx
+    // If no sections parsed, try to extract hashtags directly
+    const hashtags = cleanedStr.split(/\s+/).filter(word => word.startsWith('#') && word.length > 1);
+    if (hashtags.length > 0) {
+      return (
+        <ul className="list-disc list-inside space-y-1 text-primary-700 dark:text-primary-300 pl-4">
+          {hashtags.map((hashtag, index) => <li key={index}>{hashtag}</li>)}
+        </ul>
+      );
+    }
     return formatTextToJsx(cleanedStr, "Hashtag Strategy");
   }
 
