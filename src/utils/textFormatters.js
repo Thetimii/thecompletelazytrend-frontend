@@ -162,3 +162,163 @@ export const formatSummary = (summary) => {
 
   return cleanedSummary;
 };
+
+/**
+ * Cleans list item text by removing leading hyphens and extra newlines.
+ * @param {string} text - The text to clean.
+ * @returns {string} - Cleaned text.
+ */
+const cleanSimpleListItemText = (text) => {
+  return text.replace(/^- /, '').replace(/\n/g, ' ').trim();
+};
+
+/**
+ * Formats a string (potentially a list or paragraph) into JSX.
+ * @param {string} str - The string content.
+ * @param {string} title - The title of the section (for default message).
+ * @param {string} [listMarker='\\n- '] - The marker indicating a list item.
+ * @returns {JSX.Element}
+ */
+export const formatTextToJsx = (str, title, listMarker = '\\n- ') => {
+  if (typeof str !== 'string' || !str.trim()) {
+    return <p className="text-primary-600 dark:text-primary-400 italic">No {title.toLowerCase()} provided.</p>;
+  }
+
+  let cleanedStr = str.replace(/\*\*/g, ''); // Remove bold markers
+  cleanedStr = cleanedStr.replace(/^\s*\d\.\s*([\w\s()]+:)?/i, ''); // Remove leading "1. Title:" or "1. "
+  cleanedStr = cleanedStr.replace(/---/g, '').trim(); // Remove "---"
+
+  const items = cleanedStr.split(listMarker)
+    .map(item => cleanSimpleListItemText(item))
+    .filter(item => item);
+
+  if (items.length === 0 || (items.length === 1 && cleanedStr.indexOf(listMarker) === -1 && !cleanedStr.startsWith('- '))) {
+    // Single block of text or does not appear to be a list
+    return (
+      <div className="text-primary-700 dark:text-primary-300 whitespace-pre-line leading-relaxed break-words">
+        {cleanedStr.split('\n').map((paragraph, index) => (
+          <p key={index} className="mb-2 last:mb-0">{paragraph || '\u00A0'}</p> // Use non-breaking space for empty lines to maintain spacing
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <ul className="list-disc list-inside space-y-1 text-primary-700 dark:text-primary-300 pl-4">
+      {items.map((itemText, index) => (
+        itemText ? <li key={index}>{itemText}</li> : null
+      ))}
+    </ul>
+  );
+};
+
+/**
+ * Formats a sample script string (with Visual Cues and Voiceover) into JSX.
+ * @param {string} scriptStr - The sample script content.
+ * @returns {JSX.Element}
+ */
+export const formatSampleScriptToJsx = (scriptStr) => {
+  if (typeof scriptStr !== 'string' || !scriptStr.trim()) {
+    return <p className="text-primary-600 dark:text-primary-400 italic">No sample script provided.</p>;
+  }
+
+  const cleanedScriptStr = scriptStr.replace(/\*\*/g, ''); // Remove bold markers
+
+  const visualCuesMatch = cleanedScriptStr.match(/Visual Cues:([\s\S]*?)(Voiceover\/Script:|$)/i);
+  const voiceoverMatch = cleanedScriptStr.match(/Voiceover\/Script:([\s\S]*)/i);
+
+  const visualCuesText = visualCuesMatch && visualCuesMatch[1] ? visualCuesMatch[1].trim() : null;
+  const voiceoverText = voiceoverMatch && voiceoverMatch[1] ? voiceoverMatch[1].trim() : null;
+
+  return (
+    <div className="space-y-3">
+      <div>
+        <h5 className="text-md font-semibold text-primary-700 dark:text-primary-200 mb-1">Visual Cues:</h5>
+        {visualCuesText ? 
+          formatTextToJsx(visualCuesText, "Visual Cues") :
+          <p className="text-primary-600 dark:text-primary-400 italic">Not specified.</p>
+        }
+      </div>
+      <div>
+        <h5 className="text-md font-semibold text-primary-700 dark:text-primary-200 mb-1">Voiceover/Script:</h5>
+        {voiceoverText ? 
+          <div className="text-primary-700 dark:text-primary-300 whitespace-pre-line leading-relaxed break-words">
+            {voiceoverText.split('\n').map((paragraph, index) => (
+              <p key={index} className="mb-2 last:mb-0">{paragraph || '\u00A0'}</p>
+            ))}
+          </div> :
+          <p className="text-primary-600 dark:text-primary-400 italic">Not specified.</p>
+        }
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Formats a hashtag strategy string into JSX.
+ * @param {string} str - The hashtag strategy content.
+ * @returns {JSX.Element}
+ */
+export const formatHashtagStrategyToJsx = (str) => {
+  if (typeof str !== 'string' || !str.trim()) {
+    return <p className="text-primary-600 dark:text-primary-400 italic">No hashtag strategy provided.</p>;
+  }
+
+  const cleanedStr = str.replace(/\*\*/g, ''); // Remove bold markers
+  const sectionTitlesRegex = /^(Primary \(Niche\):|Secondary \(Trending\/Regional\):|Broad Appeal:)/i;
+  let sections = [];
+  let currentSection = null;
+
+  cleanedStr.split('\n').forEach(line => {
+    line = line.trim();
+    const titleMatch = line.match(sectionTitlesRegex);
+    if (titleMatch) {
+      if (currentSection) sections.push(currentSection);
+      currentSection = { title: titleMatch[0], items: [] };
+      const contentAfterTitle = line.substring(titleMatch[0].length).trim();
+      if (contentAfterTitle) {
+        if (contentAfterTitle.startsWith('- ')) {
+          currentSection.items.push(cleanSimpleListItemText(contentAfterTitle));
+        } else {
+          // If content after title is not a list item, treat it as a paragraph for that section
+          currentSection.items.push(contentAfterTitle); 
+        }
+      }
+    } else if (currentSection && line && !line.startsWith("---") && !line.match(/^\s*\d\.\s*$/)) {
+      if (line.startsWith('- ')) {
+        currentSection.items.push(cleanSimpleListItemText(line));
+      } else if (currentSection.items.length > 0 && !currentSection.items[currentSection.items.length-1].includes('\n')) {
+        // Append to last item if it's not a list item itself (part of a paragraph)
+        // This logic might be too complex, simpler to treat each non-list line as a new paragraph/item
+        // For now, let's treat each line as a potential list item or a standalone paragraph within the section
+        currentSection.items.push(line);
+      }
+       else {
+        currentSection.items.push(line); // Treat as a separate item/paragraph
+      }
+    }
+  });
+  if (currentSection) sections.push(currentSection);
+
+  if (sections.length === 0) {
+     // If no sections parsed, treat the whole block with formatTextToJsx
+    return formatTextToJsx(cleanedStr, "Hashtag Strategy");
+  }
+
+  return (
+    <div className="space-y-3">
+      {sections.map((section, index) => (
+        <div key={index}>
+          <h5 className="text-md font-semibold text-primary-700 dark:text-primary-200 mb-1">{section.title}</h5>
+          {section.items.length > 0 ? (
+            <ul className="list-disc list-inside space-y-1 text-primary-700 dark:text-primary-300 pl-4">
+              {section.items.map((item, itemIndex) => <li key={itemIndex}>{item}</li>)}
+            </ul>
+          ) : (
+            <p className="text-primary-600 dark:text-primary-400 italic pl-4">No specific hashtags listed for this category.</p>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+};

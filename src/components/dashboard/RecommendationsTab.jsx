@@ -1,6 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { getLatestRecommendationByUserId } from '../../services/supabaseService';
-import { formatContentIdeas, formatSummary } from '../../utils/textFormatters';
+import {
+  formatContentIdeas,
+  formatSummary,
+  formatTextToJsx,
+  formatSampleScriptToJsx,
+  formatHashtagStrategyToJsx
+} from '../../utils/textFormatters';
 
 const RecommendationsTab = ({ userProfile, onRefresh }) => {
   const [recommendation, setRecommendation] = useState(null);
@@ -94,8 +100,48 @@ const RecommendationsTab = ({ userProfile, onRefresh }) => {
   const combinedSummary = React.useMemo(() => {
     if (!recommendation?.combined_summary) return '';
     // Make sure we get the full text without any truncation
-    return formatSummary(recommendation.combined_summary);
+    return formatSummary(recommendation.combined_summary); // Keep this for simple string summary
   }, [recommendation?.combined_summary]);
+
+  // --- New Memoized JSX Formatted Sections ---
+  const marketingStrategy = React.useMemo(() => {
+    return recommendation?.marketing_strategy || {};
+  }, [recommendation?.marketing_strategy]);
+
+  const observationsJsx = React.useMemo(() => {
+    const observations = marketingStrategy.observations || marketingStrategy.rawContent;
+    return observations ? formatTextToJsx(observations, "Observations") : null;
+  }, [marketingStrategy]);
+
+  const keyTakeawaysJsx = React.useMemo(() => {
+    return marketingStrategy.keyTakeaways ? formatTextToJsx(marketingStrategy.keyTakeaways, "Key Trend Takeaways") : null;
+  }, [marketingStrategy]);
+
+  const sampleScriptJsx = React.useMemo(() => {
+    return marketingStrategy.sampleScript ? formatSampleScriptToJsx(marketingStrategy.sampleScript) : null;
+  }, [marketingStrategy]);
+
+  const technicalSpecificationsJsx = React.useMemo(() => {
+    return marketingStrategy.technicalSpecifications ? formatTextToJsx(marketingStrategy.technicalSpecifications, "Technical Specifications") : null;
+  }, [marketingStrategy]);
+
+  const contentThemesJsx = React.useMemo(() => {
+    // Assuming contentThemes might be an array or a string that formatTextToJsx can handle
+    // If it needs specific parsing like formatContentThemesHtml, a new formatContentThemesToJsx would be needed.
+    // For now, using formatTextToJsx as a general list/paragraph formatter.
+    let themesInput = marketingStrategy.contentThemes;
+    if (Array.isArray(themesInput)) themesInput = themesInput.join('\n- '); // Convert array to string for formatTextToJsx
+    return themesInput ? formatTextToJsx(themesInput, "General Content Themes") : null;
+  }, [marketingStrategy]);
+
+  const hashtagStrategyJsx = React.useMemo(() => {
+    return marketingStrategy.hashtagStrategy ? formatHashtagStrategyToJsx(marketingStrategy.hashtagStrategy) : null;
+  }, [marketingStrategy]);
+
+  const postingFrequencyJsx = React.useMemo(() => {
+    return marketingStrategy.postingFrequency ? formatTextToJsx(marketingStrategy.postingFrequency, "Posting Frequency") : null;
+  }, [marketingStrategy]);
+  // --- End New Memoized JSX Formatted Sections ---
 
   // Skip loading state and go straight to content or empty state
 
@@ -229,6 +275,86 @@ const RecommendationsTab = ({ userProfile, onRefresh }) => {
           )}
         </div>
       </div>
+
+      {/* --- Detailed Marketing Strategy Sections --- */}
+      {observationsJsx && (
+        <div className="dashboard-card mb-8">
+          <div className="flex items-center mb-6">
+            {/* You can add an icon here if you like */}
+            <h3 className="text-xl font-semibold text-primary-800 dark:text-primary-100">Observations</h3>
+          </div>
+          <div className="bg-white dark:bg-primary-800 p-6 rounded-lg border border-primary-100 dark:border-primary-700">
+            {observationsJsx}
+          </div>
+        </div>
+      )}
+
+      {keyTakeawaysJsx && (
+        <div className="dashboard-card mb-8">
+          <div className="flex items-center mb-6">
+            <h3 className="text-xl font-semibold text-primary-800 dark:text-primary-100">Key Trend Takeaways</h3>
+          </div>
+          <div className="bg-white dark:bg-primary-800 p-6 rounded-lg border border-primary-100 dark:border-primary-700">
+            {keyTakeawaysJsx}
+          </div>
+        </div>
+      )}
+
+      {sampleScriptJsx && (
+        <div className="dashboard-card mb-8">
+          <div className="flex items-center mb-6">
+            <h3 className="text-xl font-semibold text-primary-800 dark:text-primary-100">Sample TikTok Script</h3>
+          </div>
+          <div className="bg-white dark:bg-primary-800 p-6 rounded-lg border border-primary-100 dark:border-primary-700">
+            {sampleScriptJsx}
+          </div>
+        </div>
+      )}
+
+      {technicalSpecificationsJsx && (
+        <div className="dashboard-card mb-8">
+          <div className="flex items-center mb-6">
+            <h3 className="text-xl font-semibold text-primary-800 dark:text-primary-100">Technical Specifications</h3>
+          </div>
+          <div className="bg-white dark:bg-primary-800 p-6 rounded-lg border border-primary-100 dark:border-primary-700">
+            {technicalSpecificationsJsx}
+          </div>
+        </div>
+      )}
+
+      {contentThemesJsx && (
+        <div className="dashboard-card mb-8">
+          <div className="flex items-center mb-6">
+            <h3 className="text-xl font-semibold text-primary-800 dark:text-primary-100">General Content Themes</h3>
+          </div>
+          <div className="bg-white dark:bg-primary-800 p-6 rounded-lg border border-primary-100 dark:border-primary-700">
+            {contentThemesJsx}
+          </div>
+        </div>
+      )}
+
+      {hashtagStrategyJsx && (
+        <div className="dashboard-card mb-8">
+          <div className="flex items-center mb-6">
+            <h3 className="text-xl font-semibold text-primary-800 dark:text-primary-100">Hashtag Strategy</h3>
+          </div>
+          <div className="bg-white dark:bg-primary-800 p-6 rounded-lg border border-primary-100 dark:border-primary-700">
+            {hashtagStrategyJsx}
+          </div>
+        </div>
+      )}
+
+      {postingFrequencyJsx && (
+        <div className="dashboard-card mb-8">
+          <div className="flex items-center mb-6">
+            <h3 className="text-xl font-semibold text-primary-800 dark:text-primary-100">Posting Frequency</h3>
+          </div>
+          <div className="bg-white dark:bg-primary-800 p-6 rounded-lg border border-primary-100 dark:border-primary-700">
+            {postingFrequencyJsx}
+          </div>
+        </div>
+      )}
+      {/* --- End Detailed Marketing Strategy Sections --- */}
 
       {/* Last Updated */}
       <div className="text-sm text-primary-500 dark:text-primary-400 text-right">
