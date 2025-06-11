@@ -52,9 +52,12 @@ export const saveUserProfile = async (userData) => {
       console.log("Updating existing user:", existingUser.id);
       console.log("Data to update:", dataToSave);
 
+      // Remove fields that shouldn't be updated to avoid conflicts
+      const { id, created_at, ...updateData } = dataToSave;
+
       const { data, error } = await supabase
         .from('users')
-        .update(dataToSave)
+        .update(updateData)
         .eq('id', existingUser.id)
         .select()
         .single();

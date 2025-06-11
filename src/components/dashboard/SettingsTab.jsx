@@ -11,8 +11,21 @@ const SettingsTab = ({ user, userProfile, onWorkflowComplete }) => {
   const [formData, setFormData] = useState({
     email: user?.email || '',
     business_description: userProfile?.business_description || '',
-    full_name: userProfile?.full_name || ''
+    full_name: userProfile?.full_name || '',
+    timezone: userProfile?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone
   });
+  const [showBusinessDescriptionModal, setShowBusinessDescriptionModal] = useState(false);
+  const [businessDescriptionChanged, setBusinessDescriptionChanged] = useState(false);
+
+  // Update form data when userProfile changes
+  React.useEffect(() => {
+    setFormData({
+      email: user?.email || '',
+      business_description: userProfile?.business_description || '',
+      full_name: userProfile?.full_name || '',
+      timezone: userProfile?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone
+    });
+  }, [user, userProfile]);
   const [feedbackData, setFeedbackData] = useState({
     subject: '',
     message: ''
@@ -23,6 +36,12 @@ const SettingsTab = ({ user, userProfile, onWorkflowComplete }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    // Track if business description changed
+    if (name === 'business_description' && value !== userProfile?.business_description) {
+      setBusinessDescriptionChanged(true);
+    }
+    
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -83,6 +102,16 @@ const SettingsTab = ({ user, userProfile, onWorkflowComplete }) => {
     setLoading(true);
     setMessage({ text: '', type: '' });
 
+    // Validate business description length
+    if (formData.business_description && formData.business_description.length < 150) {
+      setMessage({
+        text: `Business description must be at least 150 characters. Current length: ${formData.business_description.length}`,
+        type: 'error'
+      });
+      setLoading(false);
+      return;
+    }
+
     try {
       // Update email in auth if it changed
       if (formData.email !== user.email) {
@@ -99,9 +128,12 @@ const SettingsTab = ({ user, userProfile, onWorkflowComplete }) => {
         email: formData.email,
         business_description: formData.business_description,
         full_name: formData.full_name,
+        timezone: formData.timezone,
         // Preserve other fields
         ...userProfile,
       });
+
+      console.log('Updated profile:', updatedProfile); // Debug log
 
       // Update profile in context
       updateUserProfile(updatedProfile);
@@ -111,12 +143,22 @@ const SettingsTab = ({ user, userProfile, onWorkflowComplete }) => {
         type: 'success'
       });
       setIsEditing(false);
+      
+      // Show success toast
+      toast.success('Settings saved successfully!');
+      
+      // Show business description modal if it was changed
+      if (businessDescriptionChanged) {
+        setShowBusinessDescriptionModal(true);
+        setBusinessDescriptionChanged(false);
+      }
     } catch (error) {
       console.error('Error updating profile:', error);
       setMessage({
         text: `Error updating profile: ${error.message}`,
         type: 'error'
       });
+      toast.error('Failed to save settings');
     } finally {
       setLoading(false);
     }
@@ -195,7 +237,7 @@ const SettingsTab = ({ user, userProfile, onWorkflowComplete }) => {
 
                   <div>
                     <label htmlFor="business_description" className="block text-sm font-medium text-primary-700 dark:text-primary-300 mb-1">
-                      Business Description
+                      Business Description <span className="text-red-500">*</span>
                     </label>
                     <textarea
                       id="business_description"
@@ -203,9 +245,56 @@ const SettingsTab = ({ user, userProfile, onWorkflowComplete }) => {
                       value={formData.business_description}
                       onChange={handleChange}
                       rows="4"
+                      className={`input w-full ${formData.business_description && formData.business_description.length < 150 ? 'border-red-300 dark:border-red-700' : 'border-green-300 dark:border-green-700'}`}
+                      placeholder="Describe your business, products, services, target audience, etc. Be as detailed as possible for better AI recommendations."
+                      required
+                      minLength={150}
+                    />
+                    <div className="mt-1 flex justify-between items-center">
+                      <p className={`text-sm ${formData.business_description && formData.business_description.length < 150 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
+                        {formData.business_description ? formData.business_description.length : 0} / 150 characters minimum
+                      </p>
+                    </div>
+                    {formData.business_description && formData.business_description.length < 150 && (
+                      <p className="text-sm text-red-600 dark:text-red-400 mt-1">
+                        Please provide at least 150 characters for optimal AI analysis and recommendations.
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label htmlFor="timezone" className="block text-sm font-medium text-primary-700 dark:text-primary-300 mb-1">
+                      Timezone
+                    </label>
+                    <select
+                      id="timezone"
+                      name="timezone"
+                      value={formData.timezone}
+                      onChange={handleChange}
                       className="input w-full"
-                      placeholder="Describe your business..."
-                    ></textarea>
+                      required
+                    >
+                      <option value={Intl.DateTimeFormat().resolvedOptions().timeZone}>
+                        {Intl.DateTimeFormat().resolvedOptions().timeZone} (Auto-detected)
+                      </option>
+                      <option value="America/New_York">Eastern Time (ET)</option>
+                      <option value="America/Chicago">Central Time (CT)</option>
+                      <option value="America/Denver">Mountain Time (MT)</option>
+                      <option value="America/Los_Angeles">Pacific Time (PT)</option>
+                      <option value="Europe/London">London (GMT)</option>
+                      <option value="Europe/Berlin">Berlin (CET)</option>
+                      <option value="Europe/Paris">Paris (CET)</option>
+                      <option value="Asia/Tokyo">Tokyo (JST)</option>
+                      <option value="Asia/Shanghai">Shanghai (CST)</option>
+                      <option value="Asia/Kolkata">Mumbai (IST)</option>
+                      <option value="Asia/Bangkok">Bangkok (ICT)</option>
+                      <option value="Asia/Singapore">Singapore (SGT)</option>
+                      <option value="Australia/Sydney">Sydney (AEDT)</option>
+                      <option value="Pacific/Auckland">Auckland (NZDT)</option>
+                    </select>
+                    <p className="text-sm text-primary-600 dark:text-primary-400 mt-1">
+                      This affects when you receive email notifications and scheduled reports.
+                    </p>
                   </div>
 
                   <div className="flex justify-end space-x-3">
@@ -216,9 +305,11 @@ const SettingsTab = ({ user, userProfile, onWorkflowComplete }) => {
                         setFormData({
                           email: user?.email || '',
                           business_description: userProfile?.business_description || '',
-                          full_name: userProfile?.full_name || ''
+                          full_name: userProfile?.full_name || '',
+                          timezone: userProfile?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone
                         });
                         setMessage({ text: '', type: '' });
+                        setBusinessDescriptionChanged(false); // Reset business description change tracking
                       }}
                       className="btn btn-outline"
                       disabled={loading}
@@ -258,6 +349,13 @@ const SettingsTab = ({ user, userProfile, onWorkflowComplete }) => {
                   <h4 className="text-sm font-medium text-primary-500 dark:text-primary-400">Business Description</h4>
                   <p className="text-primary-800 dark:text-primary-200 whitespace-pre-line">
                     {userProfile.business_description || 'Not set'}
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-medium text-primary-500 dark:text-primary-400">Timezone</h4>
+                  <p className="text-primary-800 dark:text-primary-200">
+                    {userProfile.timezone || 'Not set'}
                   </p>
                 </div>
               </div>
@@ -353,6 +451,49 @@ const SettingsTab = ({ user, userProfile, onWorkflowComplete }) => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      
+      {/* Business Description Change Modal */}
+      {showBusinessDescriptionModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-primary-900 p-6 rounded-xl shadow-xl max-w-md w-full m-4">
+            <div className="flex items-center mb-4">
+              <div className="flex-shrink-0 w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="ml-3 text-lg font-semibold text-primary-800 dark:text-primary-100">
+                Business Description Updated
+              </h3>
+            </div>
+            
+            <div className="space-y-4 text-primary-700 dark:text-primary-300">
+              <p>
+                <strong>Your business description has been saved successfully!</strong>
+              </p>
+              
+              <div className="bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg border-l-4 border-amber-500">
+                <p className="text-sm">
+                  <strong>Note:</strong> The updated description will be used in your next scheduled email analysis. We don't run a new analysis immediately to optimize system resources.
+                </p>
+              </div>
+              
+              <p className="text-sm">
+                Your next personalized trend report will be generated based on your updated business description and sent to your email according to your schedule.
+              </p>
+            </div>
+            
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => setShowBusinessDescriptionModal(false)}
+                className="btn btn-primary px-4 py-2"
+              >
+                Got it!
+              </button>
+            </div>
           </div>
         </div>
       )}
