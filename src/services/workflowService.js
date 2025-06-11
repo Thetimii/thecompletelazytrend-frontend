@@ -51,18 +51,27 @@ export const generateQueries = async (businessDescription) => {
 };
 
 /**
+ * Generate search queries (alias for CustomSearchTab)
+ * @param {string} businessDescription - Description of the business
+ * @returns {Promise<Object>} - Generated search queries
+ */
+export const generateSearchQueries = generateQueries;
+
+/**
  * Scrape TikTok videos
  * @param {string[]} searchQueries - Array of search queries
  * @param {string} userId - User ID
  * @param {number} videosPerQuery - Number of videos to fetch per query
+ * @param {Object} customParams - Custom search parameters (sorting, days, videosLocation)
  * @returns {Promise<Object>} - Scraped videos
  */
-export const scrapeTikTokVideos = async (searchQueries, userId, videosPerQuery = 5) => {
+export const scrapeTikTokVideos = async (searchQueries, userId, videosPerQuery = 5, customParams = {}) => {
   try {
     const response = await api.post(buildApiUrl('/scrape-tiktoks'), {
       searchQueries,
       userId,
-      videosPerQuery
+      videosPerQuery,
+      customParams
     });
 
     return response.data;

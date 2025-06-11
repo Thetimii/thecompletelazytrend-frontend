@@ -24,6 +24,7 @@ import {
 // Import components
 import Sidebar from '../components/Sidebar';
 import SummaryTab from '../components/dashboard/SummaryTab';
+import CustomSearchTab from '../components/dashboard/CustomSearchTab';
 import VideosTab from '../components/dashboard/VideosTab';
 import RecommendationsTab from '../components/dashboard/RecommendationsTab';
 import EmailScheduleTab from '../components/dashboard/EmailScheduleTab';
@@ -445,6 +446,10 @@ const Dashboard = () => {
                 onTabChange={setActiveTab}
                 onRefresh={() => fetchData(true)}
               />
+            )}
+
+            {activeTab === 'custom-search' && (
+              <CustomSearchTab />
             )}
 
             {activeTab === 'videos' && (
