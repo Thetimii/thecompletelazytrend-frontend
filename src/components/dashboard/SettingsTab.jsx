@@ -137,15 +137,16 @@ const SettingsTab = ({ user, userProfile, onWorkflowComplete }) => {
         if (emailError) throw emailError;
       }
 
-      // Update profile in database
+      // Update profile in database - preserve all existing profile data
       const updatedProfile = await saveUserProfile({
+        ...userProfile, // Keep all existing profile data first
+        id: userProfile.id,
         auth_id: user.id,
         email: formData.email,
         business_description: formData.business_description,
         full_name: formData.full_name,
         timezone: formData.timezone,
-        // Preserve other fields
-        ...userProfile,
+        updated_at: new Date().toISOString()
       });
 
       console.log('Updated profile:', updatedProfile); // Debug log
