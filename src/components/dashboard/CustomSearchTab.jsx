@@ -599,26 +599,65 @@ const CustomSearchTab = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {results.videos.map((video, index) => (
-              <div key={index} className="bg-white dark:bg-primary-800 p-4 rounded-lg border border-primary-100 dark:border-primary-700">
-                <h4 className="font-semibold text-primary-800 dark:text-primary-100 mb-2">
-                  {video.title || video.searchQuery}
-                </h4>
-                <p className="text-sm text-primary-600 dark:text-primary-400 mb-2">
-                  By: {video.author}
-                </p>
-                <div className="space-y-1 text-xs text-primary-500 dark:text-primary-500">
-                  <p>👀 {video.views?.toLocaleString()} views</p>
-                  <p>❤️ {video.likes?.toLocaleString()} likes</p>
-                  <p>🔄 {video.shares?.toLocaleString()} shares</p>
+              <div key={index} className="bg-white dark:bg-primary-800 rounded-lg border border-primary-100 dark:border-primary-700 overflow-hidden hover:shadow-lg transition-shadow">
+                {/* Thumbnail */}
+                {video.coverUrl && (
+                  <div className="relative h-48 bg-gray-100 dark:bg-gray-700">
+                    <img
+                      src={video.coverUrl}
+                      alt={video.title || 'TikTok video thumbnail'}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        // Fallback to TikTok placeholder if image fails to load
+                        e.target.src = 'https://lf16-tiktok-web.ttwstatic.com/obj/tiktok-web/tiktok/webapp/main/webapp-mobile/8152caf0c8e8bc67ae23.png';
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
+                      <div className="w-12 h-12 bg-white bg-opacity-90 rounded-full flex items-center justify-center">
+                        <svg className="w-6 h-6 text-gray-800" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                <div className="p-4">
+                  <h4 className="font-semibold text-primary-800 dark:text-primary-100 mb-2 line-clamp-2">
+                    {video.title || video.searchQuery}
+                  </h4>
+                  <p className="text-sm text-primary-600 dark:text-primary-400 mb-3">
+                    By: {video.author}
+                  </p>
+                  
+                  {/* Stats */}
+                  <div className="grid grid-cols-3 gap-2 text-xs text-primary-500 dark:text-primary-500 mb-3">
+                    <div className="text-center">
+                      <div className="font-semibold">👀</div>
+                      <div>{video.views?.toLocaleString()}</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="font-semibold">❤️</div>
+                      <div>{video.likes?.toLocaleString()}</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="font-semibold">🔄</div>
+                      <div>{video.shares?.toLocaleString()}</div>
+                    </div>
+                  </div>
+                  
+                  <a
+                    href={video.originalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center text-accent-500 hover:text-accent-600 text-sm font-medium transition-colors"
+                  >
+                    View on TikTok 
+                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
                 </div>
-                <a
-                  href={video.originalUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-accent-500 hover:text-accent-600 text-sm mt-2 block"
-                >
-                  View on TikTok →
-                </a>
               </div>
             ))}
           </div>
