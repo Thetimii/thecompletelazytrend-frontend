@@ -330,9 +330,16 @@ const CustomSearchTab = () => {
     }
 
     if (!userProfile?.business_description || userProfile.business_description.length < 150) {
+      console.log('Business description validation failed:', {
+        hasDescription: !!userProfile?.business_description,
+        length: userProfile?.business_description?.length || 0,
+        description: userProfile?.business_description
+      });
       setError('Please complete your business description in Settings (minimum 150 characters) before using custom search.');
       return;
     }
+
+    console.log('Starting custom search with business description:', userProfile.business_description);
 
     try {
       setLoading(true);
@@ -342,7 +349,11 @@ const CustomSearchTab = () => {
       // Step 1: Generate search queries based on business description
       console.log('Generating search queries...');
       const queriesResponse = await generateSearchQueries(userProfile.business_description);
-      const searchQueries = queriesResponse.searchQueries || [];
+      console.log('Queries response:', queriesResponse);
+      
+      // Extract queries from the nested response structure
+      const searchQueries = queriesResponse.data?.searchQueries || queriesResponse.searchQueries || [];
+      console.log('Extracted search queries:', searchQueries);
 
       if (searchQueries.length === 0) {
         throw new Error('No search queries generated');
@@ -357,6 +368,11 @@ const CustomSearchTab = () => {
       };
 
       const scrapingResponse = await scrapeTikTokVideos(searchQueries, user?.id, 5, customParams);
+      console.log('Scraping response:', scrapingResponse);
+      
+      // Extract videos from the nested response structure
+      const videos = scrapingResponse.data?.videos || scrapingResponse.videos || [];
+      console.log('Extracted videos:', videos);
 
       // Update last search time
       const now = Date.now();
@@ -365,11 +381,11 @@ const CustomSearchTab = () => {
 
       setResults({
         searchQueries,
-        videos: scrapingResponse.videos || [],
+        videos: videos,
         parameters: customParams
       });
 
-      toast.success(`Successfully found ${scrapingResponse.videos?.length || 0} trending videos!`);
+      toast.success(`Successfully found ${videos?.length || 0} trending videos!`);
 
     } catch (err) {
       console.error('Error in custom search:', err);
