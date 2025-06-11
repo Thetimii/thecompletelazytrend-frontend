@@ -64,6 +64,39 @@ const VideoCard = ({ video }) => {
   const comments = video.comments || video.comment_count || 0;
   const shares = video.shares || video.share_count || 0;
 
+  // Format upload date
+  const formatUploadDate = (uploadedAt) => {
+    if (!uploadedAt) return null;
+    
+    try {
+      // Handle different date formats from TikTok API
+      let date;
+      if (typeof uploadedAt === 'number') {
+        // Unix timestamp (seconds or milliseconds)
+        date = uploadedAt > 1000000000000 ? new Date(uploadedAt) : new Date(uploadedAt * 1000);
+      } else {
+        date = new Date(uploadedAt);
+      }
+      
+      if (isNaN(date.getTime())) return null;
+      
+      const now = new Date();
+      const diffInSeconds = Math.floor((now - date) / 1000);
+      
+      if (diffInSeconds < 60) return 'Just now';
+      if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+      if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+      if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)}d ago`;
+      if (diffInSeconds < 31536000) return `${Math.floor(diffInSeconds / 2592000)}mo ago`;
+      return `${Math.floor(diffInSeconds / 31536000)}y ago`;
+    } catch (error) {
+      console.warn('Error formatting upload date:', error);
+      return null;
+    }
+  };
+
+  const uploadDate = formatUploadDate(video.UPLOADED_AT || video.uploaded_at);
+
   return (
     <div
       className="glass-card overflow-hidden transition-all duration-500 hover:translate-y-[-8px] hover:shadow-xl group"
@@ -115,11 +148,21 @@ const VideoCard = ({ video }) => {
         {/* Animated particle effect */}
         <div className={`absolute -top-10 -right-10 w-20 h-20 rounded-full bg-gradient-to-br from-accent-300/20 to-transparent dark:from-accent-500/10 blur-xl transition-opacity duration-700 ${isHovered ? 'opacity-100' : 'opacity-0'}`}></div>
 
-        <div className="flex items-center mb-2 relative z-10">
-          <span className="bg-gradient-to-r from-accent-500 to-accent-600 text-white dark:from-accent-600 dark:to-accent-700 text-xs font-medium px-2.5 py-1 rounded shadow-sm">TikTok</span>
-          {hashtags && hashtags.length > 0 && (
-            <span className="ml-2 text-xs text-primary-500 dark:text-primary-400 truncate max-w-[200px]">
-              {typeof hashtags === 'string' ? hashtags : hashtags.slice(0, 3).join(', ')}
+        <div className="flex items-center justify-between mb-2 relative z-10">
+          <div className="flex items-center">
+            <span className="bg-gradient-to-r from-accent-500 to-accent-600 text-white dark:from-accent-600 dark:to-accent-700 text-xs font-medium px-2.5 py-1 rounded shadow-sm">TikTok</span>
+            {hashtags && hashtags.length > 0 && (
+              <span className="ml-2 text-xs text-primary-500 dark:text-primary-400 truncate max-w-[200px]">
+                {typeof hashtags === 'string' ? hashtags : hashtags.slice(0, 3).join(', ')}
+              </span>
+            )}
+          </div>
+          {uploadDate && (
+            <span className="text-xs text-primary-500 dark:text-primary-400 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {uploadDate}
             </span>
           )}
         </div>
