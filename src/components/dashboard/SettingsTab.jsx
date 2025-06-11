@@ -17,15 +17,30 @@ const SettingsTab = ({ user, userProfile, onWorkflowComplete }) => {
   const [showBusinessDescriptionModal, setShowBusinessDescriptionModal] = useState(false);
   const [businessDescriptionChanged, setBusinessDescriptionChanged] = useState(false);
 
-  // Update form data when userProfile changes
+  // Update form data when userProfile changes (but only when not editing)
   React.useEffect(() => {
-    setFormData({
-      email: user?.email || '',
-      business_description: userProfile?.business_description || '',
-      full_name: userProfile?.full_name || '',
-      timezone: userProfile?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone
-    });
-  }, [user, userProfile]);
+    if (!isEditing) {
+      setFormData({
+        email: user?.email || '',
+        business_description: userProfile?.business_description || '',
+        full_name: userProfile?.full_name || '',
+        timezone: userProfile?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone
+      });
+    }
+  }, [user, userProfile, isEditing]);
+
+  // Initialize form data when editing mode is enabled
+  React.useEffect(() => {
+    if (isEditing && userProfile) {
+      setFormData({
+        email: user?.email || '',
+        business_description: userProfile?.business_description || '',
+        full_name: userProfile?.full_name || '',
+        timezone: userProfile?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone
+      });
+    }
+  }, [isEditing]);
+
   const [feedbackData, setFeedbackData] = useState({
     subject: '',
     message: ''
