@@ -1,0 +1,35 @@
+{
+  "name": "The Complete Lazy Trend",
+  "short_name": "Lazy Trend",
+  "description": "TikTok Trend Analysis & Business Intelligence Platform",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3B82F6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/Favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/Favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/Favicon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["business", "productivity", "social", "analytics"],
+  "screenshots": [
+    {
+      "src": "/Favicon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

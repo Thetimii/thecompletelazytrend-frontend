@@ -92,19 +92,49 @@ const RecommendationsTab = ({ userProfile, onRefresh }) => {
 
   // Get formatted content ideas using our utility function
   const contentIdeas = React.useMemo(() => {
-    // First try to get from content_ideas field
+    // First try to get from content_ideas field if it's not empty
     if (recommendation?.content_ideas) {
-      return formatContentIdeas(recommendation.content_ideas);
+      const parsedContentIdeas = formatContentIdeas(recommendation.content_ideas);
+      if (parsedContentIdeas.length > 0) {
+        return parsedContentIdeas;
+      }
     }
     
-    // If not available, try to extract from combined_summary JSON
+    // If content_ideas is empty or doesn't exist, try to extract from combined_summary JSON
     try {
       const parsed = JSON.parse(recommendation?.combined_summary || '{}');
       if (parsed.contentThemes && Array.isArray(parsed.contentThemes)) {
-        return formatContentIdeas(parsed.contentThemes);
+        // Clean and filter the contentThemes array
+        const cleanedThemes = parsed.contentThemes
+          .filter(theme => theme && typeof theme === 'string')
+          .map(theme => theme.trim())
+          .filter(theme => 
+            theme.length > 3 && 
+            !theme.match(/^[*\-#+\d\.\s]*$/) && // Remove lines that are only formatting chars/numbers
+            !theme.includes('###') && // Remove section headers
+            !theme.includes('**#') && // Remove bold headers
+            theme !== '*' &&
+            theme !== '--' &&
+            !theme.match(/^\d+\.\s*$/) // Remove numbered list markers
+          )
+          .map(theme => {
+            // Clean up formatting artifacts
+            return theme
+              .replace(/^\*+\s*/, '') // Remove leading asterisks
+              .replace(/\*\*([^*]+)\*\*:?\s*/g, '$1: ') // Convert **text**: to text:
+              .replace(/^[\-\*\+]\s*/, '') // Remove leading dashes/asterisks
+              .replace(/^[\d\.]+\s*/, '') // Remove leading numbers
+              .replace(/^\s*["']/, '') // Remove leading quotes
+              .replace(/["']\s*$/, '') // Remove trailing quotes
+              .replace(/\s{2,}/g, ' ') // Normalize whitespace
+              .trim();
+          })
+          .filter(theme => theme.length > 10); // Only keep substantial content
+          
+        return formatContentIdeas(cleanedThemes);
       }
     } catch (e) {
-      // If parsing fails, return empty array
+      console.log('Error parsing combined_summary for content ideas:', e);
     }
     
     return [];
