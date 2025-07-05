@@ -21,7 +21,7 @@ User-agent: DuckDuckBot
 Allow: /
 
 # Sitemap location
-Sitemap: https://thecompletelazytrend.netlify.app/sitemap.xml
+Sitemap: https://www.lazy-trends.com/sitemap.xml
 
 # Crawl delay (optional - be respectful to server resources)
 Crawl-delay: 1
