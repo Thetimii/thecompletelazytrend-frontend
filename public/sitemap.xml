@@ -2,43 +2,89 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.lazy-trends.com/</loc>
-    <lastmod>2025-07-05</lastmod>
+    <lastmod>2025-07-07</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.lazy-trends.com/dashboard</loc>
-    <lastmod>2025-07-05</lastmod>
+    <lastmod>2025-07-07</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://www.lazy-trends.com/pricing</loc>
-    <lastmod>2025-07-05</lastmod>
+    <lastmod>2025-07-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Blog Pages -->
+  <url>
+    <loc>https://www.lazy-trends.com/blog-index.html</loc>
+    <lastmod>2025-07-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.lazy-trends.com/blog-social-media-trends-2025.html</loc>
+    <lastmod>2025-07-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.lazy-trends.com/blog-ai-machine-learning-social-media-2025.html</loc>
+    <lastmod>2025-07-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.lazy-trends.com/blog-social-commerce-revolution-2025.html</loc>
+    <lastmod>2025-07-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.lazy-trends.com/blog-top-tiktok-hashtags-2025.html</loc>
+    <lastmod>2025-07-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.lazy-trends.com/blog-short-form-video-content-trends-2025.html</loc>
+    <lastmod>2025-07-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.lazy-trends.com/blog-niche-social-media-platforms-2025.html</loc>
+    <lastmod>2025-07-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Other Pages -->
+  <url>
     <loc>https://www.lazy-trends.com/about</loc>
-    <lastmod>2025-07-05</lastmod>
+    <lastmod>2025-07-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://www.lazy-trends.com/contact</loc>
-    <lastmod>2025-07-05</lastmod>
+    <lastmod>2025-07-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.lazy-trends.com/privacy</loc>
-    <lastmod>2025-07-05</lastmod>
+    <lastmod>2025-07-07</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://www.lazy-trends.com/terms</loc>
-    <lastmod>2025-07-05</lastmod>
+    <lastmod>2025-07-07</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>

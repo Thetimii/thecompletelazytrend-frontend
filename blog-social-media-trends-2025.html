@@ -37,6 +37,66 @@
             background-color: #f8fafc;
         }
         
+        /* Top Navigation */
+        .top-nav {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+        
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+        }
+        
+        .brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3B82F6;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+        
+        .nav-links a {
+            color: #64748b;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: #3B82F6;
+        }
+        
+        /* Breadcrumb */
+        .breadcrumb {
+            margin-bottom: 20px;
+            padding: 10px 0;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+        
+        .breadcrumb a {
+            color: #3B82F6;
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .breadcrumb span {
+            color: #64748b;
+            font-weight: 500;
+        }
+        
         .container {
             max-width: 800px;
             margin: 0 auto;
@@ -160,6 +220,88 @@
             margin-top: 40px;
         }
         
+        .footer a {
+            color: #3B82F6;
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Blog Navigation Styles */
+        .blog-navigation {
+            margin: 40px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: 15px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .nav-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .nav-header h3 {
+            color: #1e293b;
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+        
+        .nav-header p {
+            color: #64748b;
+            font-size: 1rem;
+            margin-bottom: 0;
+        }
+        
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .nav-item {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .nav-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+            min-width: 50px;
+        }
+        
+        .nav-content h4 {
+            color: #1e293b;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .nav-content p {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-bottom: 0;
+            line-height: 1.4;
+        }
+        
         @media (max-width: 768px) {
             h1 {
                 font-size: 2rem;
@@ -169,11 +311,53 @@
                 margin: 10px;
                 padding: 15px;
             }
+            
+            .nav-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .nav-links {
+                gap: 15px;
+            }
+            
+            .nav-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .blog-navigation {
+                padding: 20px;
+                margin: 30px 0;
+            }
+            
+            .nav-link {
+                padding: 15px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Top Navigation -->
+        <nav class="top-nav">
+            <div class="nav-content">
+                <a href="https://www.lazy-trends.com" class="brand">LazyTrend</a>
+                <div class="nav-links">
+                    <a href="https://www.lazy-trends.com">Home</a>
+                    <a href="blog-index.html">Blog</a>
+                    <a href="https://www.lazy-trends.com/dashboard">Dashboard</a>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb">
+            <a href="https://www.lazy-trends.com">Home</a> › 
+            <a href="blog-index.html">Blog</a> › 
+            <span>Social Media Trends 2025</span>
+        </nav>
+        
         <header class="header">
             <h1>Top Social Media Trends 2025: The Complete Guide to the Future of Digital Marketing</h1>
             <div class="meta-info">
@@ -218,8 +402,78 @@
             </div>
         </article>
         
+        <!-- Blog Navigation -->
+        <nav class="blog-navigation">
+            <div class="nav-header">
+                <h3>🔗 Continue Reading</h3>
+                <p>Explore more insights on social media trends and digital marketing</p>
+            </div>
+            
+            <div class="nav-grid">
+                <div class="nav-item">
+                    <a href="blog-index.html" class="nav-link">
+                        <div class="nav-icon">📚</div>
+                        <div class="nav-content">
+                            <h4>All Blog Posts</h4>
+                            <p>Browse our complete collection of social media insights</p>
+                        </div>
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="blog-ai-machine-learning-social-media-2025.html" class="nav-link">
+                        <div class="nav-icon">🤖</div>
+                        <div class="nav-content">
+                            <h4>AI & Machine Learning</h4>
+                            <p>How AI is revolutionizing social media engagement</p>
+                        </div>
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="blog-social-commerce-revolution-2025.html" class="nav-link">
+                        <div class="nav-icon">🛒</div>
+                        <div class="nav-content">
+                            <h4>Social Commerce Revolution</h4>
+                            <p>The future of shopping on social platforms</p>
+                        </div>
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="blog-top-tiktok-hashtags-2025.html" class="nav-link">
+                        <div class="nav-icon">🎵</div>
+                        <div class="nav-content">
+                            <h4>Top TikTok Hashtags</h4>
+                            <p>Trending hashtags to boost your TikTok reach</p>
+                        </div>
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="blog-short-form-video-content-trends-2025.html" class="nav-link">
+                        <div class="nav-icon">📱</div>
+                        <div class="nav-content">
+                            <h4>Short-Form Video Trends</h4>
+                            <p>The evolution of quick-consumption content</p>
+                        </div>
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="blog-niche-social-media-platforms-2025.html" class="nav-link">
+                        <div class="nav-icon">🌟</div>
+                        <div class="nav-content">
+                            <h4>Niche Social Platforms</h4>
+                            <p>Emerging platforms reshaping social interaction</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </nav>
+        
         <footer class="footer">
-            <p>&copy; 2025 The Complete Lazy Trend. All rights reserved. | <a href="https://www.lazy-trends.com">Homepage</a> | <a href="https://www.lazy-trends.com/blog">More Blog Posts</a></p>
+            <p>&copy; 2025 The Complete Lazy Trend. All rights reserved. | <a href="https://www.lazy-trends.com">Homepage</a> | <a href="blog-index.html">Blog Index</a></p>
         </footer>
     </div>
 </body>
