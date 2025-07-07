@@ -20,8 +20,47 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Top Social Media Trends 2025: The Complete Guide">
     <meta name="twitter:description" content="Discover the top social media trends 2025 that will reshape digital marketing and user experiences.">
+    <meta name="twitter:image" content="https://www.lazy-trends.com/images/social-media-trends-2025.jpg">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/Favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/Favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/Favicon-32x32.png">
+    <link rel="apple-touch-icon" href="/Favicon.png">
     
     <link rel="canonical" href="https://www.lazy-trends.com/blog/social-media-trends-2025">
+    
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Top Social Media Trends 2025: The Complete Guide to the Future of Digital Marketing",
+        "description": "Discover the top social media trends 2025 that will reshape digital marketing. From AI personalization to AR/VR integration, learn what's coming next in social media.",
+        "image": "https://www.lazy-trends.com/images/social-media-trends-2025.jpg",
+        "author": {
+            "@type": "Organization",
+            "name": "The Complete Lazy Trend"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "The Complete Lazy Trend",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://www.lazy-trends.com/images/logo.png"
+            }
+        },
+        "datePublished": "2025-07-07",
+        "dateModified": "2025-07-07",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://www.lazy-trends.com/blog/social-media-trends-2025"
+        },
+        "keywords": ["social media trends 2025", "digital marketing trends", "AI social media", "AR VR social media", "social commerce", "personalized content"],
+        "articleSection": "Social Media Trends",
+        "wordCount": "800"
+    }
+    </script>
     
     <style>
         * {
@@ -302,6 +341,31 @@
             line-height: 1.4;
         }
         
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #3B82F6;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: none;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .back-to-top:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+        }
+        
         @media (max-width: 768px) {
             h1 {
                 font-size: 2rem;
@@ -472,9 +536,29 @@
             </div>
         </nav>
         
+        <!-- Back to Top Button -->
+        <button id="backToTop" class="back-to-top" onclick="scrollToTop()">↑</button>
+        
         <footer class="footer">
             <p>&copy; 2025 The Complete Lazy Trend. All rights reserved. | <a href="https://www.lazy-trends.com">Homepage</a> | <a href="blog-index.html">Blog Index</a></p>
         </footer>
     </div>
+    
+    <script>
+        // Back to top functionality
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Show/hide back to top button
+        window.addEventListener('scroll', function() {
+            const backToTop = document.getElementById('backToTop');
+            if (window.pageYOffset > 300) {
+                backToTop.style.display = 'block';
+            } else {
+                backToTop.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>
