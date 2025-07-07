@@ -1,0 +1,53 @@
+/* Tailwind CSS build for blog posts */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Blog-specific styles */
+.blog-post-container {
+  @apply max-w-4xl mx-auto px-4 py-8;
+}
+
+.blog-post-header {
+  @apply text-center mb-8;
+}
+
+.blog-post-title {
+  @apply text-4xl font-bold text-gray-900 mb-4;
+}
+
+.blog-post-meta {
+  @apply text-gray-600 text-sm mb-6;
+}
+
+.blog-post-content {
+  @apply prose prose-lg max-w-none;
+}
+
+.blog-navigation {
+  @apply mt-12 p-6 bg-gray-50 rounded-lg;
+}
+
+.nav-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
+}
+
+.nav-item {
+  @apply bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-4;
+}
+
+.nav-link {
+  @apply block text-decoration-none;
+}
+
+.nav-icon {
+  @apply text-2xl mb-2;
+}
+
+.nav-content h4 {
+  @apply font-semibold text-gray-900 mb-1;
+}
+
+.nav-content p {
+  @apply text-gray-600 text-sm;
+}

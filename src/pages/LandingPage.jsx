@@ -34,7 +34,7 @@ const LandingPage = () => {
             <a href="#features" className="text-primary-700 dark:text-primary-300 hover:text-accent-500 dark:hover:text-accent-400 transition-colors">Features</a>
             <a href="#how-it-works" className="text-primary-700 dark:text-primary-300 hover:text-accent-500 dark:hover:text-accent-400 transition-colors">How It Works</a>
             <a href="#pricing" className="text-primary-700 dark:text-primary-300 hover:text-accent-500 dark:hover:text-accent-400 transition-colors">Pricing</a>
-            <a href="/blog-index.html" className="text-primary-700 dark:text-primary-300 hover:text-accent-500 dark:hover:text-accent-400 transition-colors">Blog</a>
+            <a href="/blog" className="text-primary-700 dark:text-primary-300 hover:text-accent-500 dark:hover:text-accent-400 transition-colors">Blog</a>
             <a href="#faq" className="text-primary-700 dark:text-primary-300 hover:text-accent-500 dark:hover:text-accent-400 transition-colors">FAQ</a>
           </div>
           <div className="flex items-center space-x-4">

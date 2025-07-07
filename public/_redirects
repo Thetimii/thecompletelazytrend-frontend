@@ -1,1 +1,18 @@
+# Blog routes - serve static HTML files
+/blog-index.html    /blog-index.html    200
+/blog-social-media-trends-2025.html    /blog-social-media-trends-2025.html    200
+/blog-ai-machine-learning-social-media-2025.html    /blog-ai-machine-learning-social-media-2025.html    200
+/blog-social-commerce-revolution-2025.html    /blog-social-commerce-revolution-2025.html    200
+/blog-top-tiktok-hashtags-2025.html    /blog-top-tiktok-hashtags-2025.html    200
+/blog-short-form-video-content-trends-2025.html    /blog-short-form-video-content-trends-2025.html    200
+/blog-niche-social-media-platforms-2025.html    /blog-niche-social-media-platforms-2025.html    200
+
+# Blog shortcut routes
+/blog    /blog-index.html    200
+/blog/    /blog-index.html    200
+
+# API routes
+/api/*    https://thecompletelazytrend-backend.onrender.com/:splat    200
+
+# SPA fallback for all other routes
 /*    /index.html   200
